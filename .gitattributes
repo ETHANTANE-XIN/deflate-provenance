@@ -1,0 +1,17 @@
+# Normalise line endings so a mixed Windows/macOS/Linux team gets clean diffs.
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.json  text eol=lf
+*.html  text eol=lf
+*.svg   text eol=lf
+
+# Binary / generated artefacts should never be line-ending converted.
+*.png   binary
+*.gz    binary
+*.zip   binary
+*.docx  binary
+*.pdf   binary
+*.deflate binary

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+reports/
+*.json
+!package.json
+dfp_model.json
+model*.json
+stego.deflate
+.pytest_cache/

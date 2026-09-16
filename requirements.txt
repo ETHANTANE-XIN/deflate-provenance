@@ -1,0 +1,6 @@
+# dfp runtime dependency (CPU-only, pure Python otherwise)
+numpy>=1.24
+
+# Optional external encoders are detected on PATH at runtime, not pip-installed:
+#   Java (javac/java), .NET (dotnet), Node.js (node), libarchive (bsdtar/tar).
+# CPython zlib and the built-in pure-Python encoder need nothing extra.
