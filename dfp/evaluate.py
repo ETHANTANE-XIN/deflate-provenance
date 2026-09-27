@@ -129,10 +129,18 @@ def size_band_metrics(rows: list[dict], preds, target: float = 0.9) -> dict:
             "accuracy_on_answered": (sum(1 for r, p in ans if p.label in r["profiles"]) / len(ans)
                                      if ans else 0.0),
         })
+    # same rule as the classifier's minimum-evidence threshold: the lowest band
+    # that meets the target on its own, with all larger streams together
+    # meeting it too
     reliable = None
-    for i, b in enumerate(bands):
-        judged = [x for x in bands[i:] if x["n"] >= 20]
-        if judged and all(x["accuracy_on_answered"] >= target for x in judged):
+    for b in bands:
+        if b["n"] < 20:
+            continue
+        above = [(r, p) for r, p in zip(rows, preds)
+                 if r["compressed_size"] >= b["lo"] and not p.abstained]
+        pooled = (sum(1 for r, p in above if p.label in r["profiles"]) / len(above)
+                  if above else 0.0)
+        if b["accuracy_on_answered"] >= target and pooled >= target:
             reliable = b["lo"]
             break
     return {"bands": bands, "reliability_target": target,

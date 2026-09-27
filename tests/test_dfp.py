@@ -577,6 +577,23 @@ class TestCovertExtension(unittest.TestCase):
                             .suspicious)
 
 
+class TestMinimumEvidence(unittest.TestCase):
+    def test_dip_in_large_band_does_not_raise_the_minimum(self):
+        from dfp.ml import ProvenanceClassifier
+
+        clf = ProvenanceClassifier()
+        sizes, correct = [], []
+        # small streams unreliable, mid sizes reliable, largest band dips to 85%
+        for size, acc in [(100, 0.7), (500, 0.97), (2000, 0.95), (8000, 1.0),
+                          (30000, 0.99), (90000, 0.85)]:
+            n = 40
+            k = int(round(acc * n))
+            sizes += [size] * n
+            correct += [True] * k + [False] * (n - k)
+        got = clf._reliable_size(np.array(sizes), np.array(correct))
+        self.assertEqual(got, 256)
+
+
 class TestEvaluationHelpers(unittest.TestCase):
     def test_size_bands_and_reliability(self):
         from dfp.evaluate import size_band_metrics
