@@ -14,8 +14,17 @@ Groups
 ``dis_``   match-distance distribution over the 30 distance codes
 ``str_``   stream-level artefacts: padding bits, density, block cadence
 
+Those groups are *statistical* features: they describe the stream as a whole.
+The *decision* features (``dec_`` and ``huf_``, see :mod:`dfp.decisions`)
+compare each choice the encoder made with the alternatives that were
+available -- longest match, deferred (lazy) matches, block boundaries and
+block type, distance from the optimal Huffman table -- which the proposal
+expects to depend on the encoder much more than on the content.
+
 The vector is fixed-length and ordered; :data:`FEATURE_NAMES` is the canonical
-order and is what a trained model stores alongside its parameters.
+order and is what a trained model stores alongside its parameters.  Always
+obtain features through :func:`stream_features` (or parse with
+``keep_tokens=True``), because the decision features need the token sequence.
 """
 
 from __future__ import annotations
@@ -23,11 +32,13 @@ from __future__ import annotations
 import math
 from statistics import median
 
+from .decisions import DECISION_FEATURE_NAMES, extract_decision_features
 from .deflate import (
     BTYPE_DYNAMIC,
     BTYPE_STATIC,
     BTYPE_STORED,
     StreamRecord,
+    parse_stream,
 )
 
 #: zlib emits stored blocks of exactly this size when level=0
@@ -267,6 +278,9 @@ def extract_features(record: StreamRecord) -> dict[str, float]:
     f["str_ratio"] = _safe(record.compressed_bytes, out_size)
     f["str_truncated"] = float(record.truncated)
     f["str_has_error"] = float(record.error is not None)
+
+    # -- H. decision features ------------------------------------------------
+    f.update(extract_decision_features(record))
     return f
 
 
@@ -287,3 +301,23 @@ def features_to_vector(features: dict[str, float]) -> list[float]:
 
 def vector_from_record(record: StreamRecord) -> list[float]:
     return features_to_vector(extract_features(record))
+
+
+def stream_features(
+    payload: bytes, start_bit: int = 0
+) -> tuple[StreamRecord, dict[str, float]]:
+    """Parse one raw DEFLATE stream and compute its full feature dictionary.
+
+    This is the single entry point used by the corpus builder, the analyser
+    and the adversarial tests, so training and analysis always see features
+    computed the same way (tokens kept for the decision features).
+    """
+    record = parse_stream(payload, start_bit=start_bit, keep_tokens=True, strict=False)
+    features = extract_features(record)
+    # tokens are only needed for the decision features; drop them to save memory
+    for block in record.blocks:
+        block.tokens = None
+    return record, features
+
+
+assert all(name in FEATURE_NAMES for name in DECISION_FEATURE_NAMES)

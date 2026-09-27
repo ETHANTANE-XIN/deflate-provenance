@@ -1,6 +1,18 @@
-# dfp runtime dependency (CPU-only, pure Python otherwise)
+# DeflateProvenance runtime dependency
 numpy>=1.24
 
-# Optional external encoders are detected on PATH at runtime, not pip-installed:
-#   Java (javac/java), .NET (dotnet), Node.js (node), libarchive (bsdtar/tar).
-# CPython zlib and the built-in pure-Python encoder need nothing extra.
+# Bindings to the real C encoders used as reference profiles.  They are pinned
+# because the version is part of each profile ("zlib-ng 2.2.5 at level 6");
+# change them only together with a corpus rebuild.
+zlib-ng==1.0.0        # zlib-ng 2.2.5
+deflate==0.9.0        # libdeflate
+zopfli==0.4.3         # zopfli
+
+# Optional: `dfp evaluate --python-docx N` generates python-docx documents
+python-docx==1.2.0
+
+# Other encoders are external programs detected on PATH at run time (see the
+# Dockerfile for the exact versions): Java (javac/java), Node.js (node), Go (go),
+# .NET SDK (dotnet), 7-Zip (7z/7zz), libarchive (bsdtar), LibreOffice (soffice).
+# The preflate-rs baseline is built with:
+#   cargo build --release --manifest-path tools/preflate-estimate/Cargo.toml

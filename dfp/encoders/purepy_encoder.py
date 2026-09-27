@@ -232,7 +232,13 @@ class Token:
 
 
 class PurePyEncoder(Encoder):
-    family = "purepy"
+    name = "purepy"
+    library = "purepy"
+    reference = True
+    #: written by the team, so it is not a real-world profile: it is used as an
+    #: extra never-trained encoder in the unknown-encoder test and as the host
+    #: of the covert-channel extension, never as a training class
+    synthetic = True
 
     def __init__(self, block_span: int = 32768, max_chain: int = 128) -> None:
         self.block_span = block_span
@@ -241,8 +247,13 @@ class PurePyEncoder(Encoder):
     def available(self) -> bool:
         return True
 
-    def levels(self) -> list[str]:
+    def settings(self) -> list[str]:
         return ["greedy", "lazy"]
+
+    def version(self) -> str:
+        from .. import __version__
+
+        return f"dfp purepy {__version__}"
 
     # -- match finding ------------------------------------------------------
     def _find_match(
@@ -399,8 +410,8 @@ class PurePyEncoder(Encoder):
                 writer.write_code(lit_codes[tok.literal], lit_lengths[tok.literal])
         writer.write_code(lit_codes[256], lit_lengths[256])
 
-    def compress(self, data: bytes, level: str, steer=None) -> EncoderResult:
-        lazy = level != "greedy"
+    def compress(self, data: bytes, setting: str, steer=None) -> EncoderResult:
+        lazy = setting != "greedy"
         tokens = self._tokenize(data, lazy=lazy, steer=steer)
         writer = BitWriter()
         if not tokens:
@@ -412,13 +423,7 @@ class PurePyEncoder(Encoder):
             for i, block in enumerate(blocks):
                 self._emit_block(writer, block, is_final=(i == len(blocks) - 1))
         raw = writer.finish()
-        return EncoderResult(
-            raw_deflate=raw,
-            family=self.family,
-            level=level,
-            label=self.label(level),
-            extra={"lazy": lazy, "block_span": self.block_span},
-        )
+        return self.result(raw, setting, lazy=lazy, block_span=self.block_span)
 
     def _split_blocks(self, tokens: list[Token]) -> list[list[Token]]:
         blocks: list[list[Token]] = []
