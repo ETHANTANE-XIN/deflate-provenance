@@ -93,7 +93,7 @@ class Huffman:
     to, so decoding walks one bit at a time with no decode table to build.
     """
 
-    __slots__ = ("counts", "symbols", "lengths", "max_length", "used")
+    __slots__ = ("counts", "symbols", "lengths", "max_length", "used", "_table")
 
     def __init__(self, lengths: list[int]) -> None:
         self.lengths = lengths
@@ -122,6 +122,40 @@ class Huffman:
                 symbols[offsets[length]] = symbol
                 offsets[length] += 1
         self.symbols = symbols
+        self._table: list[int] | None = None
+
+    def table(self) -> list[int]:
+        """Lookup table indexed by the next ``max_length`` stream bits.
+
+        DEFLATE stores Huffman codes MSB-first inside an LSB-first bit stream,
+        so each code is bit-reversed and replicated across every table slot
+        whose low bits match it.  An entry packs ``symbol << 4 | length``;
+        ``-1`` marks a bit pattern that no code covers (legal only in the
+        incomplete single-code case, and an error if the stream uses it).
+        """
+        if self._table is None:
+            size = 1 << self.max_length if self.max_length else 1
+            table = [-1] * size
+            code = 0
+            next_code = [0] * 16
+            for length in range(1, 16):
+                prev = self.counts[length - 1] if length > 1 else 0
+                code = (code + prev) << 1
+                next_code[length] = code
+            for symbol, length in enumerate(self.lengths):
+                if not length:
+                    continue
+                c = next_code[length]
+                next_code[length] += 1
+                rev = 0
+                for _ in range(length):
+                    rev = (rev << 1) | (c & 1)
+                    c >>= 1
+                entry = (symbol << 4) | length
+                for k in range(rev, size, 1 << length):
+                    table[k] = entry
+            self._table = table
+        return self._table
 
     @property
     def incomplete(self) -> bool:
@@ -147,6 +181,20 @@ class Huffman:
     def code_length_histogram(self) -> list[int]:
         """Counts of codes at each length 1..15 -- the tree's shape."""
         return list(self.counts[1:16])
+
+
+_STATIC_CACHE: tuple[Huffman, Huffman] | None = None
+
+
+def _static_tables() -> tuple[Huffman, Huffman]:
+    """The fixed Huffman tables of RFC 1951 3.2.6, built once."""
+    global _STATIC_CACHE
+    if _STATIC_CACHE is None:
+        _STATIC_CACHE = (
+            Huffman(STATIC_LITERAL_LENGTHS),
+            Huffman(STATIC_DISTANCE_LENGTHS),
+        )
+    return _STATIC_CACHE
 
 
 # --- records ---------------------------------------------------------------
@@ -189,6 +237,7 @@ class BlockRecord:
     n_literals: int = 0
     n_matches: int = 0
     out_size: int = 0
+    literal_hist: list[int] = field(default_factory=lambda: [0] * 256)
     length_code_hist: list[int] = field(default_factory=lambda: [0] * 29)
     dist_code_hist: list[int] = field(default_factory=lambda: [0] * 30)
     match_len_sum: int = 0
@@ -402,79 +451,133 @@ def _decode_block_body(
     out: bytearray,
     keep_tokens: bool,
 ) -> None:
-    """Decode tokens until end-of-block, updating stats and the output window."""
+    """Decode tokens until end-of-block, updating stats and the output window.
+
+    This is the hot loop, so it works on a local bit position and table-driven
+    Huffman lookups instead of calling :class:`BitReader` per bit.  The reader
+    is re-synchronised to the final position before returning.
+    """
     from math import log2
 
+    data = reader._data
+    total_bits = len(data) * 8
+    pos = reader.bit_pos
+    lit_tab = literal_table.table()
+    lit_bits = literal_table.max_length
+    lit_mask = (1 << lit_bits) - 1
+    dist_tab = distance_table.table() if distance_table.max_length else [-1]
+    dist_bits = distance_table.max_length
+    dist_mask = (1 << dist_bits) - 1
+    from_bytes = int.from_bytes
+
     tokens: list[tuple[int, int]] | None = [] if keep_tokens else None
+    lit_hist = block.literal_hist
     literal_run = 0
     prev_was_match = False
     len_hist = block.length_code_hist
     dist_hist = block.dist_code_hist
     min_len = 0
+    n_literals = 0
 
-    while True:
-        symbol = literal_table.decode(reader)
-        if symbol < 256:
-            out.append(symbol)
-            block.n_literals += 1
-            literal_run += 1
-            prev_was_match = False
+    def peek(at: int) -> int:
+        byte = at >> 3
+        return from_bytes(data[byte : byte + 4], "little") >> (at & 7)
+
+    try:
+        while True:
+            entry = lit_tab[peek(pos) & lit_mask]
+            if entry < 0:
+                raise DeflateError("invalid literal/length Huffman code")
+            pos += entry & 15
+            if pos > total_bits:
+                raise BitStreamError("end of bitstream while decoding a symbol")
+            symbol = entry >> 4
+            if symbol < 256:
+                out.append(symbol)
+                lit_hist[symbol] += 1
+                n_literals += 1
+                literal_run += 1
+                prev_was_match = False
+                if tokens is not None:
+                    tokens.append((symbol, -1))
+                continue
+            if symbol == END_OF_BLOCK:
+                break
+            # a match
+            length_index = symbol - 257
+            if length_index >= 29:
+                raise DeflateError(f"illegal length symbol {symbol}")
+            extra = LENGTH_EXTRA[length_index]
+            length = LENGTH_BASE[length_index]
+            if extra:
+                length += peek(pos) & ((1 << extra) - 1)
+                pos += extra
+            if not dist_bits:
+                raise DeflateError("match in a block with no distance codes")
+            entry = dist_tab[peek(pos) & dist_mask]
+            if entry < 0:
+                raise DeflateError("invalid distance Huffman code")
+            pos += entry & 15
+            dist_symbol = entry >> 4
+            if dist_symbol >= 30:
+                raise DeflateError(f"illegal distance symbol {dist_symbol}")
+            extra = DIST_EXTRA[dist_symbol]
+            distance = DIST_BASE[dist_symbol]
+            if extra:
+                distance += peek(pos) & ((1 << extra) - 1)
+                pos += extra
+            if pos > total_bits:
+                raise BitStreamError("end of bitstream inside a match")
+            if distance > len(out):
+                raise DeflateError(
+                    f"distance {distance} exceeds {len(out)} bytes of history"
+                )
+            # LZ77 copy, overlapping-safe
+            start = len(out) - distance
+            if distance >= length:
+                out += out[start : start + length]
+            else:
+                reps = -(-length // distance)
+                out += (out[start:] * reps)[:length]
+
+            block.n_matches += 1
+            len_hist[length_index] += 1
+            dist_hist[dist_symbol] += 1
+            block.match_len_sum += length
+            if length == MIN_MATCH:
+                block.len3_count += 1
+            elif length == MAX_MATCH:
+                block.len258_count += 1
+            if distance == 1:
+                block.dist1_count += 1
+            if distance > block.dist_max:
+                block.dist_max = distance
+            if min_len == 0 or length < min_len:
+                min_len = length
+            if length > block.match_len_max:
+                block.match_len_max = length
+            block.log2dist_sum += log2(distance)
+            if literal_run:
+                block.literal_runs += 1
+                block.literal_run_len_sum += literal_run
+                if literal_run == 1:
+                    block.run1_literal_runs += 1
+                if literal_run > block.literal_run_len_max:
+                    block.literal_run_len_max = literal_run
+                literal_run = 0
+            elif prev_was_match:
+                block.match_after_match += 1
+            prev_was_match = True
             if tokens is not None:
-                tokens.append((symbol, -1))
-            continue
-        if symbol == END_OF_BLOCK:
-            break
-        # a match
-        length_index = symbol - 257
-        if length_index >= 29:
-            raise DeflateError(f"illegal length symbol {symbol}")
-        length = LENGTH_BASE[length_index] + reader.read_bits(LENGTH_EXTRA[length_index])
-        dist_symbol = distance_table.decode(reader)
-        if dist_symbol >= 30:
-            raise DeflateError(f"illegal distance symbol {dist_symbol}")
-        distance = DIST_BASE[dist_symbol] + reader.read_bits(DIST_EXTRA[dist_symbol])
-        if distance > len(out):
-            raise DeflateError(
-                f"distance {distance} exceeds {len(out)} bytes of history"
-            )
-        # LZ77 copy, overlapping-safe
-        start = len(out) - distance
-        if distance >= length:
-            out += out[start : start + length]
+                tokens.append((length, distance))
+    finally:
+        block.n_literals += n_literals
+        if pos > total_bits:
+            reader.seek_bit(total_bits)
         else:
-            for i in range(length):
-                out.append(out[start + i])
-
-        block.n_matches += 1
-        len_hist[length_index] += 1
-        dist_hist[dist_symbol] += 1
-        block.match_len_sum += length
-        if length == MIN_MATCH:
-            block.len3_count += 1
-        elif length == MAX_MATCH:
-            block.len258_count += 1
-        if distance == 1:
-            block.dist1_count += 1
-        if distance > block.dist_max:
-            block.dist_max = distance
-        if min_len == 0 or length < min_len:
-            min_len = length
-        if length > block.match_len_max:
-            block.match_len_max = length
-        block.log2dist_sum += log2(distance)
-        if literal_run:
-            block.literal_runs += 1
-            block.literal_run_len_sum += literal_run
-            if literal_run == 1:
-                block.run1_literal_runs += 1
-            if literal_run > block.literal_run_len_max:
-                block.literal_run_len_max = literal_run
-            literal_run = 0
-        elif prev_was_match:
-            block.match_after_match += 1
-        prev_was_match = True
-        if tokens is not None:
-            tokens.append((length, distance))
+            reader.seek_bit(pos)
+    if pos > total_bits:
+        raise BitStreamError("end of bitstream while decoding a block")
 
     if literal_run:
         block.literal_runs += 1
@@ -551,8 +654,7 @@ def inflate(
                 out += reader.read_aligned_bytes(length)
                 block.n_literals = length
             elif btype == BTYPE_STATIC:
-                literal_table = Huffman(STATIC_LITERAL_LENGTHS)
-                distance_table = Huffman(STATIC_DISTANCE_LENGTHS)
+                literal_table, distance_table = _static_tables()
                 block.literal_tree_shape = literal_table.code_length_histogram()
                 block.distance_tree_shape = distance_table.code_length_histogram()
                 _decode_block_body(

@@ -1,0 +1,13 @@
+[package]
+name = "preflate-estimate"
+version = "0.1.0"
+edition = "2021"
+description = "Prints preflate-rs's parameter estimate for raw DEFLATE streams (dfp baseline)"
+publish = false
+
+[dependencies]
+# pinned to the version cited in the project proposal
+preflate-rs = "=0.7.6"
+
+[profile.release]
+opt-level = 3

@@ -1,241 +1,320 @@
-# dfp — DEFLATE Compression-Provenance Toolkit
+# DeflateProvenance (`dfp`)
 
-**A digital-forensics tool that attributes a compressed file to the encoder
-implementation that produced it, by reading the raw DEFLATE bitstream — not the
-container metadata.**
+**A digital forensics tool that reads the DEFLATE bitstream inside ZIP, GZIP,
+DOCX, XLSX, PPTX, APK and JAR files and estimates which known compressor
+profile produced it.** It reports a calibrated confidence or "unknown
+encoder", checks whether an archive's entries agree with each other and with
+the producer the file claims, and explains which features drove each decision.
 
-ICT3215 Digital Forensics project. Side chosen: **defensive** (a forensic
-attribution tool) **plus** a responsible anti-forensics component (an
-output-preserving covert channel and its detector).
-
----
-
-## 1. What it does and why it matters
-
-Files as different as ZIP archives, Word `.docx`, Android `.apk`, Java `.jar`,
-EPUB, **PDF**, PNG and GZIP all compress their contents with the same algorithm,
-**DEFLATE** (RFC 1951). DEFLATE leaves the *encoder* many free choices — block
-types and split points, Huffman tree shapes, the code-length alphabet, greedy
-vs lazy matching, search depth. Different implementations (zlib, libdeflate,
-Java, .NET, Go, Info-ZIP, 7-Zip, …) make **different** choices for the *same*
-input, and none of those choices is recorded anywhere in the file.
-
-Existing provenance work fingerprints the **container metadata** — timestamps,
-filenames, ZIP headers, host-system bytes. All of that is editable in seconds.
-`dfp` fingerprints the **compressed bitstream itself**, which an adversary
-cannot forge without re-running the original encoder byte-for-byte.
-
-Forensic uses:
-
-* a `.docx` that claims to be Microsoft Word but whose streams were compressed
-  by a different toolchain → a **rebuilt / backdated document**;
-* an `.apk` rebuilt by a repackaging tool rather than the original build →
-  **repackaging**;
-* an evidence archive silently recompressed after seizure → a **chain-of-custody
-  break**.
+ICT3215 Digital Forensics project. The design follows the team's project
+proposal; the table in section 2 maps every proposal requirement to the code
+that implements it.
 
 ---
 
-## 2. Install
+## 1. What it does
 
-Pure Python, CPU-only, standard library **plus NumPy**. No scikit-learn, no
-matplotlib, no native build.
+A **profile** is a compressor implementation, version and setting, such as
+"zlib 1.3 at level 6". DEFLATE (RFC 1951) lets each compressor choose its own
+matches, block boundaries and Huffman codes, so different implementations
+compress the same content into different bytes. `dfp` parses those bytes with
+its own bit-level decoder, extracts statistical and *decision* features, and
+compares them with reference profiles built from files it compressed itself.
 
-```
-python -m pip install numpy
-```
+For an archive it then asks the examiner's questions:
 
-Optional external encoders enrich the training corpus if present on `PATH`
-(the tool auto-detects them and simply omits any that are missing):
-**Java** (`javac`/`java`), **.NET** (`dotnet`), **Node.js** (`node`),
-**libarchive** (`bsdtar`/`tar`). CPython's `zlib` and the built-in pure-Python
-encoder are always available.
+* Which known profile do the compressed streams match, and how confidently?
+* Is the stream too small to say ("insufficient evidence"), or unlike every
+  known profile ("unknown encoder")?
+* Do all entries come from the same encoder, or was the archive rebuilt or
+  partly edited?
+* Does the stream evidence agree with the producer the container claims
+  (`docProps/app.xml`, ODF `meta.xml`, a JAR manifest) and with the ZIP
+  compression-option bits that producer writes?
 
-Run from the project root (the folder containing this file):
+The motivating case from the proposal works end to end: a DOCX whose
+`docProps/app.xml` names Microsoft Word, but whose parts are exact zlib
+output, is flagged three ways (profile excluded for Word, option bits
+"normal" instead of Word's "super fast", entries exactly reproduced by zlib).
+python-docx really produces such files: it writes "Microsoft Macintosh Word"
+while compressing with zlib.
 
-```
-python -m dfp --help
-```
+The report states what the tool does **not** claim: it does not prove
+tampering or authorship, and because DEFLATE is lossless it cannot see an
+encoder that was used before the last recompression. It reports whether the
+current compressed data is consistent with the claimed origin.
 
 ---
 
-## 3. Quick start
+## 2. Proposal alignment
+
+| Proposal requirement | Where it is implemented |
+|---|---|
+| Accept ZIP, GZIP, DOCX, XLSX, PPTX, APK, JAR; locate every stream | `dfp/containers.py` |
+| Own bit-level DEFLATE parser, not zlib | `dfp/deflate.py`, `dfp/bitreader.py` (zlib is only a test oracle) |
+| Record block types and boundaries, code lengths and their header encoding, every literal and match, final padding | `dfp/deflate.py` (`BlockRecord`, `StreamRecord`) |
+| Statistical features | `dfp/features.py` (182 features) |
+| Decision features: longest match taken, lazy deferral, block boundaries, distance from the optimal Huffman table | `dfp/decisions.py` (27 features), `dfp/huffman.py` (exact package-merge) |
+| Random Forest; per-prediction feature contributions | `dfp/ml/forest.py` (decision-path contributions that sum exactly to the prediction) |
+| Confidence calibrated on held-out data | `dfp/ml/classifier.py`: a fifth of the training *source files* is held out; temperature fitted there |
+| "Unknown encoder" when confidence is below a threshold or the sample is farther than a set distance from every profile | `dfp/ml/classifier.py`; both thresholds are set on the held-out source files |
+| Programs sharing a library share a profile (Java on zlib) | `dfp/corpus.py` verifies byte-identical output before merging; rates are in the manifest |
+| Identical outputs labelled with the whole set; any member counts as correct | `dfp/corpus.py` (label sets), `dfp/evaluate.py` (set-aware scoring) |
+| Archive vote weighted by compressed size; stored or small entries are "insufficient evidence" | `dfp/aggregate.py` (minimum size measured on held-out data) |
+| Flag a profile that contradicts the claimed producer or its ZIP option bits | `dfp/producers.py` (producer table), `dfp/aggregate.py` |
+| Flag entries made by different encoders | `dfp/aggregate.py` (names the odd entries) |
+| Report: profile, confidence, main features, inconsistencies | `dfp/report.py` (HTML + JSON) |
+| Five components | (1) `containers.py`, `deflate.py`; (2) `features.py`, `decisions.py`; (3) `ml/`, `aggregate.py`, `producers.py`, `report.py`; (4) `corpus.py`, `encoders/`, `realfiles.py`; (5) `baselines.py`, `zipwriter.py`, `adversarial.py`, `evaluate.py` |
+| Profiles: zlib 1-9 (Python and Java), zlib-ng (.NET 9+), Chromium's zlib (Node.js), libdeflate, zopfli, 7-Zip, Go | `dfp/encoders/` (plus .NET 8 and libarchive, both verified to share the zlib profile) |
+| Exact versions recorded; pinned container image | corpus `manifest.json`; `requirements.txt`; `Dockerfile` |
+| Applications such as Word profiled from saved documents, half kept for testing; producer table | `dfp app` (`dfp/realfiles.py`), `dfp/producers.py` |
+| Split by source file | `dfp/evaluate.py` (`split_sources`; the report prints the overlap check) |
+| Second test set from a different corpus (e.g. Govdocs1) and real application files | `dfp evaluate --second-sources`, `--real`, `--libreoffice`, `--python-docx`; `scripts/fetch_govdocs1.py` |
+| Accuracy, precision, recall, macro-F1, confusion matrices per profile and size band; accuracy against compressed size | `dfp/evaluate.py`, `dfp/report.py` |
+| Whole encoders left out of training (rejection vs misattribution) | `dfp/evaluate.py` (`leave_one_encoder_out`) |
+| False-alarm rate; one part edited by a Python script | `dfp/realfiles.py`, `dfp/evaluate.py` |
+| Baselines: preflate-rs estimate, brute-force zlib re-encoding, container metadata alone | `dfp/baselines.py`, `tools/preflate-estimate/` (preflate-rs 0.7.6) |
+| Claimed producer rewritten to a false value | `dfp/zipwriter.py` (`impersonate`), `dfp/evaluate.py` |
+
+---
+
+## 3. Install
+
+Python 3.10 or later (tested on 3.11) and the pinned bindings to the real C
+encoders:
+
+```
+python -m pip install -r requirements.txt
+```
+
+External encoders are detected on `PATH` and used when present (the exact
+versions behind the published results are in the `Dockerfile`): Java
+(`javac`, `java`), Node.js, Go, .NET SDK, 7-Zip (`7z`), libarchive
+(`bsdtar`), and LibreOffice (`soffice`) for real-file samples. Check what
+this machine has with `python -m dfp encoders`.
+
+The preflate-rs baseline is a small Rust wrapper (needs crates.io access):
+
+```
+cargo build --release --manifest-path tools/preflate-estimate/Cargo.toml
+```
+
+Or build the whole pinned environment: `docker build -t dfp .` (see the note
+at the top of the `Dockerfile`).
+
+---
+
+## 4. Quick start
 
 ```bash
-# 1. Train a model (builds a corpus by compressing generated files with every
-#    available encoder, then trains a random forest). Default scheme = coarse.
-python -m dfp train -o model.json
+# 1. Build the reference corpus (every source x every encoder and setting).
+#    --sources adds real files as extra sources.
+python -m dfp corpus -o corpus --sources /usr/share/doc
 
-# 2. Attribute a file and write a court-ready report
+# 2. (When available) add documents saved by an application, e.g. Word.
+#    Half of the files train, half are held out for testing.
+python -m dfp app corpus word_saved_docs/ --name word --description "Word 365, Windows"
+
+# 3. Train, then examine a file
+python -m dfp train --corpus corpus -o model.json
 python -m dfp analyse suspicious.docx -m model.json -o reports/
 
-# 3. Reproduce all evaluation figures (confusion matrix, minimum-evidence
-#    curve, open-set, feature importance) as a self-contained HTML report
-python -m dfp evaluate -o reports/
+# 4. The proposal's full evaluation (HTML + JSON report)
+python -m dfp evaluate --corpus corpus -o reports/ \
+    --second-sources govdocs1_sample/ --real real_docs/ --libreoffice 10 --python-docx 20
 
-# 4. Run the case studies (forged document, repackaging, metadata robustness,
-#    covert channel)
-python -m dfp.demo
+# 5. Case studies
+python -m dfp.demo --model model.json
 ```
 
----
-
-## 4. Supported input formats
-
-Verified by `tests/` and by direct probing. **DEFLATE is what the tool reads**, so
-a file works if its compression method is DEFLATE.
-
-| Input | Detected as | Works |
-|---|---|---|
-| `.zip` | `zip` | ✅ |
-| `.docx` `.xlsx` `.pptx` `.docm` | `ooxml` | ✅ |
-| `.apk` | `apk` | ✅ |
-| `.jar` `.aar` | `jar` | ✅ |
-| `.epub` | `epub` | ✅ |
-| `.odt` `.ods` `.odp` | `odf` | ✅ |
-| `.pdf` (`/FlateDecode` streams) | `pdf` | ✅ |
-| `.gz` `.tgz` | `gzip` | ✅ |
-| zlib stream (`.zz`) | `zlib` | ✅ |
-| `.png` (IDAT) | `png` | ✅ |
-| headerless raw DEFLATE | `raw` | ✅ |
-
-**Not DEFLATE, so out of scope** (the tool reports them rather than failing):
-
-* ZIP entries stored uncompressed (method 0) → counted as `stored`, no bitstream
-  to analyse.
-* ZIP entries using BZIP2 / LZMA / XZ / Zstandard / PPMd (methods 12, 14, 93–98)
-  → counted as `other_method`.
-* `.7z`, `.rar`, `.xz`, `.bz2`, `.zst`, `.br` archives — different algorithms
-  entirely.
-* Encrypted archives and encrypted PDFs — the compressed bytes are not readable.
-* PDF streams behind a filter chain (e.g. `/Filter [/ASCII85Decode /FlateDecode]`)
-  → skipped, because the on-disk bytes are not raw DEFLATE.
+Other commands: `inspect` (dump every stream's structure), `reencode` (exact
+re-encoding test against every panel encoder and setting), `producers` (the
+producer table), `encoders` (versions), and the covert-channel extension
+(`covert-embed`, `covert-detect`).
 
 ---
 
-## 5. Command reference
-
-| Command | Purpose |
-|---|---|
-| `dfp inspect FILE` | Parse and dump every DEFLATE stream: block types, sizes, token counts, padding. Uses **no zlib** for parsing. |
-| `dfp train [-o M] [--scheme S] [--trees N] [--per-combo K]` | Build a corpus and train the classifier. `--scheme` ∈ `fine`/`lineage`/`coarse` (see §6). |
-| `dfp analyse FILE -m M [-o DIR]` | Attribute a file; writes `<name>.report.html` and `.json`. |
-| `dfp evaluate [-o DIR] [--scheme S]` | Full quantitative evaluation + figures. |
-| `dfp recompress FILE` | Constructive test: try to reproduce each stream by recompressing its output with every panel encoder. An exact byte match names the encoder+level. |
-| `dfp covert-embed FILE MSG -o OUT` | Hide `MSG` in DEFLATE final-byte padding; the decompressed bytes are unchanged. |
-| `dfp covert-detect FILE` | Flag streams whose padding is non-zero (a padding covert channel). |
-
----
-
-## 6. How it works (pipeline)
+## 5. How it works
 
 ```
- input file
-    │  containers.py   locate raw DEFLATE streams + harvest container metadata
-    ▼
- raw DEFLATE stream
-    │  deflate.py      bit-level RFC 1951 parser (records every encoder choice)
-    ▼
- StreamRecord (blocks, trees, tokens, padding)
-    │  features.py     182-dim encoder-behaviour vector
-    ▼
- feature vector
-    │  ml/             random forest + temperature calibration + abstain
-    │  signatures.py   deterministic hard rules (transparent corroboration)
-    ▼
- per-stream verdict
-    │  aggregate.py    size/confidence-weighted vote per archive
-    ▼
- report.py            court-ready HTML + JSON
+ file ─ containers.py ─ streams + container metadata + producer claims
+          │
+          ├─ deflate.py     bit-level RFC 1951 parser (blocks, trees, tokens, padding)
+          ├─ features.py    182 statistical features
+          ├─ decisions.py   27 decision features (choices versus alternatives)
+          │
+          ├─ ml/            Random Forest → profile + setting, calibrated confidence,
+          │                 "unknown encoder", traced feature contributions
+          │
+          ├─ aggregate.py   entry statuses, vote weighted by compressed size,
+          │                 mixed-encoder check, zlib re-encoding corroboration
+          ├─ producers.py   claimed producer and option bits versus the evidence
+          │
+          └─ report.py      HTML + JSON report
 ```
 
-Key modules:
+**Decision features.** After decompression the tool knows the original bytes,
+so it can compare each choice with the alternatives: whether the longest
+match was taken (and the length at which the encoder stopped searching),
+whether the nearest copy was chosen, whether a literal was followed by a
+longer match (lazy matching) or a match was simply skipped, the minimum match
+length, zlib's far-length-3 rule, how many symbols each block holds and
+whether each split paid for its extra header, whether the cheapest block type
+was used, and how far each Huffman table is from the optimal length-limited
+table for the symbols the block really contains.
 
-* **`bitreader.py`** — LSB-first bit reader tracking absolute bit position (so
-  block boundaries, an encoder artefact, are recorded exactly).
-* **`deflate.py`** — the forensic parser. Decodes stored/static/dynamic blocks
-  from first principles and keeps block boundaries, the 19-symbol code-length
-  alphabet and its repeat usage, both Huffman trees as code-length arrays, the
-  token sequence with order statistics (the lazy-match signature), and the
-  final padding bits. Verified byte-for-byte against `zlib` on 350+ streams
-  (all 10 levels × 5 strategies × 7 content types).
-* **`encoders/`** — adapters for zlib (10 levels × 5 strategies), a **from-scratch
-  pure-Python DEFLATE encoder** (greedy & lazy; also the covert-channel host and
-  the open-set "unknown"), Java, .NET, Node.js and libarchive.
-* **`ml/`** — a pure-NumPy random forest (weighted-Gini CART, bootstrap, random
-  feature subsets), temperature-calibrated on out-of-bag probabilities, with an
-  **abstain** option driven by confidence, top-2 margin and a novelty score.
-  Serialises to plain JSON (no pickle).
-* **`covert.py`** — the covert channel (in encoder freedom) and its detector.
-* **`adversarial.py`** — metadata normalisation, recompression detection, and
-  the metadata-vs-bitstream comparison.
+**Profiles.** The corpus builder compresses every source with every encoder
+and setting, stores byte-identical outputs once with their whole label set,
+and merges a program into its library's profile only after verifying
+byte-identical output (Java, .NET 8 and libarchive all reproduce CPython's
+zlib on 100% of streams, so they share the zlib profile, exactly as the
+proposal predicted for Java).
 
----
-
-## 7. Attribution granularity (`--scheme`)
-
-Vendor names are **not always separable**, because several tools link the same
-zlib code base and emit near-identical bytes. Rather than pretend otherwise, the
-tool lets you choose how specific a claim the evidence supports:
-
-* **`fine`** — every family separate (`zlib`, `java`, `dotnet`, `node`,
-  `libarchive`, `purepy`). Highest resolution, lowest confidence where families
-  overlap.
-* **`lineage`** — merge the indistinguishable zlib-code-base tools
-  (`libarchive`→`zlib`), keep the rest separate. Evaluation default.
-* **`coarse`** — `zlib_lineage` (the whole zlib toolchain, incl. Java, Node,
-  .NET's managed port) vs `non_standard` (a custom encoder; our `purepy` is the
-  exemplar). Highest-confidence, court-usable claim. **Training default.**
-
-This design choice is itself a finding: see §8.
+**Thresholds are measured, not guessed.** A fifth of the training source files
+is held out. On it the tool fits the calibration temperature, the confidence
+threshold (the smallest one whose accepted predictions reach 95% precision),
+the distance threshold (99th percentile of known-profile distances) and the
+minimum compressed size from which every size band reaches 90% accuracy.
 
 ---
 
-## 8. Evaluation results
+## 6. Evaluation results
 
-Generated by `python -m dfp evaluate` (numbers vary a little with `--per-combo`).
-Representative run:
+Full report: [`results/evaluation.html`](results/evaluation.html) (raw numbers
+in `results/evaluation.json`, corpus manifest with every version in
+`results/manifest.json`, and the exact commands in `results/README.md`).
+The training corpus has 348 source files (168 generated, 180 real files from
+the reference machine), each compressed with every encoder and setting.
 
-* **zlib strategy inference:** ~88 % accuracy (default / filtered / huffman-only
-  / RLE / fixed).
-* **zlib compression-level band inference:** ~86 % accuracy (L0 / L1-3 / L4-6 /
-  L7-9).
-* **Minimum-evidence curve:** accuracy-on-answered rises from ~0.84 at 4 KB to
-  ~0.92 at 64–128 KB; the abstain option withholds a verdict below ~2 KB (too
-  little evidence). "Attribution is reliable from N bytes" is the headline.
-* **Open-set:** an encoder never seen in training is rejected rather than
-  misattributed (rejection rate reported per run).
-* **Adversarial (metadata robustness):** normalising every ZIP metadata field
-  changes the metadata but moves the bitstream feature vector by **0.0** — the
-  invariance the whole approach rests on.
-* **Recompression:** exact byte-for-byte reproduction identifies the encoder +
-  level constructively (strongest possible attribution).
-* **Covert channel:** a message is embedded in DEFLATE padding with the
-  decompressed output provably unchanged; the corpus detector's non-zero-padding
-  fraction jumps from ~0.00 (clean) to ~0.46 (stego).
+**Split by source file.** 243 training and 105 test source files (5,890 and
+2,673 streams); **0** test streams share a source file with training. 92 test
+streams are produced identically by more than one profile and are scored
+against their whole label set.
 
-Figures (confusion matrix, curves, importances) are rendered as inline SVG in
-`reports/evaluation.html`.
+**Closed set (test sources).** Accuracy **91.6%**, macro-F1 **0.913**;
+the model answers 90.1% of streams and is right on **95.0%** of those.
+
+| Profile | Test streams | Precision | Recall | F1 |
+|---|---|---|---|---|
+| 7-Zip | 307 | 0.93 | 0.90 | 0.91 |
+| Chromium zlib (Node.js) | 368 | 0.86 | 0.92 | 0.89 |
+| Go compress/flate | 379 | 1.00 | 1.00 | 1.00 |
+| libdeflate | 384 | 0.86 | 0.82 | 0.84 |
+| zlib (Python, Java, .NET 8, libarchive) | 716 | 0.92 | 0.99 | 0.95 |
+| zlib-ng | 345 | 0.90 | 0.79 | 0.84 |
+| zopfli | 174 | 0.99 | 0.92 | 0.95 |
+
+**Accuracy against compressed size.** Every band from **256 bytes** upwards
+reaches at least 90% accuracy on the streams the model answers (0.91 at
+256 B to 1 KiB, 0.97 to 1.00 between 4 and 64 KiB, 0.96 above 64 KiB). Below
+256 bytes the model would answer only 56% of streams, so the analyser reports
+entries that small as "insufficient evidence"; the 256-byte threshold was
+measured on held-out training sources, not chosen by hand.
+
+**Setting inference** (set-aware): zlib-ng 99%, libdeflate 94%, 7-Zip 93%,
+Go 87%, Chromium zlib 82%, zlib 69% (zlib levels 4 to 9 often differ by only a
+few bytes), zopfli 60% (5 versus 15 iterations).
+
+**Unknown encoders.** With each profile left out of training in turn, the
+share of its streams rejected as "unknown" ranges from 2% (libdeflate) to
+41% (7-Zip); the rest are attributed to the closest relative (Chromium zlib
+to zlib-ng, Go to Chromium zlib, zopfli to 7-Zip). The team's own encoder is
+rejected 27% of the time. Open-set rejection of encoders that resemble a
+known one is the weakest result and is reported as such.
+
+**Baselines on the same 280 test streams** (40 per profile):
+
+| Method | Correct | Wrong profile | No answer |
+|---|---|---|---|
+| DeflateProvenance | **83.6%** | 5.4% | 11.1% |
+| preflate-rs 0.7.6 parameter estimate | 23.2% | 58.2% | 18.6% |
+| Brute-force zlib re-encoding (81 settings) | 14.3% | 0% | 85.7% |
+
+preflate-rs is right mainly on zlib and libdeflate and cannot represent Go,
+7-Zip or zopfli; brute-force zlib can only ever answer "zlib".
+
+**Archive experiments** (72 test archives written by six real ZIP writers:
+Python zipfile, Java, .NET 8, libarchive, Go, 7-Zip):
+
+* genuine archives: DeflateProvenance profile correct **100%**, container
+  metadata baseline 83%, false alarms **0%**;
+* container metadata rewritten to impersonate another writer: the
+  metadata-only baseline followed the forgery **96%** of the time;
+  DeflateProvenance kept its attribution **100%** and disagreed with the
+  forged writer 100%;
+* claimed producer rewritten to a false value: flagged **100%**, attribution
+  kept 100%;
+* one part edited and recompressed with a different library: flagged and the
+  edited entry singled out **90%**; the misses are edited parts too small to
+  attribute (100% when the part had enough evidence).
+
+**Second test set** (120 Python, Perl and X11 files, a different corpus never
+used in training): accuracy 87.1%, macro-F1 0.868, 93.1% on answered streams;
+reliable from 256 bytes as well.
+
+**Real application files** (30 documents saved by LibreOffice 24.2.7.2:
+DOCX, ODT, XLSX): all 30 attributed to zlib, consistent with the measured
+producer table; false alarms **0%**; claimed producer rewritten to Microsoft
+Word (with Word's option bits copied): flagged **100%**; one part edited and
+recompressed by Go: flagged 97%. An edit recompressed by Python's zlib at the
+same level is **not** detectable (0%): it produces exactly the bytes
+LibreOffice itself would write, so no stream analysis can see it. The
+proposal's version of this test edits *Word* documents, whose encoder is not
+zlib; see section 7.
+
+**python-docx** (20 documents that claim "Microsoft Macintosh Word" but are
+written by zlib): **20/20 flagged**.
 
 ---
 
-## 9. Honest limitations
+## 7. What the team still has to supply
 
-* **Same-code-base tools are not separable by vendor name.** zlib, Info-ZIP,
-  libarchive, Java's `Deflater`, Node's zlib and .NET's managed zlib port emit
-  near-identical bytes. The tool groups them (`coarse`/`lineage`) and abstains
-  rather than guessing a vendor the bytes cannot support.
-* **A library, not the program.** An attribution names the *compression
-  implementation*, not the application that called it (many programs link
-  zlib).
-* **Small streams carry little evidence.** Below ~2 KB the tool usually
-  abstains; this is by design (see the minimum-evidence curve).
-* **Optimal convergence.** On highly repetitive input, competent encoders can
-  converge on the *same* optimal encoding, making provenance genuinely
-  undecidable there.
+These parts of the proposal need material that could not be produced on the
+machine that generated the results above; the code paths are implemented and
+tested with stand-ins.
 
-Every report states: **the attribution is supporting evidence, not proof of
-authorship.**
+* **Microsoft Word documents.** Save a set of documents with Word, run
+  `python -m dfp app corpus <dir> --name word`, retrain, and re-run
+  `dfp evaluate --real <held-out Word files>`. The producer table already
+  encodes the proposal's preliminary finding (zlib reproduces no Word part;
+  Word sets "super fast"); once Word files are added its expected profile is
+  confirmed rather than inferred. Excel and PowerPoint entries are marked
+  "not yet profiled" until the same is done for them.
+* **Govdocs1.** Downloads were blocked in the build environment, so the
+  second test set used a different local corpus (Python, Perl and X11 files)
+  instead. Run `python scripts/fetch_govdocs1.py --threads 0 1 --out gd` and
+  `dfp evaluate --second-sources gd` to use Govdocs1 as proposed.
+* **Time-permitting items** (Google Docs exports, APKs built with the Android
+  build tools): add them with `dfp app` in the same way.
+* **Container build.** The `Dockerfile` pins every version but was not
+  test-built (no Docker daemon was available); build it once and commit the
+  resulting digest.
+
+---
+
+## 8. Limitations
+
+* A profile names the compression library, not the program: every zlib-based
+  program (Python, Java, .NET 8, libarchive, LibreOffice) shares one profile,
+  and only container metadata separates them.
+* Small streams carry little evidence; below the measured minimum size the
+  tool reports "insufficient evidence" instead of guessing.
+* Rejecting encoders never seen in training is hard when they resemble a known
+  one (see the unknown-encoder results); an unseen encoder is often attributed
+  to its closest relative.
+* Real content differs from generated content; the second test set measures
+  how much that costs.
+
+---
+
+## 9. Extensions beyond the proposal
+
+These were in the earlier prototype and are kept, clearly separated:
+
+* PDF (`/FlateDecode`), PNG, EPUB, ODF, raw zlib and headerless DEFLATE input;
+* deterministic signature rules (`dfp/signatures.py`);
+* a DEFLATE padding covert channel and its detector (`dfp/covert.py`,
+  `covert-embed`, `covert-detect`).
 
 ---
 
@@ -245,11 +324,14 @@ authorship.**
 python -m unittest discover -s tests
 ```
 
-24 tests cover the bit reader, the parser (round-trip vs zlib across all
-levels/strategies), every encoder, container extraction (ZIP/GZIP with CRC
-verification), feature stability, the covert channel, metadata-robustness
-invariance, recompression, the signature rules, and classifier train/predict/
-save/load.
+54 tests cover the bit reader, the parser against zlib (350 streams across all
+levels and strategies, plus truncation), optimal Huffman construction, decision
+features, every available encoder, the corpus (unique sources, label sets,
+Java sharing the zlib profile, regeneration), calibration and explanations,
+the vote, producer claims and the producer table, ZIP rewriting, the
+baselines, verification by re-encoding, metadata robustness, signatures, the
+covert-channel extension and the size-band reliability rule. Tests that need
+an optional encoder or the preflate-rs tool skip when it is missing.
 
 ---
 
@@ -258,34 +340,42 @@ save/load.
 ```
 deflate-provenance/
   dfp/
-    bitreader.py      LSB-first bit reader
-    deflate.py        bit-level RFC 1951 parser (no zlib for parsing)
-    containers.py     ZIP/OOXML/APK/JAR/EPUB/GZIP/zlib/PNG/raw + metadata
-    features.py       182-feature encoder-behaviour vector
-    encoders/         zlib, purepy, java, dotnet, node, libarchive adapters
-    ml/               forest.py, classifier.py (pure-NumPy, calibrated, abstain)
-    schemes.py        fine / lineage / coarse label granularity
-    signatures.py     deterministic hard rules
-    aggregate.py      per-stream analysis + per-archive vote
-    adversarial.py    metadata normalisation, recompression, channel compare
-    covert.py         covert channel + detector
-    evaluate.py       closed-set / minimum-evidence / open-set / adversarial
-    charts.py         dependency-free SVG figures
-    report.py         court-ready HTML + JSON
-    cli.py            command-line interface
-    demo.py           case studies
-  tests/
-    test_dfp.py       unittest suite
-  README.md
-  requirements.txt
+    containers.py   ZIP/OOXML/APK/JAR/ODF/EPUB/GZIP/zlib/PNG/PDF/raw + claims
+    bitreader.py    LSB-first bit reader
+    deflate.py      bit-level RFC 1951 parser (table-driven, no zlib)
+    features.py     statistical features
+    decisions.py    decision features
+    huffman.py      optimal and length-limited Huffman lengths
+    encoders/       zlib, java, zlib-ng, node, libdeflate, zopfli, 7zip, go,
+                    dotnet, libarchive, purepy
+    corpus.py       reference corpus, label sets, profile sharing, manifest
+    training.py     train a model from a corpus
+    ml/             forest.py, classifier.py
+    aggregate.py    archive analysis and consistency findings
+    producers.py    producer table
+    report.py       HTML + JSON reports
+    baselines.py    preflate-rs, brute-force zlib, metadata-only
+    zipwriter.py    lossless ZIP rewriting
+    realfiles.py    application files, LibreOffice samples, real-file tests
+    evaluate.py     evaluation plan
+    adversarial.py  metadata robustness, exact re-encoding
+    signatures.py   deterministic rules (extension)
+    covert.py       covert channel (extension)
+    charts.py       SVG charts
+    cli.py, demo.py
+  tools/preflate-estimate/   Rust wrapper around preflate-rs 0.7.6
+  scripts/fetch_govdocs1.py  Govdocs1 sample downloader
+  results/                   the published evaluation (HTML, JSON, manifest)
+  tests/test_dfp.py
+  Dockerfile, requirements.txt
 ```
 
 ---
 
 ## 12. Use of generative AI
 
-Per the assignment's disclosure requirement, record in your submission where AI
-assistance was used (e.g. drafting code and documentation), and remember that
-the correctness and academic integrity of the final work are the team's
-responsibility — validate every result independently (the test suite and the
-`evaluate`/`demo` outputs are the primary validation here).
+Per the assignment's disclosure requirement, record in your submission where
+AI assistance was used (for example drafting code and documentation). The
+correctness and academic integrity of the final work are the team's
+responsibility: validate every result independently (the test suite and the
+`evaluate` and `demo` outputs are the primary validation here).

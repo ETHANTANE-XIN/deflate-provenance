@@ -129,6 +129,10 @@ class ContainerReport:
     stored_entries: int = 0
     other_method_entries: int = 0
     notes: list[str] = field(default_factory=list)
+    #: every archive entry, whatever its method (name, method, sizes, flags)
+    entries: list[dict] = field(default_factory=list)
+    #: producer claims found in the container (see :func:`harvest_claims`)
+    claims: dict = field(default_factory=dict)
 
 
 # --- helpers ---------------------------------------------------------------
@@ -259,6 +263,19 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
         pos += 46 + name_len + extra_len + comment_len_e
 
         order.append(name)
+        entry = {
+            "name": name,
+            "method": method,
+            "compressed_size": csize,
+            "uncompressed_size": usize,
+            "flags": flags,
+            "option_bits": (flags >> 1) & 0x3,
+            "version_made_by": version_made,
+            "local_header_offset": local_offset,
+            "crc32": crc,
+            "stream_index": None,
+        }
+        report.entries.append(entry)
         host = version_made >> 8
         host_systems.add(ZIP_HOST_SYSTEM.get(host, f"host{host}"))
         versions.add(version_made & 0xFF)
@@ -290,6 +307,7 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
         else:
             payload = data[body : body + csize]
 
+        entry["stream_index"] = len(report.streams)
         report.streams.append(
             DeflateStream(
                 payload=payload,
@@ -328,9 +346,89 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
             "distinct_timestamps": len(set(timestamps)),
             "stored_entries": report.stored_entries,
             "deflate_entries": len(report.streams),
+            "option_bits_seen": sorted({e["option_bits"] for e in report.entries
+                                        if e["method"] == METHOD_DEFLATE}),
         }
     )
+    report.claims = harvest_claims(data, report)
     return report
+
+
+# --- producer claims ----------------------------------------------------------
+
+#: option bits 1-2 of the general-purpose flag for DEFLATE (APPNOTE 4.4.4)
+OPTION_BITS = {0: "normal", 1: "maximum", 2: "fast", 3: "super fast"}
+
+
+def read_entry(data: bytes, entry: dict, limit: int = 4_000_000) -> bytes | None:
+    """Return an entry's uncompressed bytes (stored or DEFLATE) or ``None``.
+
+    DEFLATE entries are decoded with this project's own parser, never zlib.
+    """
+    from .deflate import parse_stream
+
+    off = entry["local_header_offset"]
+    if data[off : off + 4] != ZIP_LOCAL_SIG:
+        return None
+    l_name_len, l_extra_len = struct.unpack_from("<HH", data, off + 26)
+    body = off + 30 + l_name_len + l_extra_len
+    size = entry["compressed_size"]
+    if size in (0, 0xFFFFFFFF) or size > limit:
+        return None
+    blob = data[body : body + size]
+    if entry["method"] == METHOD_STORE:
+        return blob
+    if entry["method"] == METHOD_DEFLATE:
+        rec = parse_stream(blob, strict=False)
+        return rec.output if rec.error is None else None
+    return None
+
+
+def _xml_text(blob: bytes, tag: str) -> str | None:
+    import re
+
+    m = re.search(rb"<(?:\w+:)?" + tag.encode() + rb"[^>]*>([^<]{0,300})</", blob)
+    return m.group(1).decode("utf-8", "replace").strip() if m else None
+
+
+def harvest_claims(data: bytes, report: ContainerReport) -> dict:
+    """Collect what the container says about the program that wrote it.
+
+    * OOXML (DOCX/XLSX/PPTX): ``docProps/app.xml`` ``Application`` and
+      ``AppVersion``;
+    * ODF: ``meta.xml`` ``meta:generator``;
+    * JAR/APK: ``META-INF/MANIFEST.MF`` ``Created-By``.
+
+    These are the claims the consistency checks compare with the compressed
+    data; they are as easy to forge as any other metadata, which is the point.
+    """
+    by_name = {e["name"]: e for e in report.entries}
+    claims: dict = {}
+    app = by_name.get("docProps/app.xml")
+    if app:
+        blob = read_entry(data, app)
+        if blob:
+            claims["producer"] = _xml_text(blob, "Application")
+            claims["producer_version"] = _xml_text(blob, "AppVersion")
+            claims["source"] = "docProps/app.xml"
+    meta = by_name.get("meta.xml")
+    if meta and "producer" not in claims:
+        blob = read_entry(data, meta)
+        if blob:
+            claims["producer"] = _xml_text(blob, "generator")
+            claims["source"] = "meta.xml"
+    manifest = by_name.get("META-INF/MANIFEST.MF")
+    if manifest and "producer" not in claims:
+        blob = read_entry(data, manifest)
+        if blob:
+            for line in blob.decode("utf-8", "replace").splitlines():
+                if line.lower().startswith("created-by:"):
+                    claims["producer"] = line.split(":", 1)[1].strip()
+                    claims["source"] = "META-INF/MANIFEST.MF"
+                    break
+    if claims.get("producer") is None:
+        claims.pop("producer", None)
+    return claims
 
 
 # --- GZIP / zlib / PNG / raw ----------------------------------------------
@@ -596,6 +694,8 @@ def extract_pdf(data: bytes, path: str) -> ContainerReport:
         )
         index += 1
 
+    if producer or creator:
+        report.claims = {"producer": producer or creator, "source": "PDF /Producer"}
     report.metadata["total_stream_objects"] = total_streams
     report.metadata["flate_streams"] = len(report.streams)
     if not report.streams:

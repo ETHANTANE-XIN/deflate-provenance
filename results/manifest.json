@@ -1,0 +1,2499 @@
+{
+  "created": "2026-09-27T10:09:31+00:00",
+  "dfp_version": "2.0.0",
+  "python": "3.11.15",
+  "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
+  "encoders": [
+    {
+      "program": "zlib",
+      "library": "zlib",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "version": "zlib 1.3"
+    },
+    {
+      "program": "zlib-ng",
+      "library": "zlib-ng",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "3",
+        "6",
+        "9"
+      ],
+      "version": "zlib-ng 2.2.5 (python-zlib-ng 1.0.0)"
+    },
+    {
+      "program": "libdeflate",
+      "library": "libdeflate",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "6",
+        "9",
+        "12"
+      ],
+      "version": "libdeflate via python-deflate 0.9.0"
+    },
+    {
+      "program": "zopfli",
+      "library": "zopfli",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "i5",
+        "i15"
+      ],
+      "version": "zopfli via python-zopfli 0.4.3"
+    },
+    {
+      "program": "java",
+      "library": "zlib",
+      "reference": false,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "version": "Java Ubuntu 21.0.10 java.util.zip.Deflater"
+    },
+    {
+      "program": "node",
+      "library": "chromium-zlib",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "3",
+        "6",
+        "9"
+      ],
+      "version": "Node.js v22.22.2 zlib 1.3.1-e00f703"
+    },
+    {
+      "program": "go",
+      "library": "go-flate",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "3",
+        "6",
+        "9"
+      ],
+      "version": "Go go1.24.7 compress/flate"
+    },
+    {
+      "program": "dotnet",
+      "library": "zlib",
+      "reference": false,
+      "synthetic": false,
+      "settings": [
+        "fastest",
+        "optimal",
+        "smallest"
+      ],
+      "version": ".NET 8.0.31 System.IO.Compression"
+    },
+    {
+      "program": "7zip",
+      "library": "7zip",
+      "reference": true,
+      "synthetic": false,
+      "settings": [
+        "mx1",
+        "mx5",
+        "mx9"
+      ],
+      "version": "7-Zip 23.01 (x64)"
+    },
+    {
+      "program": "libarchive",
+      "library": "zlib",
+      "reference": false,
+      "synthetic": false,
+      "settings": [
+        "1",
+        "6",
+        "9"
+      ],
+      "version": "bsdtar 3.7.2 - libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5"
+    },
+    {
+      "program": "purepy",
+      "library": "purepy",
+      "reference": true,
+      "synthetic": true,
+      "settings": [
+        "greedy",
+        "lazy"
+      ],
+      "version": "dfp purepy 2.0.0"
+    }
+  ],
+  "profile_sharing": {
+    "java": {
+      "declared_library": "zlib",
+      "reference": "zlib",
+      "identical_streams": 3132,
+      "streams": 3132,
+      "identical_rate": 1.0,
+      "shares_profile": true,
+      "profile": "zlib"
+    },
+    "dotnet": {
+      "declared_library": "zlib",
+      "reference": "zlib",
+      "identical_streams": 1044,
+      "streams": 1044,
+      "identical_rate": 1.0,
+      "shares_profile": true,
+      "profile": "zlib"
+    },
+    "libarchive": {
+      "declared_library": "zlib",
+      "reference": "zlib",
+      "identical_streams": 1044,
+      "streams": 1044,
+      "identical_rate": 1.0,
+      "shares_profile": true,
+      "profile": "zlib"
+    }
+  },
+  "share_threshold": 0.95,
+  "n_sources": 348,
+  "sources": [
+    {
+      "id": "syn:text:500:0",
+      "content_type": "text",
+      "size": 500,
+      "origin": "synthetic seed 9821032266018007700"
+    },
+    {
+      "id": "syn:text:500:1",
+      "content_type": "text",
+      "size": 500,
+      "origin": "synthetic seed 8142873756551312529"
+    },
+    {
+      "id": "syn:text:500:2",
+      "content_type": "text",
+      "size": 500,
+      "origin": "synthetic seed 17344352665138622281"
+    },
+    {
+      "id": "syn:text:500:3",
+      "content_type": "text",
+      "size": 500,
+      "origin": "synthetic seed 11652869644019491484"
+    },
+    {
+      "id": "syn:text:1500:0",
+      "content_type": "text",
+      "size": 1500,
+      "origin": "synthetic seed 11071264453911975722"
+    },
+    {
+      "id": "syn:text:1500:1",
+      "content_type": "text",
+      "size": 1500,
+      "origin": "synthetic seed 1268289593871963120"
+    },
+    {
+      "id": "syn:text:1500:2",
+      "content_type": "text",
+      "size": 1500,
+      "origin": "synthetic seed 8812357745323935020"
+    },
+    {
+      "id": "syn:text:1500:3",
+      "content_type": "text",
+      "size": 1500,
+      "origin": "synthetic seed 6875609463276425285"
+    },
+    {
+      "id": "syn:text:4000:0",
+      "content_type": "text",
+      "size": 4000,
+      "origin": "synthetic seed 8394258023698309250"
+    },
+    {
+      "id": "syn:text:4000:1",
+      "content_type": "text",
+      "size": 4000,
+      "origin": "synthetic seed 15240267332892730412"
+    },
+    {
+      "id": "syn:text:4000:2",
+      "content_type": "text",
+      "size": 4000,
+      "origin": "synthetic seed 4257619390692808484"
+    },
+    {
+      "id": "syn:text:4000:3",
+      "content_type": "text",
+      "size": 4000,
+      "origin": "synthetic seed 14060616835721407814"
+    },
+    {
+      "id": "syn:text:12000:0",
+      "content_type": "text",
+      "size": 12000,
+      "origin": "synthetic seed 5145768514297217506"
+    },
+    {
+      "id": "syn:text:12000:1",
+      "content_type": "text",
+      "size": 12000,
+      "origin": "synthetic seed 4417054423559839893"
+    },
+    {
+      "id": "syn:text:12000:2",
+      "content_type": "text",
+      "size": 12000,
+      "origin": "synthetic seed 6941671101586738996"
+    },
+    {
+      "id": "syn:text:12000:3",
+      "content_type": "text",
+      "size": 12000,
+      "origin": "synthetic seed 7966442951561900487"
+    },
+    {
+      "id": "syn:text:32000:0",
+      "content_type": "text",
+      "size": 32000,
+      "origin": "synthetic seed 11395753424853029173"
+    },
+    {
+      "id": "syn:text:32000:1",
+      "content_type": "text",
+      "size": 32000,
+      "origin": "synthetic seed 13290156747235471968"
+    },
+    {
+      "id": "syn:text:32000:2",
+      "content_type": "text",
+      "size": 32000,
+      "origin": "synthetic seed 5044712006303497205"
+    },
+    {
+      "id": "syn:text:32000:3",
+      "content_type": "text",
+      "size": 32000,
+      "origin": "synthetic seed 11368159745769756569"
+    },
+    {
+      "id": "syn:text:96000:0",
+      "content_type": "text",
+      "size": 96000,
+      "origin": "synthetic seed 8363652518585813181"
+    },
+    {
+      "id": "syn:text:96000:1",
+      "content_type": "text",
+      "size": 96000,
+      "origin": "synthetic seed 6294676749938828732"
+    },
+    {
+      "id": "syn:text:96000:2",
+      "content_type": "text",
+      "size": 96000,
+      "origin": "synthetic seed 16052547561342441676"
+    },
+    {
+      "id": "syn:text:96000:3",
+      "content_type": "text",
+      "size": 96000,
+      "origin": "synthetic seed 4492612387902263545"
+    },
+    {
+      "id": "syn:xml:500:0",
+      "content_type": "xml",
+      "size": 500,
+      "origin": "synthetic seed 8812154381332121842"
+    },
+    {
+      "id": "syn:xml:500:1",
+      "content_type": "xml",
+      "size": 500,
+      "origin": "synthetic seed 18005375476721584137"
+    },
+    {
+      "id": "syn:xml:500:2",
+      "content_type": "xml",
+      "size": 500,
+      "origin": "synthetic seed 16124222859326850015"
+    },
+    {
+      "id": "syn:xml:500:3",
+      "content_type": "xml",
+      "size": 500,
+      "origin": "synthetic seed 12465079641589677317"
+    },
+    {
+      "id": "syn:xml:1500:0",
+      "content_type": "xml",
+      "size": 1500,
+      "origin": "synthetic seed 2081875861652938140"
+    },
+    {
+      "id": "syn:xml:1500:1",
+      "content_type": "xml",
+      "size": 1500,
+      "origin": "synthetic seed 7045864596553874592"
+    },
+    {
+      "id": "syn:xml:1500:2",
+      "content_type": "xml",
+      "size": 1500,
+      "origin": "synthetic seed 11696351272071708539"
+    },
+    {
+      "id": "syn:xml:1500:3",
+      "content_type": "xml",
+      "size": 1500,
+      "origin": "synthetic seed 8075684976836237618"
+    },
+    {
+      "id": "syn:xml:4000:0",
+      "content_type": "xml",
+      "size": 4000,
+      "origin": "synthetic seed 1172301944674950662"
+    },
+    {
+      "id": "syn:xml:4000:1",
+      "content_type": "xml",
+      "size": 4000,
+      "origin": "synthetic seed 2871560590065940970"
+    },
+    {
+      "id": "syn:xml:4000:2",
+      "content_type": "xml",
+      "size": 4000,
+      "origin": "synthetic seed 4244265549158197573"
+    },
+    {
+      "id": "syn:xml:4000:3",
+      "content_type": "xml",
+      "size": 4000,
+      "origin": "synthetic seed 9535499782147903007"
+    },
+    {
+      "id": "syn:xml:12000:0",
+      "content_type": "xml",
+      "size": 12000,
+      "origin": "synthetic seed 8112611950444754712"
+    },
+    {
+      "id": "syn:xml:12000:1",
+      "content_type": "xml",
+      "size": 12000,
+      "origin": "synthetic seed 17608899079241222161"
+    },
+    {
+      "id": "syn:xml:12000:2",
+      "content_type": "xml",
+      "size": 12000,
+      "origin": "synthetic seed 2447547053222756075"
+    },
+    {
+      "id": "syn:xml:12000:3",
+      "content_type": "xml",
+      "size": 12000,
+      "origin": "synthetic seed 12412065539520700292"
+    },
+    {
+      "id": "syn:xml:32000:0",
+      "content_type": "xml",
+      "size": 32000,
+      "origin": "synthetic seed 6165426955551760933"
+    },
+    {
+      "id": "syn:xml:32000:1",
+      "content_type": "xml",
+      "size": 32000,
+      "origin": "synthetic seed 1656406761927384232"
+    },
+    {
+      "id": "syn:xml:32000:2",
+      "content_type": "xml",
+      "size": 32000,
+      "origin": "synthetic seed 5321094592366164522"
+    },
+    {
+      "id": "syn:xml:32000:3",
+      "content_type": "xml",
+      "size": 32000,
+      "origin": "synthetic seed 10945066650966577248"
+    },
+    {
+      "id": "syn:xml:96000:0",
+      "content_type": "xml",
+      "size": 96000,
+      "origin": "synthetic seed 8222452340382538726"
+    },
+    {
+      "id": "syn:xml:96000:1",
+      "content_type": "xml",
+      "size": 96000,
+      "origin": "synthetic seed 6743239234005264813"
+    },
+    {
+      "id": "syn:xml:96000:2",
+      "content_type": "xml",
+      "size": 96000,
+      "origin": "synthetic seed 18008542713057085520"
+    },
+    {
+      "id": "syn:xml:96000:3",
+      "content_type": "xml",
+      "size": 96000,
+      "origin": "synthetic seed 14635022783988651338"
+    },
+    {
+      "id": "syn:source:500:0",
+      "content_type": "source",
+      "size": 500,
+      "origin": "synthetic seed 7933881903750472024"
+    },
+    {
+      "id": "syn:source:500:1",
+      "content_type": "source",
+      "size": 500,
+      "origin": "synthetic seed 14700620416734053244"
+    },
+    {
+      "id": "syn:source:500:2",
+      "content_type": "source",
+      "size": 500,
+      "origin": "synthetic seed 2361127321353231881"
+    },
+    {
+      "id": "syn:source:500:3",
+      "content_type": "source",
+      "size": 500,
+      "origin": "synthetic seed 14934326393242329637"
+    },
+    {
+      "id": "syn:source:1500:0",
+      "content_type": "source",
+      "size": 1500,
+      "origin": "synthetic seed 14901801539402392848"
+    },
+    {
+      "id": "syn:source:1500:1",
+      "content_type": "source",
+      "size": 1500,
+      "origin": "synthetic seed 11815287803307110546"
+    },
+    {
+      "id": "syn:source:1500:2",
+      "content_type": "source",
+      "size": 1500,
+      "origin": "synthetic seed 13215041349042870483"
+    },
+    {
+      "id": "syn:source:1500:3",
+      "content_type": "source",
+      "size": 1500,
+      "origin": "synthetic seed 17890089337704670160"
+    },
+    {
+      "id": "syn:source:4000:0",
+      "content_type": "source",
+      "size": 4000,
+      "origin": "synthetic seed 16169357461332672283"
+    },
+    {
+      "id": "syn:source:4000:1",
+      "content_type": "source",
+      "size": 4000,
+      "origin": "synthetic seed 790967860750688251"
+    },
+    {
+      "id": "syn:source:4000:2",
+      "content_type": "source",
+      "size": 4000,
+      "origin": "synthetic seed 15032353130161026917"
+    },
+    {
+      "id": "syn:source:4000:3",
+      "content_type": "source",
+      "size": 4000,
+      "origin": "synthetic seed 7661211759085693617"
+    },
+    {
+      "id": "syn:source:12000:0",
+      "content_type": "source",
+      "size": 12000,
+      "origin": "synthetic seed 265658034776755429"
+    },
+    {
+      "id": "syn:source:12000:1",
+      "content_type": "source",
+      "size": 12000,
+      "origin": "synthetic seed 1321634076009893066"
+    },
+    {
+      "id": "syn:source:12000:2",
+      "content_type": "source",
+      "size": 12000,
+      "origin": "synthetic seed 7764539166973156615"
+    },
+    {
+      "id": "syn:source:12000:3",
+      "content_type": "source",
+      "size": 12000,
+      "origin": "synthetic seed 5536588284762427815"
+    },
+    {
+      "id": "syn:source:32000:0",
+      "content_type": "source",
+      "size": 32000,
+      "origin": "synthetic seed 2516587883818581077"
+    },
+    {
+      "id": "syn:source:32000:1",
+      "content_type": "source",
+      "size": 32000,
+      "origin": "synthetic seed 16568247730259434170"
+    },
+    {
+      "id": "syn:source:32000:2",
+      "content_type": "source",
+      "size": 32000,
+      "origin": "synthetic seed 1727802791909788801"
+    },
+    {
+      "id": "syn:source:32000:3",
+      "content_type": "source",
+      "size": 32000,
+      "origin": "synthetic seed 3138222970594908260"
+    },
+    {
+      "id": "syn:source:96000:0",
+      "content_type": "source",
+      "size": 96000,
+      "origin": "synthetic seed 10772191861607273936"
+    },
+    {
+      "id": "syn:source:96000:1",
+      "content_type": "source",
+      "size": 96000,
+      "origin": "synthetic seed 15281631418156986065"
+    },
+    {
+      "id": "syn:source:96000:2",
+      "content_type": "source",
+      "size": 96000,
+      "origin": "synthetic seed 524238105516087740"
+    },
+    {
+      "id": "syn:source:96000:3",
+      "content_type": "source",
+      "size": 96000,
+      "origin": "synthetic seed 12282438261571561117"
+    },
+    {
+      "id": "syn:json:500:0",
+      "content_type": "json",
+      "size": 500,
+      "origin": "synthetic seed 82213307133802482"
+    },
+    {
+      "id": "syn:json:500:1",
+      "content_type": "json",
+      "size": 500,
+      "origin": "synthetic seed 5119484688168254915"
+    },
+    {
+      "id": "syn:json:500:2",
+      "content_type": "json",
+      "size": 500,
+      "origin": "synthetic seed 3297813269149349436"
+    },
+    {
+      "id": "syn:json:500:3",
+      "content_type": "json",
+      "size": 500,
+      "origin": "synthetic seed 7556660411757571404"
+    },
+    {
+      "id": "syn:json:1500:0",
+      "content_type": "json",
+      "size": 1500,
+      "origin": "synthetic seed 4863704602276605812"
+    },
+    {
+      "id": "syn:json:1500:1",
+      "content_type": "json",
+      "size": 1500,
+      "origin": "synthetic seed 13647121436462731467"
+    },
+    {
+      "id": "syn:json:1500:2",
+      "content_type": "json",
+      "size": 1500,
+      "origin": "synthetic seed 5071839326534572600"
+    },
+    {
+      "id": "syn:json:1500:3",
+      "content_type": "json",
+      "size": 1500,
+      "origin": "synthetic seed 7065681820375280856"
+    },
+    {
+      "id": "syn:json:4000:0",
+      "content_type": "json",
+      "size": 4000,
+      "origin": "synthetic seed 5667584624703270538"
+    },
+    {
+      "id": "syn:json:4000:1",
+      "content_type": "json",
+      "size": 4000,
+      "origin": "synthetic seed 2153266585774021752"
+    },
+    {
+      "id": "syn:json:4000:2",
+      "content_type": "json",
+      "size": 4000,
+      "origin": "synthetic seed 6980893961776964206"
+    },
+    {
+      "id": "syn:json:4000:3",
+      "content_type": "json",
+      "size": 4000,
+      "origin": "synthetic seed 2509429524321592164"
+    },
+    {
+      "id": "syn:json:12000:0",
+      "content_type": "json",
+      "size": 12000,
+      "origin": "synthetic seed 4135542455884838950"
+    },
+    {
+      "id": "syn:json:12000:1",
+      "content_type": "json",
+      "size": 12000,
+      "origin": "synthetic seed 17889689372374035556"
+    },
+    {
+      "id": "syn:json:12000:2",
+      "content_type": "json",
+      "size": 12000,
+      "origin": "synthetic seed 12316146945340637193"
+    },
+    {
+      "id": "syn:json:12000:3",
+      "content_type": "json",
+      "size": 12000,
+      "origin": "synthetic seed 739841425263574270"
+    },
+    {
+      "id": "syn:json:32000:0",
+      "content_type": "json",
+      "size": 32000,
+      "origin": "synthetic seed 9143356627929279032"
+    },
+    {
+      "id": "syn:json:32000:1",
+      "content_type": "json",
+      "size": 32000,
+      "origin": "synthetic seed 15160403310685438560"
+    },
+    {
+      "id": "syn:json:32000:2",
+      "content_type": "json",
+      "size": 32000,
+      "origin": "synthetic seed 16461382133837159961"
+    },
+    {
+      "id": "syn:json:32000:3",
+      "content_type": "json",
+      "size": 32000,
+      "origin": "synthetic seed 14190309832853659472"
+    },
+    {
+      "id": "syn:json:96000:0",
+      "content_type": "json",
+      "size": 96000,
+      "origin": "synthetic seed 16206219728831186393"
+    },
+    {
+      "id": "syn:json:96000:1",
+      "content_type": "json",
+      "size": 96000,
+      "origin": "synthetic seed 9385797623674566438"
+    },
+    {
+      "id": "syn:json:96000:2",
+      "content_type": "json",
+      "size": 96000,
+      "origin": "synthetic seed 396168033723989431"
+    },
+    {
+      "id": "syn:json:96000:3",
+      "content_type": "json",
+      "size": 96000,
+      "origin": "synthetic seed 1045720725389062809"
+    },
+    {
+      "id": "syn:csv:500:0",
+      "content_type": "csv",
+      "size": 500,
+      "origin": "synthetic seed 3415748144495764046"
+    },
+    {
+      "id": "syn:csv:500:1",
+      "content_type": "csv",
+      "size": 500,
+      "origin": "synthetic seed 10632787757541257611"
+    },
+    {
+      "id": "syn:csv:500:2",
+      "content_type": "csv",
+      "size": 500,
+      "origin": "synthetic seed 68233753777098047"
+    },
+    {
+      "id": "syn:csv:500:3",
+      "content_type": "csv",
+      "size": 500,
+      "origin": "synthetic seed 4233244798189044658"
+    },
+    {
+      "id": "syn:csv:1500:0",
+      "content_type": "csv",
+      "size": 1500,
+      "origin": "synthetic seed 5358055592735591569"
+    },
+    {
+      "id": "syn:csv:1500:1",
+      "content_type": "csv",
+      "size": 1500,
+      "origin": "synthetic seed 3711656471538760751"
+    },
+    {
+      "id": "syn:csv:1500:2",
+      "content_type": "csv",
+      "size": 1500,
+      "origin": "synthetic seed 3492943492065129906"
+    },
+    {
+      "id": "syn:csv:1500:3",
+      "content_type": "csv",
+      "size": 1500,
+      "origin": "synthetic seed 5291082318534988055"
+    },
+    {
+      "id": "syn:csv:4000:0",
+      "content_type": "csv",
+      "size": 4000,
+      "origin": "synthetic seed 15177544139307530434"
+    },
+    {
+      "id": "syn:csv:4000:1",
+      "content_type": "csv",
+      "size": 4000,
+      "origin": "synthetic seed 17970562327851795623"
+    },
+    {
+      "id": "syn:csv:4000:2",
+      "content_type": "csv",
+      "size": 4000,
+      "origin": "synthetic seed 6279051844213945089"
+    },
+    {
+      "id": "syn:csv:4000:3",
+      "content_type": "csv",
+      "size": 4000,
+      "origin": "synthetic seed 17950990623749064121"
+    },
+    {
+      "id": "syn:csv:12000:0",
+      "content_type": "csv",
+      "size": 12000,
+      "origin": "synthetic seed 1190744325657210945"
+    },
+    {
+      "id": "syn:csv:12000:1",
+      "content_type": "csv",
+      "size": 12000,
+      "origin": "synthetic seed 16684788127547521726"
+    },
+    {
+      "id": "syn:csv:12000:2",
+      "content_type": "csv",
+      "size": 12000,
+      "origin": "synthetic seed 5922540130087343339"
+    },
+    {
+      "id": "syn:csv:12000:3",
+      "content_type": "csv",
+      "size": 12000,
+      "origin": "synthetic seed 14558514830401394462"
+    },
+    {
+      "id": "syn:csv:32000:0",
+      "content_type": "csv",
+      "size": 32000,
+      "origin": "synthetic seed 16660463176970818275"
+    },
+    {
+      "id": "syn:csv:32000:1",
+      "content_type": "csv",
+      "size": 32000,
+      "origin": "synthetic seed 2354896866522811061"
+    },
+    {
+      "id": "syn:csv:32000:2",
+      "content_type": "csv",
+      "size": 32000,
+      "origin": "synthetic seed 14857037149621409683"
+    },
+    {
+      "id": "syn:csv:32000:3",
+      "content_type": "csv",
+      "size": 32000,
+      "origin": "synthetic seed 12828170880565904720"
+    },
+    {
+      "id": "syn:csv:96000:0",
+      "content_type": "csv",
+      "size": 96000,
+      "origin": "synthetic seed 3190313302282108678"
+    },
+    {
+      "id": "syn:csv:96000:1",
+      "content_type": "csv",
+      "size": 96000,
+      "origin": "synthetic seed 12021174880476389271"
+    },
+    {
+      "id": "syn:csv:96000:2",
+      "content_type": "csv",
+      "size": 96000,
+      "origin": "synthetic seed 14614101249670565827"
+    },
+    {
+      "id": "syn:csv:96000:3",
+      "content_type": "csv",
+      "size": 96000,
+      "origin": "synthetic seed 9666499365548865741"
+    },
+    {
+      "id": "syn:binary:500:0",
+      "content_type": "binary",
+      "size": 500,
+      "origin": "synthetic seed 434338725843362056"
+    },
+    {
+      "id": "syn:binary:500:1",
+      "content_type": "binary",
+      "size": 500,
+      "origin": "synthetic seed 166004278669135262"
+    },
+    {
+      "id": "syn:binary:500:2",
+      "content_type": "binary",
+      "size": 500,
+      "origin": "synthetic seed 4029674125803151064"
+    },
+    {
+      "id": "syn:binary:500:3",
+      "content_type": "binary",
+      "size": 500,
+      "origin": "synthetic seed 15101987927041437942"
+    },
+    {
+      "id": "syn:binary:1500:0",
+      "content_type": "binary",
+      "size": 1500,
+      "origin": "synthetic seed 7530549155347808427"
+    },
+    {
+      "id": "syn:binary:1500:1",
+      "content_type": "binary",
+      "size": 1500,
+      "origin": "synthetic seed 16044965631636889041"
+    },
+    {
+      "id": "syn:binary:1500:2",
+      "content_type": "binary",
+      "size": 1500,
+      "origin": "synthetic seed 12269156620431341653"
+    },
+    {
+      "id": "syn:binary:1500:3",
+      "content_type": "binary",
+      "size": 1500,
+      "origin": "synthetic seed 3886410972288968831"
+    },
+    {
+      "id": "syn:binary:4000:0",
+      "content_type": "binary",
+      "size": 4000,
+      "origin": "synthetic seed 4431351211625385212"
+    },
+    {
+      "id": "syn:binary:4000:1",
+      "content_type": "binary",
+      "size": 4000,
+      "origin": "synthetic seed 1323332590293392893"
+    },
+    {
+      "id": "syn:binary:4000:2",
+      "content_type": "binary",
+      "size": 4000,
+      "origin": "synthetic seed 10960332745197615526"
+    },
+    {
+      "id": "syn:binary:4000:3",
+      "content_type": "binary",
+      "size": 4000,
+      "origin": "synthetic seed 3612858937903452688"
+    },
+    {
+      "id": "syn:binary:12000:0",
+      "content_type": "binary",
+      "size": 12000,
+      "origin": "synthetic seed 9938783040949153365"
+    },
+    {
+      "id": "syn:binary:12000:1",
+      "content_type": "binary",
+      "size": 12000,
+      "origin": "synthetic seed 17980770482414766397"
+    },
+    {
+      "id": "syn:binary:12000:2",
+      "content_type": "binary",
+      "size": 12000,
+      "origin": "synthetic seed 10109681744819074060"
+    },
+    {
+      "id": "syn:binary:12000:3",
+      "content_type": "binary",
+      "size": 12000,
+      "origin": "synthetic seed 6591681663094305356"
+    },
+    {
+      "id": "syn:binary:32000:0",
+      "content_type": "binary",
+      "size": 32000,
+      "origin": "synthetic seed 2367182515079518133"
+    },
+    {
+      "id": "syn:binary:32000:1",
+      "content_type": "binary",
+      "size": 32000,
+      "origin": "synthetic seed 6454020192914520146"
+    },
+    {
+      "id": "syn:binary:32000:2",
+      "content_type": "binary",
+      "size": 32000,
+      "origin": "synthetic seed 478404959229616857"
+    },
+    {
+      "id": "syn:binary:32000:3",
+      "content_type": "binary",
+      "size": 32000,
+      "origin": "synthetic seed 18207070236586276675"
+    },
+    {
+      "id": "syn:binary:96000:0",
+      "content_type": "binary",
+      "size": 96000,
+      "origin": "synthetic seed 5899501730135658272"
+    },
+    {
+      "id": "syn:binary:96000:1",
+      "content_type": "binary",
+      "size": 96000,
+      "origin": "synthetic seed 11020953802474129417"
+    },
+    {
+      "id": "syn:binary:96000:2",
+      "content_type": "binary",
+      "size": 96000,
+      "origin": "synthetic seed 16266272022887077203"
+    },
+    {
+      "id": "syn:binary:96000:3",
+      "content_type": "binary",
+      "size": 96000,
+      "origin": "synthetic seed 1179277321735703514"
+    },
+    {
+      "id": "syn:rle:500:0",
+      "content_type": "rle",
+      "size": 500,
+      "origin": "synthetic seed 7395363624676470820"
+    },
+    {
+      "id": "syn:rle:500:1",
+      "content_type": "rle",
+      "size": 500,
+      "origin": "synthetic seed 7510917189660586805"
+    },
+    {
+      "id": "syn:rle:500:2",
+      "content_type": "rle",
+      "size": 500,
+      "origin": "synthetic seed 6950679006657698674"
+    },
+    {
+      "id": "syn:rle:500:3",
+      "content_type": "rle",
+      "size": 500,
+      "origin": "synthetic seed 13807287327800503868"
+    },
+    {
+      "id": "syn:rle:1500:0",
+      "content_type": "rle",
+      "size": 1500,
+      "origin": "synthetic seed 13383607943414341915"
+    },
+    {
+      "id": "syn:rle:1500:1",
+      "content_type": "rle",
+      "size": 1500,
+      "origin": "synthetic seed 5529811146081217661"
+    },
+    {
+      "id": "syn:rle:1500:2",
+      "content_type": "rle",
+      "size": 1500,
+      "origin": "synthetic seed 8240212785495998461"
+    },
+    {
+      "id": "syn:rle:1500:3",
+      "content_type": "rle",
+      "size": 1500,
+      "origin": "synthetic seed 10682479466668419014"
+    },
+    {
+      "id": "syn:rle:4000:0",
+      "content_type": "rle",
+      "size": 4000,
+      "origin": "synthetic seed 17261153833391434510"
+    },
+    {
+      "id": "syn:rle:4000:1",
+      "content_type": "rle",
+      "size": 4000,
+      "origin": "synthetic seed 6762015209568287625"
+    },
+    {
+      "id": "syn:rle:4000:2",
+      "content_type": "rle",
+      "size": 4000,
+      "origin": "synthetic seed 1300174279898135077"
+    },
+    {
+      "id": "syn:rle:4000:3",
+      "content_type": "rle",
+      "size": 4000,
+      "origin": "synthetic seed 13556479247128651549"
+    },
+    {
+      "id": "syn:rle:12000:0",
+      "content_type": "rle",
+      "size": 12000,
+      "origin": "synthetic seed 6560315792582095587"
+    },
+    {
+      "id": "syn:rle:12000:1",
+      "content_type": "rle",
+      "size": 12000,
+      "origin": "synthetic seed 3827065097517453899"
+    },
+    {
+      "id": "syn:rle:12000:2",
+      "content_type": "rle",
+      "size": 12000,
+      "origin": "synthetic seed 8449521305441191362"
+    },
+    {
+      "id": "syn:rle:12000:3",
+      "content_type": "rle",
+      "size": 12000,
+      "origin": "synthetic seed 7185615309862255797"
+    },
+    {
+      "id": "syn:rle:32000:0",
+      "content_type": "rle",
+      "size": 32000,
+      "origin": "synthetic seed 10202083225581324679"
+    },
+    {
+      "id": "syn:rle:32000:1",
+      "content_type": "rle",
+      "size": 32000,
+      "origin": "synthetic seed 4332210629246645122"
+    },
+    {
+      "id": "syn:rle:32000:2",
+      "content_type": "rle",
+      "size": 32000,
+      "origin": "synthetic seed 2314085329334341611"
+    },
+    {
+      "id": "syn:rle:32000:3",
+      "content_type": "rle",
+      "size": 32000,
+      "origin": "synthetic seed 13394481847629663268"
+    },
+    {
+      "id": "syn:rle:96000:0",
+      "content_type": "rle",
+      "size": 96000,
+      "origin": "synthetic seed 7471221825824002309"
+    },
+    {
+      "id": "syn:rle:96000:1",
+      "content_type": "rle",
+      "size": 96000,
+      "origin": "synthetic seed 3961703585678642511"
+    },
+    {
+      "id": "syn:rle:96000:2",
+      "content_type": "rle",
+      "size": 96000,
+      "origin": "synthetic seed 5994733200406494740"
+    },
+    {
+      "id": "syn:rle:96000:3",
+      "content_type": "rle",
+      "size": 96000,
+      "origin": "synthetic seed 9281883516732725577"
+    },
+    {
+      "id": "dir168:77797e4ebb10839c",
+      "content_type": "file",
+      "size": 21982,
+      "origin": "/usr/share/doc/fonts-ipafont-gothic/copyright"
+    },
+    {
+      "id": "dir168:0ba21769a9b04d84",
+      "content_type": "file",
+      "size": 1051,
+      "origin": "/usr/share/doc/libepubgen-0.1-1/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:74c13a92633b28d4",
+      "content_type": "file",
+      "size": 3278,
+      "origin": "/usr/share/doc/libpolkit-gobject-1-0/copyright"
+    },
+    {
+      "id": "dir168:00d1a8dcf5bcc336",
+      "content_type": "file",
+      "size": 8978,
+      "origin": "/usr/share/doc/dash/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:c8087695b08db817",
+      "content_type": "file",
+      "size": 1520,
+      "origin": "/usr/share/doc/libxmlsec1t64-nss/copyright"
+    },
+    {
+      "id": "dir168:92e5c09d4194cf34",
+      "content_type": "file",
+      "size": 13398,
+      "origin": "/usr/share/doc/adduser/copyright"
+    },
+    {
+      "id": "dir168:b4777b17031e763e",
+      "content_type": "file",
+      "size": 21830,
+      "origin": "/usr/share/doc/ure/copyright"
+    },
+    {
+      "id": "dir168:78e9df8f8153c91c",
+      "content_type": "file",
+      "size": 1833,
+      "origin": "/usr/share/doc/libsqlite3-dev/copyright"
+    },
+    {
+      "id": "dir168:76e988a2c3100c34",
+      "content_type": "file",
+      "size": 3964,
+      "origin": "/usr/share/doc/libedit2/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:8bea8cf2f94cd8b3",
+      "content_type": "file",
+      "size": 2701,
+      "origin": "/usr/share/doc/libgdbm-compat-dev/copyright"
+    },
+    {
+      "id": "dir168:c709c600f8ce42d2",
+      "content_type": "file",
+      "size": 6548,
+      "origin": "/usr/share/doc/libcairo2/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:1ed1b41eae332d4b",
+      "content_type": "file",
+      "size": 13475,
+      "origin": "/usr/share/doc/sudo/copyright"
+    },
+    {
+      "id": "dir168:a4c3e5b19700dd3c",
+      "content_type": "file",
+      "size": 7044,
+      "origin": "/usr/share/doc/passwd/copyright"
+    },
+    {
+      "id": "dir168:512c9a57fd8b449a",
+      "content_type": "file",
+      "size": 15612,
+      "origin": "/usr/share/doc/libdrm2/copyright"
+    },
+    {
+      "id": "dir168:240efe5bb16f60f0",
+      "content_type": "file",
+      "size": 34887,
+      "origin": "/usr/share/doc/php8.4-common/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:2ad521e3adb9cf42",
+      "content_type": "file",
+      "size": 3535,
+      "origin": "/usr/share/doc/libgd3/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:dc91c0b004a1332d",
+      "content_type": "file",
+      "size": 8306,
+      "origin": "/usr/share/doc/pkg-config/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:cbf3d2eb38998daf",
+      "content_type": "file",
+      "size": 18288,
+      "origin": "/usr/share/doc/mesa-libgallium/copyright"
+    },
+    {
+      "id": "dir168:429176a11e4add83",
+      "content_type": "file",
+      "size": 862,
+      "origin": "/usr/share/doc/libexttextcat-data/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:29e6f06b1dcd85f1",
+      "content_type": "file",
+      "size": 6364,
+      "origin": "/usr/share/doc/xtrans-dev/copyright"
+    },
+    {
+      "id": "dir168:fb1ea085945df53c",
+      "content_type": "file",
+      "size": 7035,
+      "origin": "/usr/share/doc/libisl23/copyright"
+    },
+    {
+      "id": "dir168:676c75e54ff7e3b9",
+      "content_type": "file",
+      "size": 7501,
+      "origin": "/usr/share/doc/pkgconf-bin/copyright"
+    },
+    {
+      "id": "dir168:18834b9bd37876d7",
+      "content_type": "file",
+      "size": 4625,
+      "origin": "/usr/share/doc/fonts-freefont-ttf/copyright"
+    },
+    {
+      "id": "dir168:b61d0ffb10bb4c06",
+      "content_type": "file",
+      "size": 13985,
+      "origin": "/usr/share/doc/python3.11-lib2to3/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:a2dc8fac0f496e1c",
+      "content_type": "file",
+      "size": 15465,
+      "origin": "/usr/share/doc/xz-utils/copyright"
+    },
+    {
+      "id": "dir168:6a9bede62137f651",
+      "content_type": "file",
+      "size": 867,
+      "origin": "/usr/share/doc/libeot0/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:e85e1bcad3a915dc",
+      "content_type": "file",
+      "size": 18940,
+      "origin": "/usr/share/doc/ca-certificates/copyright"
+    },
+    {
+      "id": "dir168:4e9a543d67659796",
+      "content_type": "file",
+      "size": 42371,
+      "origin": "/usr/share/doc/libpython3.12-minimal/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:2d6c752315a9c174",
+      "content_type": "file",
+      "size": 1138,
+      "origin": "/usr/share/doc/libxcursor1/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:826a53dda5def053",
+      "content_type": "file",
+      "size": 5403,
+      "origin": "/usr/share/doc/libunistring5/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:c4a64d631f4a7c88",
+      "content_type": "file",
+      "size": 2851,
+      "origin": "/usr/share/doc/libjs-jquery/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:e46dae36cc12656b",
+      "content_type": "file",
+      "size": 30641,
+      "origin": "/usr/share/doc/libdbus-1-3/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:1c76065d1149aef8",
+      "content_type": "file",
+      "size": 6248,
+      "origin": "/usr/share/doc/bc/copyright"
+    },
+    {
+      "id": "dir168:55c642bb5d826fda",
+      "content_type": "file",
+      "size": 1162,
+      "origin": "/usr/share/doc/xauth/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:e1cf064ea92f833b",
+      "content_type": "file",
+      "size": 1457,
+      "origin": "/usr/share/doc/patch/changelog.Debian.gz"
+    },
+    {
+      "id": "dir168:8b6670fa7b8b37f4",
+      "content_type": "file",
+      "size": 1592,
+      "origin": "/usr/share/doc/python3-toml/copyright"
+    },
+    {
+      "id": "dir204:b065e56028447d78",
+      "content_type": "xml",
+      "size": 3040,
+      "origin": "/usr/share/mime/application/x-gameboy-rom.xml"
+    },
+    {
+      "id": "dir204:f164cdf3173b04bf",
+      "content_type": "xml",
+      "size": 8693,
+      "origin": "/usr/share/mime/application/vnd.oasis.opendocument.presentation-template.xml"
+    },
+    {
+      "id": "dir204:1374abea017c0e56",
+      "content_type": "xml",
+      "size": 2352,
+      "origin": "/usr/share/mime/audio/x-pn-audibleaudio.xml"
+    },
+    {
+      "id": "dir204:990050753e146c81",
+      "content_type": "xml",
+      "size": 3194,
+      "origin": "/usr/share/mime/application/x-karbon.xml"
+    },
+    {
+      "id": "dir204:1a6a12e9fce71663",
+      "content_type": "xml",
+      "size": 3227,
+      "origin": "/usr/share/mime/image/x-sun-raster.xml"
+    },
+    {
+      "id": "dir204:e165361748cac028",
+      "content_type": "xml",
+      "size": 776,
+      "origin": "/usr/share/mime/application/x-ms-pdb.xml"
+    },
+    {
+      "id": "dir204:5bf622e2e274fea6",
+      "content_type": "xml",
+      "size": 3017,
+      "origin": "/usr/share/mime/application/x-gamecube-rom.xml"
+    },
+    {
+      "id": "dir204:fe3944216377571a",
+      "content_type": "xml",
+      "size": 2988,
+      "origin": "/usr/share/mime/application/x-java-jnlp-file.xml"
+    },
+    {
+      "id": "dir204:c9ef507b304b330b",
+      "content_type": "xml",
+      "size": 2328,
+      "origin": "/usr/share/mime/application/x-sms-rom.xml"
+    },
+    {
+      "id": "dir204:e31bfc7374e3fa83",
+      "content_type": "xml",
+      "size": 3632,
+      "origin": "/usr/share/mime/message/x-gnu-rmail.xml"
+    },
+    {
+      "id": "dir204:569a724812fdb59e",
+      "content_type": "xml",
+      "size": 2747,
+      "origin": "/usr/share/mime/x-content/video-vcd.xml"
+    },
+    {
+      "id": "dir204:82a85164bfd9e1ab",
+      "content_type": "xml",
+      "size": 3188,
+      "origin": "/usr/share/mime/text/vnd.graphviz.xml"
+    },
+    {
+      "id": "dir204:b46567082ba3479d",
+      "content_type": "xml",
+      "size": 939,
+      "origin": "/usr/share/mime/application/x-tex-pk.xml"
+    },
+    {
+      "id": "dir204:b3201f04e160dbd8",
+      "content_type": "xml",
+      "size": 2935,
+      "origin": "/usr/share/mime/application/x-mimearchive.xml"
+    },
+    {
+      "id": "dir204:cb6215d66f469da4",
+      "content_type": "xml",
+      "size": 3182,
+      "origin": "/usr/share/mime/video/wavelet.xml"
+    },
+    {
+      "id": "dir204:64124a7c816933a2",
+      "content_type": "xml",
+      "size": 3558,
+      "origin": "/usr/share/mime/audio/x-xm.xml"
+    },
+    {
+      "id": "dir204:a250f5402c462faa",
+      "content_type": "xml",
+      "size": 2706,
+      "origin": "/usr/share/mime/application/x-thomson-cartridge-memo7.xml"
+    },
+    {
+      "id": "dir204:3ac114cbefce478a",
+      "content_type": "xml",
+      "size": 3173,
+      "origin": "/usr/share/mime/video/x-flv.xml"
+    },
+    {
+      "id": "dir204:58126050f63cdc78",
+      "content_type": "file",
+      "size": 20152,
+      "origin": "/usr/share/mime/types"
+    },
+    {
+      "id": "dir204:fed2591119e28b65",
+      "content_type": "xml",
+      "size": 939,
+      "origin": "/usr/share/mime/message/partial.xml"
+    },
+    {
+      "id": "dir204:4cd4df408a8cbaa4",
+      "content_type": "xml",
+      "size": 3229,
+      "origin": "/usr/share/mime/application/x-java-jce-keystore.xml"
+    },
+    {
+      "id": "dir204:4eec6661307f2a82",
+      "content_type": "xml",
+      "size": 2817,
+      "origin": "/usr/share/mime/application/vnd.ms-visio.drawing.macroenabled.main+xml.xml"
+    },
+    {
+      "id": "dir204:a8f5ed52b07b2bbd",
+      "content_type": "xml",
+      "size": 2109,
+      "origin": "/usr/share/mime/text/x-kotlin.xml"
+    },
+    {
+      "id": "dir204:9cc55fe260336340",
+      "content_type": "xml",
+      "size": 2851,
+      "origin": "/usr/share/mime/x-content/image-picturecd.xml"
+    },
+    {
+      "id": "dir204:573d3a971079fa5a",
+      "content_type": "xml",
+      "size": 2732,
+      "origin": "/usr/share/mime/font/woff.xml"
+    },
+    {
+      "id": "dir204:598d344eb46c437a",
+      "content_type": "xml",
+      "size": 7953,
+      "origin": "/usr/share/mime/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.xml"
+    },
+    {
+      "id": "dir204:907b1f882607c5b3",
+      "content_type": "xml",
+      "size": 3246,
+      "origin": "/usr/share/mime/application/x-slp.xml"
+    },
+    {
+      "id": "dir204:5889767ae7545d79",
+      "content_type": "xml",
+      "size": 637,
+      "origin": "/usr/share/mime/application/x-msdownload.xml"
+    },
+    {
+      "id": "dir204:1efaa2bb3358a532",
+      "content_type": "xml",
+      "size": 3424,
+      "origin": "/usr/share/mime/audio/prs.sid.xml"
+    },
+    {
+      "id": "dir204:f34fd449510081f3",
+      "content_type": "xml",
+      "size": 3235,
+      "origin": "/usr/share/mime/image/x-lws.xml"
+    },
+    {
+      "id": "dir204:4209e25c6e5cf5cd",
+      "content_type": "xml",
+      "size": 3239,
+      "origin": "/usr/share/mime/text/x-literate-haskell.xml"
+    },
+    {
+      "id": "dir204:40e47beb07324cc7",
+      "content_type": "xml",
+      "size": 1152,
+      "origin": "/usr/share/mime/image/apng.xml"
+    },
+    {
+      "id": "dir204:d2272bd00e9b07cf",
+      "content_type": "xml",
+      "size": 3179,
+      "origin": "/usr/share/mime/application/x-font-libgrx.xml"
+    },
+    {
+      "id": "dir204:717d9211aebed129",
+      "content_type": "xml",
+      "size": 1022,
+      "origin": "/usr/share/mime/application/x-profile.xml"
+    },
+    {
+      "id": "dir204:e6b8f9dd4004a281",
+      "content_type": "xml",
+      "size": 1418,
+      "origin": "/usr/share/mime/video/vnd.radgamettools.bink.xml"
+    },
+    {
+      "id": "dir204:cdbc70a2fc8b6ca3",
+      "content_type": "xml",
+      "size": 2479,
+      "origin": "/usr/share/mime/application/x-ipynb+json.xml"
+    },
+    {
+      "id": "dir240:ceee94a2d2c153a4",
+      "content_type": "ui",
+      "size": 14599,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svx/ui/passwd.ui"
+    },
+    {
+      "id": "dir240:cac46cead2b132bc",
+      "content_type": "ui",
+      "size": 11545,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/optchartcolorspage.ui"
+    },
+    {
+      "id": "dir240:d7035ac40d746cc5",
+      "content_type": "xml",
+      "size": 3010,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/oleobjectbar.xml"
+    },
+    {
+      "id": "dir240:be9873ec42bda70a",
+      "content_type": "xml",
+      "size": 1854,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/schart/toolbar/starshapes.xml"
+    },
+    {
+      "id": "dir240:ddc0f60bf684ff9f",
+      "content_type": "xml",
+      "size": 922,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/popupmenu/notebookbar.xml"
+    },
+    {
+      "id": "dir240:5d9dde87e2ee8204",
+      "content_type": "ui",
+      "size": 10165,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/newstyle.ui"
+    },
+    {
+      "id": "dir240:4005b7623f2b1719",
+      "content_type": "xml",
+      "size": 2441,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/insertbar.xml"
+    },
+    {
+      "id": "dir240:d107352cecb92a47",
+      "content_type": "ui",
+      "size": 11298,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/slidedesigndialog.ui"
+    },
+    {
+      "id": "dir240:e1f50b537cc3fa50",
+      "content_type": "xml",
+      "size": 2482,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swxform/toolbar/formsnavigationbar.xml"
+    },
+    {
+      "id": "dir240:92268281fbe1f149",
+      "content_type": "xml",
+      "size": 3414,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/toolbar/flowchartshapes.xml"
+    },
+    {
+      "id": "dir240:d0b9be06c09c7202",
+      "content_type": "ui",
+      "size": 3922,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/captiondialog.ui"
+    },
+    {
+      "id": "dir240:ba779f5111b7bc01",
+      "content_type": "ui",
+      "size": 41547,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/optimpressgeneralpage.ui"
+    },
+    {
+      "id": "dir240:5a36c02c012570ff",
+      "content_type": "xml",
+      "size": 3574,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/tableobjectbar.xml"
+    },
+    {
+      "id": "dir240:da62e5a53f50cf4d",
+      "content_type": "ui",
+      "size": 3740,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/uui/ui/sslwarndialog.ui"
+    },
+    {
+      "id": "dir240:ba19bd364624f145",
+      "content_type": "ui",
+      "size": 21981,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/schart/ui/tp_axisLabel.ui"
+    },
+    {
+      "id": "dir240:701cdabe53484c5f",
+      "content_type": "ui",
+      "size": 121449,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/notebookbar_groups.ui"
+    },
+    {
+      "id": "dir240:9e59ef52bcca0aa2",
+      "content_type": "xml",
+      "size": 2300,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/toolbar/symbolshapes.xml"
+    },
+    {
+      "id": "dir240:84ef79a52fe4baf8",
+      "content_type": "ui",
+      "size": 10966,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/optnewdictionarydialog.ui"
+    },
+    {
+      "id": "dir240:ad39c5fcaa6fb995",
+      "content_type": "xml",
+      "size": 1452,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swreport/toolbar/mailmerge.xml"
+    },
+    {
+      "id": "dir240:5e8c4e3cb087661c",
+      "content_type": "ui",
+      "size": 1701,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/tabviewbar.ui"
+    },
+    {
+      "id": "dir240:d4552fcb7bf5188f",
+      "content_type": "ui",
+      "size": 6302,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/bookmarkdialog.ui"
+    },
+    {
+      "id": "dir240:a4f3c889723a8bee",
+      "content_type": "ui",
+      "size": 655,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/ui/navigatorcontextmenu.ui"
+    },
+    {
+      "id": "dir240:c951963d15183292",
+      "content_type": "xml",
+      "size": 3571,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sglobal/toolbar/drawbar.xml"
+    },
+    {
+      "id": "dir240:f716d50c9575eeb7",
+      "content_type": "ui",
+      "size": 22027,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/footnoteareapage.ui"
+    },
+    {
+      "id": "dir240:00a2b9237e08a6cc",
+      "content_type": "ui",
+      "size": 4937,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/panel.ui"
+    },
+    {
+      "id": "dir240:89cd0c05c400bd51",
+      "content_type": "ui",
+      "size": 4281,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/helpbookmarkpage.ui"
+    },
+    {
+      "id": "dir240:7cbef79d96fe5810",
+      "content_type": "ui",
+      "size": 2988,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svt/ui/calendar.ui"
+    },
+    {
+      "id": "dir240:d3ef7df09b55a950",
+      "content_type": "xml",
+      "size": 1454,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swreport/toolbar/optimizetablebar.xml"
+    },
+    {
+      "id": "dir240:b66d288f57f32c4d",
+      "content_type": "ui",
+      "size": 6571,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/layoutwindow.ui"
+    },
+    {
+      "id": "dir240:616651e1bcd501aa",
+      "content_type": "ui",
+      "size": 12720,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/tocstylespage.ui"
+    },
+    {
+      "id": "dir240:13d1bc01fa9e7c72",
+      "content_type": "ui",
+      "size": 31070,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/possizetabpage.ui"
+    },
+    {
+      "id": "dir240:3c7ea5661fc89610",
+      "content_type": "ui",
+      "size": 4453,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svx/ui/inspectortextpanel.ui"
+    },
+    {
+      "id": "dir240:10afe6de3b2a840d",
+      "content_type": "ui",
+      "size": 8228,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/ui/sharedleftfooterdialog.ui"
+    },
+    {
+      "id": "dir240:bf936a45da2e177d",
+      "content_type": "ui",
+      "size": 1204,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svt/ui/tabbaredit.ui"
+    },
+    {
+      "id": "dir240:27198ef9e8348033",
+      "content_type": "xml",
+      "size": 2860,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/toolbar/formcontrols.xml"
+    },
+    {
+      "id": "dir240:4f96f153f694d08f",
+      "content_type": "ui",
+      "size": 15600,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/autoredactdialog.ui"
+    },
+    {
+      "id": "dir276:36791cfdcdf1cedf",
+      "content_type": "file",
+      "size": 15157,
+      "origin": "/usr/share/i18n/locales/translit_circle"
+    },
+    {
+      "id": "dir276:eb6a8c5cde98dd3f",
+      "content_type": "file",
+      "size": 3918,
+      "origin": "/usr/share/i18n/locales/mag_IN"
+    },
+    {
+      "id": "dir276:04e2310efd3939e6",
+      "content_type": "file",
+      "size": 12980,
+      "origin": "/usr/share/i18n/charmaps/ISO-8859-10.gz"
+    },
+    {
+      "id": "dir276:d0bc551c0610ed04",
+      "content_type": "file",
+      "size": 7362,
+      "origin": "/usr/share/i18n/charmaps/EBCDIC-ES-S.gz"
+    },
+    {
+      "id": "dir276:51c87dbbb1ba4a16",
+      "content_type": "file",
+      "size": 11780,
+      "origin": "/usr/share/i18n/charmaps/CP1257.gz"
+    },
+    {
+      "id": "dir276:35809ac9b25e07db",
+      "content_type": "file",
+      "size": 12340,
+      "origin": "/usr/share/i18n/charmaps/ISO-8859-15.gz"
+    },
+    {
+      "id": "dir276:44aeb915d8fa4fe5",
+      "content_type": "file",
+      "size": 7313,
+      "origin": "/usr/share/i18n/charmaps/EBCDIC-US.gz"
+    },
+    {
+      "id": "dir276:34feec511fda1d39",
+      "content_type": "file",
+      "size": 4419,
+      "origin": "/usr/share/i18n/locales/so_DJ"
+    },
+    {
+      "id": "dir276:80912987bb96fe61",
+      "content_type": "file",
+      "size": 2492,
+      "origin": "/usr/share/i18n/locales/sq_MK"
+    },
+    {
+      "id": "dir276:5f4c2063e1b82713",
+      "content_type": "file",
+      "size": 6284,
+      "origin": "/usr/share/i18n/locales/dsb_DE"
+    },
+    {
+      "id": "dir276:f2bd7c0ff44cccef",
+      "content_type": "file",
+      "size": 12097,
+      "origin": "/usr/share/i18n/charmaps/HP-TURKISH8.gz"
+    },
+    {
+      "id": "dir276:2150cd703818b5a9",
+      "content_type": "file",
+      "size": 7317,
+      "origin": "/usr/share/i18n/charmaps/EBCDIC-UK.gz"
+    },
+    {
+      "id": "dir276:8cb639c1a6d83798",
+      "content_type": "file",
+      "size": 11970,
+      "origin": "/usr/share/i18n/charmaps/IBM1004.gz"
+    },
+    {
+      "id": "dir276:343eaba589c4acdc",
+      "content_type": "file",
+      "size": 4572,
+      "origin": "/usr/share/i18n/locales/en_HK"
+    },
+    {
+      "id": "dir276:7143c340df24f89c",
+      "content_type": "file",
+      "size": 12329,
+      "origin": "/usr/share/i18n/charmaps/CP1250.gz"
+    },
+    {
+      "id": "dir276:6782c602262aefc2",
+      "content_type": "file",
+      "size": 12322,
+      "origin": "/usr/share/i18n/charmaps/CP774.gz"
+    },
+    {
+      "id": "dir276:89a420cdf0a5f3a1",
+      "content_type": "file",
+      "size": 11468,
+      "origin": "/usr/share/i18n/locales/bg_BG"
+    },
+    {
+      "id": "dir276:dc413293a08f8972",
+      "content_type": "file",
+      "size": 6986,
+      "origin": "/usr/share/i18n/locales/mr_IN"
+    },
+    {
+      "id": "dir276:e95892fdd97f09e1",
+      "content_type": "file",
+      "size": 256000,
+      "origin": "/usr/share/i18n/locales/translit_hangul"
+    },
+    {
+      "id": "dir276:a60686071d192920",
+      "content_type": "file",
+      "size": 2489,
+      "origin": "/usr/share/i18n/locales/li_NL"
+    },
+    {
+      "id": "dir276:abccd3e73e2c5dd8",
+      "content_type": "file",
+      "size": 2769,
+      "origin": "/usr/share/i18n/locales/nl_AW"
+    },
+    {
+      "id": "dir276:7fc3fd90d570416b",
+      "content_type": "file",
+      "size": 16268,
+      "origin": "/usr/share/i18n/charmaps/ISO_8859-1,GL.gz"
+    },
+    {
+      "id": "dir276:fa36318e6c9ea047",
+      "content_type": "file",
+      "size": 11517,
+      "origin": "/usr/share/i18n/charmaps/IBM1164.gz"
+    },
+    {
+      "id": "dir276:045e4aaadb8881ca",
+      "content_type": "file",
+      "size": 256000,
+      "origin": "/usr/share/i18n/charmaps/UTF-8.gz"
+    },
+    {
+      "id": "dir276:121ffa7d9f3f4d44",
+      "content_type": "file",
+      "size": 3508,
+      "origin": "/usr/share/i18n/locales/eu_ES"
+    },
+    {
+      "id": "dir276:0041730a3d4fd05d",
+      "content_type": "file",
+      "size": 4338,
+      "origin": "/usr/share/i18n/locales/gez_ER"
+    },
+    {
+      "id": "dir276:2148faaedbe50216",
+      "content_type": "file",
+      "size": 12624,
+      "origin": "/usr/share/i18n/charmaps/SAMI-WS2.gz"
+    },
+    {
+      "id": "dir276:df9c883965626a16",
+      "content_type": "file",
+      "size": 4356,
+      "origin": "/usr/share/i18n/locales/agr_PE"
+    },
+    {
+      "id": "dir276:5b20ce2fbde7e9dc",
+      "content_type": "file",
+      "size": 4762,
+      "origin": "/usr/share/i18n/locales/ar_LB"
+    },
+    {
+      "id": "dir276:da0be545d004964a",
+      "content_type": "file",
+      "size": 6634,
+      "origin": "/usr/share/i18n/locales/zu_ZA"
+    },
+    {
+      "id": "dir276:76ca45949a13e84a",
+      "content_type": "file",
+      "size": 3390,
+      "origin": "/usr/share/i18n/locales/en_IE"
+    },
+    {
+      "id": "dir276:35df214fb9be8415",
+      "content_type": "file",
+      "size": 11828,
+      "origin": "/usr/share/i18n/charmaps/GEORGIAN-PS.gz"
+    },
+    {
+      "id": "dir276:95150062e60fcbd0",
+      "content_type": "file",
+      "size": 3779,
+      "origin": "/usr/share/i18n/locales/ug_CN@latin"
+    },
+    {
+      "id": "dir276:4d5a4adaf5c1593b",
+      "content_type": "file",
+      "size": 4502,
+      "origin": "/usr/share/i18n/locales/ku_TR"
+    },
+    {
+      "id": "dir276:243fb45cb18ca082",
+      "content_type": "file",
+      "size": 5659,
+      "origin": "/usr/share/i18n/locales/hi_IN"
+    },
+    {
+      "id": "dir276:9ed8a6f5570ab8ff",
+      "content_type": "file",
+      "size": 2889,
+      "origin": "/usr/share/i18n/locales/fur_IT"
+    },
+    {
+      "id": "dir312:c159ba16d910a441",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf"
+    },
+    {
+      "id": "dir312:6c4e2b98a1215045",
+      "content_type": "file",
+      "size": 11448,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox2to.pcf.gz"
+    },
+    {
+      "id": "dir312:28b7cf90182996b9",
+      "content_type": "file",
+      "size": 10728,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox1h.pcf.gz"
+    },
+    {
+      "id": "dir312:c89c57fcfb7e048b",
+      "content_type": "afm",
+      "size": 15395,
+      "origin": "/usr/share/fonts/X11/Type1/c0419bt_.afm"
+    },
+    {
+      "id": "dir312:a742830aea98cbd2",
+      "content_type": "file",
+      "size": 9730,
+      "origin": "/usr/share/fonts/X11/util/map-ISO8859-11"
+    },
+    {
+      "id": "dir312:3a5371b1326bf955",
+      "content_type": "file",
+      "size": 17860,
+      "origin": "/usr/share/fonts/X11/cyrillic/koi8x13.pcf.gz"
+    },
+    {
+      "id": "dir312:a0261377294fbf07",
+      "content_type": "alias",
+      "size": 3607,
+      "origin": "/usr/share/fonts/X11/cyrillic/fonts.alias"
+    },
+    {
+      "id": "dir312:a00e489ed170b6e4",
+      "content_type": "file",
+      "size": 13804,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox4h.pcf.gz"
+    },
+    {
+      "id": "dir312:0f127fe7e6528a2b",
+      "content_type": "file",
+      "size": 10696,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox1t.pcf.gz"
+    },
+    {
+      "id": "dir312:419c155c39648d90",
+      "content_type": "file",
+      "size": 12144,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox3t.pcf.gz"
+    },
+    {
+      "id": "dir312:3cc5e20194a74a8c",
+      "content_type": "otf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/opentype/unifont/unifont_sample.otf"
+    },
+    {
+      "id": "dir312:9ecc1d370c5ee96c",
+      "content_type": "pfb",
+      "size": 39511,
+      "origin": "/usr/share/fonts/X11/Type1/c0582bt_.pfb"
+    },
+    {
+      "id": "dir312:d8c8b20497e63f31",
+      "content_type": "file",
+      "size": 73575,
+      "origin": "/usr/share/fonts/X11/encodings/large/jisx0212.1990-0.enc.gz"
+    },
+    {
+      "id": "dir312:d00410bd88128fd8",
+      "content_type": "file",
+      "size": 10724,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox1hb.pcf.gz"
+    },
+    {
+      "id": "dir312:3fc9b87a29f1ecaa",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"
+    },
+    {
+      "id": "dir312:35d8fa51fed06e84",
+      "content_type": "file",
+      "size": 13924,
+      "origin": "/usr/share/fonts/X11/cyrillic/koi5x8.pcf.gz"
+    },
+    {
+      "id": "dir312:f2640e1dbeb1371e",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf"
+    },
+    {
+      "id": "dir312:8d9a9b63246d8c4c",
+      "content_type": "file",
+      "size": 5718,
+      "origin": "/usr/share/fonts/X11/encodings/ibm-cp437.enc.gz"
+    },
+    {
+      "id": "dir312:4bea5cf4b048e3b7",
+      "content_type": "file",
+      "size": 8553,
+      "origin": "/usr/share/fonts/X11/util/map-ISO8859-8"
+    },
+    {
+      "id": "dir312:e0d5abb324cc4536",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf"
+    },
+    {
+      "id": "dir312:ab54aa13caf21a94",
+      "content_type": "file",
+      "size": 2564,
+      "origin": "/usr/share/fonts/X11/encodings/large/sun.unicode.india-0.enc.gz"
+    },
+    {
+      "id": "dir312:165dca534bd0f39d",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf"
+    },
+    {
+      "id": "dir312:99d7dcd6d6790468",
+      "content_type": "afm",
+      "size": 15407,
+      "origin": "/usr/share/fonts/X11/Type1/c0582bt_.afm"
+    },
+    {
+      "id": "dir312:976d48dfff033c7b",
+      "content_type": "file",
+      "size": 10628,
+      "origin": "/usr/share/fonts/X11/util/map-ISO8859-9"
+    },
+    {
+      "id": "dir312:248f6588aa8ff98e",
+      "content_type": "file",
+      "size": 3245,
+      "origin": "/usr/share/fonts/X11/encodings/microsoft-cp1257.enc.gz"
+    },
+    {
+      "id": "dir312:bc24c6077057917b",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
+    },
+    {
+      "id": "dir312:a7906a91ec3a4ac7",
+      "content_type": "file",
+      "size": 10498,
+      "origin": "/usr/share/fonts/X11/util/map-ISO8859-3"
+    },
+    {
+      "id": "dir312:a2ffd35f572aa7c9",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
+    },
+    {
+      "id": "dir312:52026556ee7b322c",
+      "content_type": "file",
+      "size": 11118,
+      "origin": "/usr/share/fonts/X11/encodings/adobe-dingbats.enc.gz"
+    },
+    {
+      "id": "dir312:133e6af2dcdfea62",
+      "content_type": "otf",
+      "size": 52036,
+      "origin": "/usr/share/fonts/opentype/tlwg/Loma-Oblique.otf"
+    },
+    {
+      "id": "dir312:354a9227f7b82d67",
+      "content_type": "file",
+      "size": 27516,
+      "origin": "/usr/share/fonts/X11/cyrillic/koi12x24b.pcf.gz"
+    },
+    {
+      "id": "dir312:858535cc22ffcb88",
+      "content_type": "file",
+      "size": 1078,
+      "origin": "/usr/share/fonts/X11/encodings/mulearabic-2.enc.gz"
+    },
+    {
+      "id": "dir312:1d0d54f537a3bea0",
+      "content_type": "file",
+      "size": 18004,
+      "origin": "/usr/share/fonts/X11/cyrillic/koi6x13.pcf.gz"
+    },
+    {
+      "id": "dir312:ad1aa75f167286fb",
+      "content_type": "file",
+      "size": 13232,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox4t.pcf.gz"
+    },
+    {
+      "id": "dir312:3b76c9fb69f3010b",
+      "content_type": "file",
+      "size": 10724,
+      "origin": "/usr/share/fonts/X11/cyrillic/crox1hbo.pcf.gz"
+    },
+    {
+      "id": "dir312:fe64f38e11eff1b0",
+      "content_type": "ttf",
+      "size": 256000,
+      "origin": "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf"
+    }
+  ],
+  "params": {
+    "per_combo": 4,
+    "sizes": null,
+    "source_dirs": [
+      "/usr/share/doc",
+      "/usr/share/mime",
+      "/usr/lib/libreoffice/share/config",
+      "/usr/share/i18n",
+      "/usr/share/fonts"
+    ]
+  },
+  "errors": [],
+  "app_profiles": {},
+  "feature_names": [
+    "blk_count",
+    "blk_per_100kb",
+    "blk_frac_stored",
+    "blk_frac_static",
+    "blk_frac_dynamic",
+    "blk_out_mean",
+    "blk_out_median",
+    "blk_out_max",
+    "blk_out_min",
+    "blk_out_cv",
+    "blk_bits_mean",
+    "blk_bits_cv",
+    "blk_first_is_stored",
+    "blk_first_is_static",
+    "blk_last_is_stored",
+    "blk_single_block",
+    "blk_store_65535_frac",
+    "blk_store_len_mean",
+    "blk_stored_pad_nonzero",
+    "blk_interior_out_cv",
+    "blk_interior_uniform",
+    "blk_tokens_mean",
+    "blk_tokens_cv",
+    "blk_tokens_near_litbuf",
+    "cl_hclen_mean",
+    "cl_hclen_min",
+    "cl_hclen_max",
+    "cl_hclen_is_19_frac",
+    "cl_hlit_mean",
+    "cl_hlit_is_286_frac",
+    "cl_hlit_is_257_frac",
+    "cl_hdist_mean",
+    "cl_hdist_is_1_frac",
+    "cl_hdist_is_30_frac",
+    "cl_rep16_per_block",
+    "cl_rep17_per_block",
+    "cl_rep18_per_block",
+    "cl_rep16_frac",
+    "cl_rep17_frac",
+    "cl_rep18_frac",
+    "cl_uses_any_repeat",
+    "cl_symbols_per_block",
+    "cl_tree_bits_mean",
+    "cl_tree_bits_frac_of_stream",
+    "cl_arr_mean",
+    "cl_arr_zeros_frac",
+    "cl_arr_max",
+    "cl_arr_entropy",
+    "lit_shape_1",
+    "lit_shape_2",
+    "lit_shape_3",
+    "lit_shape_4",
+    "lit_shape_5",
+    "lit_shape_6",
+    "lit_shape_7",
+    "lit_shape_8",
+    "lit_shape_9",
+    "lit_shape_10",
+    "lit_shape_11",
+    "lit_shape_12",
+    "lit_shape_13",
+    "lit_shape_14",
+    "lit_shape_15",
+    "dst_shape_1",
+    "dst_shape_2",
+    "dst_shape_3",
+    "dst_shape_4",
+    "dst_shape_5",
+    "dst_shape_6",
+    "dst_shape_7",
+    "dst_shape_8",
+    "dst_shape_9",
+    "dst_shape_10",
+    "dst_shape_11",
+    "dst_shape_12",
+    "dst_shape_13",
+    "dst_shape_14",
+    "dst_shape_15",
+    "lit_shape_entropy",
+    "dst_shape_entropy",
+    "lit_maxlen",
+    "dst_maxlen",
+    "lit_codes_used_mean",
+    "dst_codes_used_mean",
+    "lit_mean_code_len",
+    "dst_mean_code_len",
+    "tok_count",
+    "tok_literal_ratio",
+    "tok_match_ratio",
+    "tok_per_out_byte",
+    "tok_match_len_mean",
+    "tok_match_len_max",
+    "tok_len3_frac",
+    "tok_len258_frac",
+    "tok_dist1_frac",
+    "tok_dist_max",
+    "tok_log2dist_mean",
+    "tok_coverage_by_matches",
+    "tok_lit_runs_per_match",
+    "tok_lit_run_mean",
+    "tok_lit_run_max",
+    "tok_run1_frac",
+    "tok_lazy_signature",
+    "tok_match_after_match_frac",
+    "len_code_0",
+    "len_code_1",
+    "len_code_2",
+    "len_code_3",
+    "len_code_4",
+    "len_code_5",
+    "len_code_6",
+    "len_code_7",
+    "len_code_8",
+    "len_code_9",
+    "len_code_10",
+    "len_code_11",
+    "len_code_12",
+    "len_code_13",
+    "len_code_14",
+    "len_code_15",
+    "len_code_16",
+    "len_code_17",
+    "len_code_18",
+    "len_code_19",
+    "len_code_20",
+    "len_code_21",
+    "len_code_22",
+    "len_code_23",
+    "len_code_24",
+    "len_code_25",
+    "len_code_26",
+    "len_code_27",
+    "len_code_28",
+    "dis_code_0",
+    "dis_code_1",
+    "dis_code_2",
+    "dis_code_3",
+    "dis_code_4",
+    "dis_code_5",
+    "dis_code_6",
+    "dis_code_7",
+    "dis_code_8",
+    "dis_code_9",
+    "dis_code_10",
+    "dis_code_11",
+    "dis_code_12",
+    "dis_code_13",
+    "dis_code_14",
+    "dis_code_15",
+    "dis_code_16",
+    "dis_code_17",
+    "dis_code_18",
+    "dis_code_19",
+    "dis_code_20",
+    "dis_code_21",
+    "dis_code_22",
+    "dis_code_23",
+    "dis_code_24",
+    "dis_code_25",
+    "dis_code_26",
+    "dis_code_27",
+    "dis_code_28",
+    "dis_code_29",
+    "len_entropy",
+    "dis_entropy",
+    "len_gini",
+    "dis_gini",
+    "dis_frac_gt_4k",
+    "dis_frac_gt_8k",
+    "dis_frac_gt_16k",
+    "dis_frac_le_256",
+    "dis_top_code",
+    "len_top_code",
+    "str_final_pad_bits",
+    "str_final_pad_nonzero",
+    "str_bits_per_out_byte",
+    "str_bits_per_token",
+    "str_out_size_log",
+    "str_compressed_size_log",
+    "str_ratio",
+    "str_truncated",
+    "str_has_error",
+    "dec_match_longest_frac",
+    "dec_match_shortfall_mean",
+    "dec_shortfall_len_median",
+    "dec_match_nearest_frac",
+    "dec_match_farther_log2_mean",
+    "dec_min_match_len",
+    "dec_len3_far_frac",
+    "dec_lit_avail_frac",
+    "dec_lit_avail_len_mean",
+    "dec_lazy_defer_frac",
+    "dec_lazy_nogain_frac",
+    "dec_missed_match_frac",
+    "dec_avail3_far_frac",
+    "dec_blk_tokens_mode_frac",
+    "dec_blk_tokens_mode_log2",
+    "dec_blk_tokens_pow2_frac",
+    "dec_blk_boundary_gain_mean",
+    "dec_blk_boundary_paid_frac",
+    "dec_blk_type_suboptimal_frac",
+    "dec_blk_static_saving_mean",
+    "huf_lit_excess_mean",
+    "huf_dst_excess_mean",
+    "huf_lit_optimal_frac",
+    "huf_unused_lit_mean",
+    "huf_unused_dst_mean",
+    "huf_eob_len_mean",
+    "huf_lit_limit_hit_frac"
+  ]
+}

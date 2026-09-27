@@ -1,4 +1,4 @@
-"""CPython zlib adapter -- the RFC 1951 anchor family."""
+"""CPython zlib adapter -- the reference implementation of the zlib profile."""
 
 from __future__ import annotations
 
@@ -15,44 +15,49 @@ STRATEGIES = {
 }
 
 
-class ZlibEncoder(Encoder):
-    family = "zlib"
+def zlib_raw(
+    data: bytes,
+    level: int,
+    mem_level: int = 8,
+    wbits: int = 15,
+    strategy: int = zlib.Z_DEFAULT_STRATEGY,
+) -> bytes:
+    """Raw DEFLATE from CPython's zlib with every parameter exposed."""
+    comp = zlib.compressobj(level, zlib.DEFLATED, -wbits, mem_level, strategy)
+    return comp.compress(data) + comp.flush()
 
-    def __init__(self, include_strategies: bool = True) -> None:
+
+class ZlibEncoder(Encoder):
+    """zlib levels 1 to 9 (proposal III.B); strategies as optional extras."""
+
+    name = "zlib"
+    library = "zlib"
+    reference = True
+
+    def __init__(self, include_strategies: bool = False) -> None:
         self.include_strategies = include_strategies
 
     def available(self) -> bool:
         return True
 
-    def levels(self) -> list[str]:
-        base = [str(i) for i in range(0, 10)]
+    def version(self) -> str:
+        return f"zlib {zlib.ZLIB_RUNTIME_VERSION}"
+
+    def settings(self) -> list[str]:
+        base = [str(i) for i in range(1, 10)]
         if not self.include_strategies:
             return base
-        # keep the corpus tractable: default strategy over all levels, plus the
-        # non-default strategies at a representative level 6
-        extra = [f"6{s}" for s in ("filt", "huff", "rle", "fixed")]
-        return base + extra
+        return base + [f"6{s}" for s in ("filt", "huff", "rle", "fixed")]
 
-    def compress(self, data: bytes, level: str) -> EncoderResult:
-        if level.isdigit():
-            n, strategy, sname = int(level), zlib.Z_DEFAULT_STRATEGY, "def"
+    def compress(self, data: bytes, setting: str) -> EncoderResult:
+        if setting.isdigit():
+            n, strategy, sname = int(setting), zlib.Z_DEFAULT_STRATEGY, "def"
         else:
-            n = int(level[0])
-            sname = level[1:]
+            n = int(setting[0])
+            sname = setting[1:]
             strategy = STRATEGIES[sname]
-        comp = zlib.compressobj(n, zlib.DEFLATED, -15, 8, strategy)
-        raw = comp.compress(data) + comp.flush()
-        return EncoderResult(
-            raw_deflate=raw,
-            family=self.family,
-            level=level,
-            label=self.label(level),
-            extra={
-                "runtime_version": zlib.ZLIB_RUNTIME_VERSION,
-                "numeric_level": n,
-                "strategy": sname,
-            },
-        )
+        raw = zlib_raw(data, n, strategy=strategy)
+        return self.result(raw, setting, numeric_level=n, strategy=sname)
 
 
 register(ZlibEncoder())

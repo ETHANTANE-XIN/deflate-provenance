@@ -14,7 +14,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .deflate import BTYPE_STORED, StreamRecord
-from .features import extract_features
 
 
 @dataclass
