@@ -26,6 +26,7 @@ The model is saved as plain JSON (no pickle).
 
 from __future__ import annotations
 
+import gzip
 import json
 from dataclasses import dataclass, field
 
@@ -103,6 +104,8 @@ class ProvenanceClassifier:
     calibration: dict = field(default_factory=dict)
     calibration_note: str = ""
     profile_info: dict = field(default_factory=dict)
+    #: how and on what the model was trained (dfp version, date, corpus)
+    training: dict = field(default_factory=dict)
     _forest: RandomForest | None = None
     _mean: np.ndarray | None = None
     _std: np.ndarray | None = None
@@ -347,6 +350,7 @@ class ProvenanceClassifier:
 
     # -- persistence -------------------------------------------------------------
     def save(self, path: str) -> None:
+        """Write the model as JSON; a ``.gz`` suffix writes it compressed."""
         blob = {
             "format": "dfp-model-2",
             "classes": self.classes,
@@ -357,6 +361,7 @@ class ProvenanceClassifier:
             "min_evidence_bytes": self.min_evidence_bytes,
             "calibration": self.calibration,
             "profile_info": self.profile_info,
+            "training": self.training,
             "mean": self._mean.tolist(),
             "std": self._std.tolist(),
             "centroids": self._centroids.tolist(),
@@ -368,12 +373,15 @@ class ProvenanceClassifier:
                 for k, v in self._setting_models.items()
             },
         }
-        with open(path, "w", encoding="utf-8") as fh:
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "wt", encoding="utf-8") as fh:
             json.dump(blob, fh)
 
     @classmethod
     def load(cls, path: str) -> "ProvenanceClassifier":
-        with open(path, "r", encoding="utf-8") as fh:
+        """Read a model written by :meth:`save` (plain or ``.gz``)."""
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "rt", encoding="utf-8") as fh:
             blob = json.load(fh)
         if blob.get("format") != "dfp-model-2":
             raise ValueError("model file is from an older dfp version; retrain with `dfp train`")
@@ -388,6 +396,7 @@ class ProvenanceClassifier:
         obj.min_evidence_bytes = blob["min_evidence_bytes"]
         obj.calibration = blob.get("calibration", {})
         obj.profile_info = blob.get("profile_info", {})
+        obj.training = blob.get("training", {})
         obj._mean = np.array(blob["mean"])
         obj._std = np.array(blob["std"])
         obj._centroids = np.array(blob["centroids"])

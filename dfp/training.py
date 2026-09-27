@@ -68,4 +68,26 @@ def train_model(
     clf = ProvenanceClassifier(n_estimators=n_estimators, seed=seed)
     clf.fit(X, labels, groups, settings=settings, compressed_sizes=sizes)
     clf.profile_info = profile_info(corpus)
+    clf.training = training_info(corpus, rows, n_estimators, seed)
     return clf
+
+
+def training_info(corpus: Corpus, rows: list[dict], n_estimators: int, seed: int) -> dict:
+    """What a saved model was trained on, recorded inside the model file."""
+    from datetime import datetime, timezone
+
+    from . import __version__
+
+    m = corpus.manifest
+    return {
+        "trained": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "dfp_version": __version__,
+        "trees": n_estimators,
+        "seed": seed,
+        "training_streams": len(rows),
+        "training_sources": len({r["source_id"] for r in rows}),
+        "corpus_created": m.get("created"),
+        "corpus_sources": m.get("n_sources"),
+        "corpus_platform": m.get("platform"),
+        "app_profiles": sorted(m.get("app_profiles", {})),
+    }

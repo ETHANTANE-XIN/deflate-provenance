@@ -33,6 +33,8 @@ from dfp.signatures import evaluate_signatures  # noqa: E402
 TMP = tempfile.TemporaryDirectory()
 TMPDIR = Path(TMP.name)
 os.environ.setdefault("DFP_CACHE", str(TMPDIR / "cache"))
+# never read or write the user's own model store while testing
+os.environ["DFP_MODELS"] = str(TMPDIR / "store")
 
 
 def zc(data, level=6, strategy=zlib.Z_DEFAULT_STRATEGY, mem_level=8):
@@ -340,6 +342,47 @@ class TestClassifier(unittest.TestCase):
         v = analyse_archive(str(path), self.clf, reencode=False)
         stored = next(e for e in v.entries if e.name == "stored.bin")
         self.assertEqual(stored.status, INSUFFICIENT)
+
+
+class TestModelStore(unittest.TestCase):
+    def test_bundled_default_model_loads_and_flags_a_false_word_claim(self):
+        from dfp import modelstore
+        from dfp.aggregate import analyse_archive
+
+        path = modelstore.resolve("default")
+        self.assertTrue(str(path).startswith(str(modelstore.BUNDLED_DIR)))
+        clf = modelstore.load()  # fails if the features changed without retraining
+        self.assertIn("zlib", clf.classes)
+        self.assertEqual(clf.training.get("training_sources"), 348)
+        doc = TMPDIR / "store-claims-word.docx"
+        doc.write_bytes(make_docx([("word/document.xml", xml(30000, 8))],
+                                  app="Microsoft Office Word"))
+        v = analyse_archive(str(doc), clf, reencode=False)
+        self.assertEqual(v.profile, "zlib")
+        self.assertIn(("producer", "inconsistent"), {(f.check, f.kind) for f in v.findings})
+
+    def test_local_store_overrides_bundled_and_gz_roundtrip(self):
+        from dfp import modelstore
+        from dfp.ml import ProvenanceClassifier
+
+        bundled = modelstore.load("default")
+        path = modelstore.save(bundled, "default")
+        self.assertTrue(path.name.endswith(".json.gz"))
+        self.assertEqual(modelstore.resolve("default"), path)
+        again = ProvenanceClassifier.load(str(path))
+        self.assertEqual(again.classes, bundled.classes)
+        names = {(m["name"], m["where"]): m["active"] for m in modelstore.list_models()}
+        self.assertTrue(names[("default", "local")])
+        self.assertFalse(names[("default", "bundled")])
+        path.unlink()
+        self.assertEqual(modelstore.resolve("default").parent, modelstore.BUNDLED_DIR)
+
+    def test_missing_model_names_what_exists(self):
+        from dfp import modelstore
+
+        with self.assertRaises(FileNotFoundError) as ctx:
+            modelstore.resolve("no-such-model")
+        self.assertIn("default", str(ctx.exception))
 
 
 class TestVerification(unittest.TestCase):

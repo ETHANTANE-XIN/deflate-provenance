@@ -2,8 +2,9 @@
 
 Run from the project root::
 
-    python -m dfp.demo                 # builds a small corpus and model first
-    python -m dfp.demo --model M.json  # or reuse a trained model
+    python -m dfp.demo                   # uses the 'default' model (no training)
+    python -m dfp.demo --model NAME      # any model name or file
+    python -m dfp.demo --retrain         # build a small corpus and model instead
 
 Case studies (written to ``reports/demo`` by default):
 
@@ -182,21 +183,31 @@ def case_covert_extension() -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m dfp.demo")
-    ap.add_argument("--model", default=None, help="trained model (built if omitted)")
+    ap.add_argument("--model", default=None,
+                    help="model name or file (default: the 'default' model)")
+    ap.add_argument("--retrain", action="store_true",
+                    help="build a small corpus and model instead of loading one")
     ap.add_argument("--out", default="reports/demo")
     args = ap.parse_args(argv)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    from .ml import ProvenanceClassifier
+    clf = None
+    if not args.retrain:
+        from .modelstore import load, resolve
 
-    if args.model:
-        clf = ProvenanceClassifier.load(args.model)
-    else:
+        try:
+            clf = load(args.model)
+            print(f"model: {resolve(args.model)}")
+        except FileNotFoundError as exc:
+            if args.model:
+                raise
+            print(f"{exc}\nfalling back to training a small model...")
+    if clf is None:
         from .corpus import build_corpus, synthetic_sources
         from .training import train_model
 
-        print("building a small corpus and model (use --model to skip)...")
+        print("building a small corpus and model...")
         corpus = build_corpus(synthetic_sources(per_combo=2))
         clf = train_model(corpus, n_estimators=80)
     print(f"profiles: {', '.join(clf.classes)}")
