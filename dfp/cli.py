@@ -4,8 +4,9 @@ Subcommands
 -----------
   corpus  -o DIR          build the reference corpus (every source x every encoder)
   app     CORPUS DOCS     add documents saved by an application (e.g. Word)
-  train   -o MODEL        train the classifier from a corpus
-  analyse FILE -m MODEL   examine a file and write the HTML + JSON report
+  train                   train the classifier and save it in the model store
+  models                  list the trained models (local store and bundled)
+  analyse FILE            examine a file with the default model, write HTML + JSON
   evaluate -o DIR         run the proposal's full evaluation
   inspect FILE            dump the DEFLATE structure of every stream
   reencode FILE           exact re-encoding test against every panel encoder
@@ -84,23 +85,63 @@ def cmd_train(args) -> int:
 
     corpus = Corpus.load(args.corpus) if args.corpus else _build_corpus(args)
     clf = train_model(corpus, n_estimators=args.trees)
-    clf.save(args.out)
     print(f"profiles: {', '.join(clf.classes)}")
     cal = clf.calibration
     print(f"held-out calibration: accuracy {cal.get('raw_accuracy', 0):.3f} on "
           f"{cal.get('held_out_sources', 0)} source files; unknown if confidence < "
           f"{clf.min_confidence} or distance > {clf.max_distance:.2f}; insufficient evidence "
           f"below {clf.min_evidence_bytes} compressed bytes")
-    print(f"model saved to {args.out}")
+    if args.out:
+        clf.save(args.out)
+        print(f"model saved to {args.out}")
+    if args.save_as or not args.out:
+        from .modelstore import save
+
+        name = args.save_as or "default"
+        path = save(clf, name)
+        print(f"model saved as '{name}' in the model store: {path}")
+        if name == "default":
+            print("`python -m dfp analyse FILE` will now use it without -m")
+    return 0
+
+
+def cmd_models(args) -> int:
+    from .modelstore import BUNDLED_DIR, list_models, store_dir
+
+    models = list_models()
+    print(f"local store: {store_dir()}\nbundled:     {BUNDLED_DIR}\n")
+    if not models:
+        print("no models yet: run `python -m dfp train`")
+        return 0
+    for m in models:
+        if "error" in m:
+            print(f"{m['name']} ({m['where']}): unreadable: {m['error']}")
+            continue
+        t = m["training"]
+        flag = "" if m["active"] else "  (shadowed by the local model of the same name)"
+        print(f"{m['name']} [{m['where']}]{flag}")
+        print(f"  file: {m['path']} ({m['size_mb']} MB)")
+        print(f"  profiles: {', '.join(m['profiles'])}")
+        if t:
+            print(f"  trained {t.get('trained')} with dfp {t.get('dfp_version')} on "
+                  f"{t.get('training_sources')} source files ({t.get('training_streams')} streams)")
+        if m.get("held_out_accuracy") is not None:
+            print(f"  held-out accuracy {m['held_out_accuracy']:.3f}; insufficient evidence "
+                  f"below {m['min_evidence_bytes']} compressed bytes")
     return 0
 
 
 def cmd_analyse(args) -> int:
     from .aggregate import analyse_archive
-    from .ml import ProvenanceClassifier
     from .report import analysis_html, analysis_json
 
-    clf = ProvenanceClassifier.load(args.model) if args.model else None
+    if args.no_model:
+        clf = None
+    else:
+        from .modelstore import load, resolve
+
+        clf = load(args.model)
+        print(f"model: {resolve(args.model)}")
     v = analyse_archive(args.file, clf, reencode=not args.no_reencode)
     out_dir = Path(args.outdir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -161,6 +202,10 @@ def cmd_evaluate(args) -> int:
     (out_dir / "evaluation.json").write_text(evaluation_json(result), encoding="utf-8")
     if args.model:
         clf.save(args.model)
+    if args.save_as:
+        from .modelstore import save
+
+        print(f"evaluated model saved as '{args.save_as}': {save(clf, args.save_as)}")
     cs = result["closed_set"]
     print(f"\naccuracy {cs['accuracy']:.3f}  macro-F1 {cs['macro_f1']:.3f}  "
           f"coverage {cs['coverage']:.2f}  accuracy on answered {cs['accuracy_on_answered']:.3f}")
@@ -320,14 +365,22 @@ def build_parser() -> argparse.ArgumentParser:
 
     q = sub.add_parser("train", help="train the classifier")
     q.add_argument("--corpus", default=None, help="corpus directory (built if omitted)")
-    q.add_argument("-o", "--out", default="dfp_model.json")
+    q.add_argument("--save-as", default=None,
+                   help="name in the model store (default: 'default' unless -o is given)")
+    q.add_argument("-o", "--out", default=None, help="also (or only) save to this file")
     q.add_argument("--trees", type=int, default=150)
     _corpus_args(q)
     q.set_defaults(func=cmd_train)
 
+    q = sub.add_parser("models", help="list trained models")
+    q.set_defaults(func=cmd_models)
+
     q = sub.add_parser("analyse", help="examine a file")
     q.add_argument("file")
-    q.add_argument("-m", "--model", default=None)
+    q.add_argument("-m", "--model", default=None,
+                   help="model name or file (default: the 'default' model; see `dfp models`)")
+    q.add_argument("--no-model", action="store_true",
+                   help="structure and claims only, no attribution")
     q.add_argument("-o", "--outdir", default="reports")
     q.add_argument("--no-reencode", action="store_true",
                    help="skip the zlib re-encoding corroboration")
@@ -349,7 +402,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="generate this many LibreOffice documents per format as real files")
     q.add_argument("--python-docx", type=int, default=0,
                    help="generate this many python-docx documents (they claim Word)")
-    q.add_argument("--model", default=None, help="also save the evaluated model here")
+    q.add_argument("--model", default=None, help="also save the evaluated model to this file")
+    q.add_argument("--save-as", default=None, help="also save it in the model store")
     q.add_argument("--quick", action="store_true",
                    help="skip the unknown-encoder, baseline and archive experiments")
     _corpus_args(q)

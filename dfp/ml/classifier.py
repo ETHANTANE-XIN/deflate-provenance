@@ -26,6 +26,7 @@ The model is saved as plain JSON (no pickle).
 
 from __future__ import annotations
 
+import gzip
 import json
 from dataclasses import dataclass, field
 
@@ -101,7 +102,10 @@ class ProvenanceClassifier:
     min_evidence_bytes: int = 0
     temperature: float = 1.0
     calibration: dict = field(default_factory=dict)
+    calibration_note: str = ""
     profile_info: dict = field(default_factory=dict)
+    #: how and on what the model was trained (dfp version, date, corpus)
+    training: dict = field(default_factory=dict)
     _forest: RandomForest | None = None
     _mean: np.ndarray | None = None
     _std: np.ndarray | None = None
@@ -209,6 +213,7 @@ class ProvenanceClassifier:
                 "min_confidence": self.min_confidence,
                 "max_distance": self.max_distance,
                 "min_evidence_bytes": self.min_evidence_bytes,
+                "note": self.calibration_note,
                 "target_precision": self.target_precision,
                 "reliability_target": self.reliability_target,
             }
@@ -247,24 +252,28 @@ class ProvenanceClassifier:
 
     def _reliable_size(self, sizes: np.ndarray, correct: np.ndarray,
                        answered: np.ndarray | None = None) -> int:
-        """Smallest compressed size from which *every* size band of the
-        held-out data meets the reliability target (accuracy on the streams
-        the model answers).  Smaller streams are "insufficient evidence"."""
+        """Minimum compressed size for a reliable attribution.
+
+        The smallest band edge whose own band of held-out data meets the
+        reliability target (accuracy on the streams the model answers) *and*
+        from which all larger streams, taken together, meet it too.  A dip in
+        one larger band (for example very large streams where two encoders
+        converge) is not a lack of evidence, so it must not push the minimum
+        up.  Smaller streams are reported as "insufficient evidence".
+        """
         if not len(sizes):
             return 0
         answered = np.ones(len(sizes), dtype=bool) if answered is None else answered
         edges = list(self.SIZE_EDGES) + [np.inf]
-        ok = []
         for lo, hi in zip(edges[:-1], edges[1:]):
             band = (sizes >= lo) & (sizes < hi) & answered
+            above = (sizes >= lo) & answered
             if band.sum() < 10:
-                ok.append(None)  # too little data to judge this band
-            else:
-                ok.append(bool(correct[band].mean() >= self.reliability_target))
-        for i, lo in enumerate(edges[:-1]):
-            rest = [x for x in ok[i:] if x is not None]
-            if rest and all(rest):
+                continue  # too little data to judge this band
+            if (correct[band].mean() >= self.reliability_target
+                    and correct[above].mean() >= self.reliability_target):
                 return int(lo)
+        self.calibration_note = "reliability target not reached at any size"
         return int(edges[-2])
 
     # -- prediction ------------------------------------------------------------
@@ -341,6 +350,7 @@ class ProvenanceClassifier:
 
     # -- persistence -------------------------------------------------------------
     def save(self, path: str) -> None:
+        """Write the model as JSON; a ``.gz`` suffix writes it compressed."""
         blob = {
             "format": "dfp-model-2",
             "classes": self.classes,
@@ -351,6 +361,7 @@ class ProvenanceClassifier:
             "min_evidence_bytes": self.min_evidence_bytes,
             "calibration": self.calibration,
             "profile_info": self.profile_info,
+            "training": self.training,
             "mean": self._mean.tolist(),
             "std": self._std.tolist(),
             "centroids": self._centroids.tolist(),
@@ -362,12 +373,15 @@ class ProvenanceClassifier:
                 for k, v in self._setting_models.items()
             },
         }
-        with open(path, "w", encoding="utf-8") as fh:
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "wt", encoding="utf-8") as fh:
             json.dump(blob, fh)
 
     @classmethod
     def load(cls, path: str) -> "ProvenanceClassifier":
-        with open(path, "r", encoding="utf-8") as fh:
+        """Read a model written by :meth:`save` (plain or ``.gz``)."""
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "rt", encoding="utf-8") as fh:
             blob = json.load(fh)
         if blob.get("format") != "dfp-model-2":
             raise ValueError("model file is from an older dfp version; retrain with `dfp train`")
@@ -382,6 +396,7 @@ class ProvenanceClassifier:
         obj.min_evidence_bytes = blob["min_evidence_bytes"]
         obj.calibration = blob.get("calibration", {})
         obj.profile_info = blob.get("profile_info", {})
+        obj.training = blob.get("training", {})
         obj._mean = np.array(blob["mean"])
         obj._std = np.array(blob["std"])
         obj._centroids = np.array(blob["centroids"])

@@ -106,25 +106,42 @@ at the top of the `Dockerfile`).
 
 ## 4. Quick start
 
+A trained model ships with the repository (`dfp/bundled_models/default.json.gz`,
+7 profiles, see the notes beside it), so you can analyse files straight after
+installing, with no training:
+
 ```bash
-# 1. Build the reference corpus (every source x every encoder and setting).
-#    --sources adds real files as extra sources.
+python -m dfp analyse suspicious.docx -o reports/   # uses the 'default' model
+python -m dfp.demo                                  # the case studies, in seconds
+python -m dfp models                                # which models are available
+```
+
+### Train once, reuse by name
+
+Models are looked up by name: a file path if you give one, otherwise your
+**local store** (`~/.dfp/models`, or `$DFP_MODELS`), then the **bundled**
+models. `dfp train` saves into the local store, so a model you train yourself
+(for example one that includes Word documents) replaces the bundled one
+everywhere, and you only train again when the corpus changes.
+
+```bash
+# 1. Build the reference corpus once (every source x every encoder and setting)
 python -m dfp corpus -o corpus --sources /usr/share/doc
 
 # 2. (When available) add documents saved by an application, e.g. Word.
 #    Half of the files train, half are held out for testing.
 python -m dfp app corpus word_saved_docs/ --name word --description "Word 365, Windows"
 
-# 3. Train, then examine a file
-python -m dfp train --corpus corpus -o model.json
-python -m dfp analyse suspicious.docx -m model.json -o reports/
+# 3. Train and save as your 'default' (or --save-as NAME for another name)
+python -m dfp train --corpus corpus
 
-# 4. The proposal's full evaluation (HTML + JSON report)
+# 4. Use it: no -m needed for 'default'; -m NAME or -m FILE for others
+python -m dfp analyse suspicious.docx -o reports/
+python -m dfp analyse suspicious.docx -m word-2026 -o reports/
+
+# The proposal's full evaluation (HTML + JSON report)
 python -m dfp evaluate --corpus corpus -o reports/ \
     --second-sources govdocs1_sample/ --real real_docs/ --libreoffice 10 --python-docx 20
-
-# 5. Case studies
-python -m dfp.demo --model model.json
 ```
 
 Other commands: `inspect` (dump every stream's structure), `reencode` (exact
@@ -350,6 +367,8 @@ deflate-provenance/
                     dotnet, libarchive, purepy
     corpus.py       reference corpus, label sets, profile sharing, manifest
     training.py     train a model from a corpus
+    modelstore.py   find models by name (local store, then bundled)
+    bundled_models/ the trained 'default' model shipped with the repository
     ml/             forest.py, classifier.py
     aggregate.py    archive analysis and consistency findings
     producers.py    producer table
