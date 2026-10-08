@@ -77,6 +77,19 @@ def save(clf, name: str = DEFAULT_NAME) -> Path:
     return path
 
 
+def bundled_profiles(name: str = DEFAULT_NAME) -> list[str]:
+    """Profiles of the bundled model ``name`` (empty if there is none).
+
+    Read from the file without building the model, so it works even when the
+    bundled model was trained on an older feature set.
+    """
+    for suffix in _SUFFIXES:
+        path = BUNDLED_DIR / f"{name}{suffix}"
+        if path.is_file():
+            return list(_summary(path, "bundled").get("profiles", []))
+    return []
+
+
 def _summary(path: Path, where: str) -> dict:
     import gzip
 

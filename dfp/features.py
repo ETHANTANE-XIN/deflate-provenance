@@ -84,7 +84,13 @@ def _stdev(values: list[float]) -> float:
 def extract_features(record: StreamRecord) -> dict[str, float]:
     """Compute the ordered feature dictionary for one parsed stream."""
     f: dict[str, float] = {}
-    blocks = record.blocks
+    all_blocks = record.blocks
+    # Empty blocks (no output) are not choices about how to split content:
+    # an empty stored block is a sync/full flush marker, an empty block at the
+    # end is a terminator written after a flush (zlib, Word) or on close (Go).
+    # The block-splitting features describe the blocks that carry data; the
+    # flush and terminator habits get features of their own (section A2).
+    blocks = [b for b in all_blocks if b.out_size > 0]
     n_blocks = len(blocks)
     out_size = record.out_size
     total_bits = record.total_bits
@@ -131,6 +137,19 @@ def extract_features(record: StreamRecord) -> dict[str, float]:
         sum(1 for t in tok_per_block if abs(t - ZLIB_LIT_BUFSIZE) <= 64),
         max(len(tok_per_block), 1),
     )
+
+    # -- A2. flush markers and the end-of-stream terminator ------------------
+    empty = [b for b in all_blocks if b.out_size == 0]
+    last = all_blocks[-1] if all_blocks else None
+    terminator = last if (last is not None and last.out_size == 0 and len(all_blocks) > 1) else None
+    f["blk_flush_markers"] = float(sum(
+        1 for b in empty if b.btype == BTYPE_STORED and b is not terminator))
+    f["blk_empty_coded_nonfinal"] = float(sum(
+        1 for b in empty if b.btype != BTYPE_STORED and b is not terminator))
+    # Go's compress/flate closes with an empty *stored* final block; zlib after
+    # a flush (and Microsoft Word) closes with an empty *fixed-code* final block
+    f["blk_term_empty_stored"] = float(terminator is not None and terminator.btype == BTYPE_STORED)
+    f["blk_term_empty_coded"] = float(terminator is not None and terminator.btype != BTYPE_STORED)
 
     # -- B. code-length alphabet -------------------------------------------
     hclens = [float(b.hclen or 0) for b in dynamic]
@@ -256,8 +275,9 @@ def extract_features(record: StreamRecord) -> dict[str, float]:
     f["dis_entropy"] = _entropy(dis_hist)
     f["len_gini"] = _gini(len_hist)
     f["dis_gini"] = _gini(dis_hist)
-    # window-reach features: how deep the encoder searched
-    f["dis_frac_gt_4k"] = _safe(sum(dis_hist[22:]), dis_total)
+    # window-reach features: how deep the encoder searched (distance code 24
+    # starts at 4097, code 26 at 8193, code 28 at 16385; RFC 1951 3.2.5)
+    f["dis_frac_gt_4k"] = _safe(sum(dis_hist[24:]), dis_total)
     f["dis_frac_gt_8k"] = _safe(sum(dis_hist[26:]), dis_total)
     f["dis_frac_gt_16k"] = _safe(sum(dis_hist[28:]), dis_total)
     f["dis_frac_le_256"] = _safe(sum(dis_hist[:16]), dis_total)
@@ -304,15 +324,18 @@ def vector_from_record(record: StreamRecord) -> list[float]:
 
 
 def stream_features(
-    payload: bytes, start_bit: int = 0
+    payload: bytes, start_bit: int = 0, max_bytes: int | None = None
 ) -> tuple[StreamRecord, dict[str, float]]:
     """Parse one raw DEFLATE stream and compute its full feature dictionary.
 
     This is the single entry point used by the corpus builder, the analyser
     and the adversarial tests, so training and analysis always see features
     computed the same way (tokens kept for the decision features).
+    ``max_bytes`` caps how much of a very large stream is parsed (the analyser
+    uses it; training streams are far below the cap).
     """
-    record = parse_stream(payload, start_bit=start_bit, keep_tokens=True, strict=False)
+    record = parse_stream(payload, start_bit=start_bit, keep_tokens=True, strict=False,
+                          max_bytes=max_bytes)
     features = extract_features(record)
     # tokens are only needed for the decision features; drop them to save memory
     for block in record.blocks:

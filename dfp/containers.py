@@ -128,6 +128,9 @@ class ContainerReport:
     metadata: dict = field(default_factory=dict)
     stored_entries: int = 0
     other_method_entries: int = 0
+    #: entries whose data is encrypted (general-purpose flag bit 0 or 6): their
+    #: bytes are ciphertext, not DEFLATE, so no stream is built for them
+    encrypted_entries: int = 0
     notes: list[str] = field(default_factory=list)
     #: every archive entry, whatever its method (name, method, sizes, flags)
     entries: list[dict] = field(default_factory=list)
@@ -165,26 +168,55 @@ def _parse_extra(blob: bytes) -> list[dict]:
     return fields
 
 
+def _zip_kind(path: str | Path | None) -> str:
+    if path:
+        kind = CONTAINER_BY_SUFFIX.get(Path(path).suffix.lower())
+        if kind and kind not in ("gzip", "png", "zlib", "raw", "pdf"):
+            return kind
+    return "zip"
+
+
 def detect_container(data: bytes, path: str | Path | None = None) -> str:
-    """Identify the container from magic bytes, falling back to the suffix."""
+    """Identify the container from magic bytes, falling back to the suffix.
+
+    A ZIP whose first bytes are something else (a self-extracting stub, or data
+    prepended to the archive) is recognised from its end-of-central-directory
+    record, as ZIP readers do.
+    """
     if data[:4] in (ZIP_LOCAL_SIG, ZIP_CENTRAL_SIG, ZIP_EOCD_SIG):
-        if path:
-            suffix = Path(path).suffix.lower()
-            kind = CONTAINER_BY_SUFFIX.get(suffix)
-            if kind and kind not in ("gzip", "png", "zlib", "raw"):
-                return kind
-        return "zip"
+        return _zip_kind(path)
     if data[:2] == GZIP_MAGIC:
         return "gzip"
     if data[:8] == PNG_MAGIC:
         return "png"
     if data[:5] == PDF_MAGIC:
         return "pdf"
+    if _looks_like_zip(data):
+        return _zip_kind(path)
     if len(data) >= 2 and data[0] & 0x0F == 8 and ((data[0] << 8) | data[1]) % 31 == 0:
         return "zlib"
     if path:
         return CONTAINER_BY_SUFFIX.get(Path(path).suffix.lower(), "raw")
     return "raw"
+
+
+def _looks_like_zip(data: bytes) -> bool:
+    """True when an EOCD record near the end points at a central directory."""
+    try:
+        eocd = _find_eocd(data)
+    except ContainerError:
+        return False
+    if eocd + 22 > len(data):
+        return False
+    cd_size, cd_offset = struct.unpack_from("<II", data, eocd + 12)
+    z64 = _zip64_eocd(data, eocd)
+    end_of_cd = eocd
+    if z64 is not None:
+        cd_size, cd_offset, end_of_cd = z64["cd_size"], z64["cd_offset"], z64["record_offset"]
+    if data[cd_offset : cd_offset + 4] == ZIP_CENTRAL_SIG:
+        return True
+    cand = end_of_cd - cd_size
+    return 0 <= cand < len(data) and data[cand : cand + 4] == ZIP_CENTRAL_SIG
 
 
 # --- ZIP -------------------------------------------------------------------
@@ -198,6 +230,58 @@ def _find_eocd(data: bytes) -> int:
     if idx < 0:
         raise ContainerError("no ZIP end-of-central-directory record found")
     return len(data) - limit + idx
+
+
+def _zip64_eocd(data: bytes, eocd: int) -> dict | None:
+    """Read the ZIP64 end-of-central-directory record (APPNOTE 4.3.14-4.3.15).
+
+    The ZIP64 locator sits immediately before the classic EOCD record and points
+    at the ZIP64 record.  When data was prepended without adjusting offsets the
+    stored offset is wrong, so the record is then looked for just before the
+    locator, where every writer puts it.
+    """
+    loc = eocd - 20
+    if loc < 0 or data[loc : loc + 4] != ZIP64_LOCATOR_SIG:
+        return None
+    _disk, stored, _ndisks = struct.unpack_from("<IQI", data, loc + 4)
+    pos = stored if data[stored : stored + 4] == ZIP64_EOCD_SIG else data.rfind(ZIP64_EOCD_SIG, 0, loc)
+    if pos < 0 or pos + 56 > len(data):
+        return None
+    (
+        _size, _made, _need, _disk_no, _cd_disk,
+        _entries_disk, entries, cd_size, cd_offset,
+    ) = struct.unpack_from("<QHHIIQQQQ", data, pos + 4)
+    return {
+        "record_offset": pos,
+        "stored_offset": stored,
+        "entries": entries,
+        "cd_size": cd_size,
+        "cd_offset": cd_offset,
+    }
+
+
+def _zip64_sizes(extra: bytes, usize: int, csize: int, local_offset: int) -> tuple[int, int, int]:
+    """Resolve 0xFFFFFFFF fields from a central entry's ZIP64 extra field (0x0001).
+
+    The field holds, in this order, only the values whose 32-bit slot is
+    saturated: uncompressed size, compressed size, local header offset.
+    """
+    pos = 0
+    while pos + 4 <= len(extra):
+        header_id, size = struct.unpack_from("<HH", extra, pos)
+        body = extra[pos + 4 : pos + 4 + size]
+        pos += 4 + size
+        if header_id != 0x0001:
+            continue
+        values = [struct.unpack_from("<Q", body, i)[0] for i in range(0, len(body) - 7, 8)]
+        if usize == 0xFFFFFFFF and values:
+            usize = values.pop(0)
+        if csize == 0xFFFFFFFF and values:
+            csize = values.pop(0)
+        if local_offset == 0xFFFFFFFF and values:
+            local_offset = values.pop(0)
+        break
+    return usize, csize, local_offset
 
 
 def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
@@ -214,7 +298,29 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
     ) = struct.unpack_from("<HHHHIIH", data, eocd + 4)
     comment = data[eocd + 22 : eocd + 22 + comment_len]
 
-    zip64 = ZIP64_EOCD_SIG in data[max(0, eocd - 64) : eocd]
+    # ZIP64: more than 65535 entries or offsets/sizes beyond 4 GiB
+    z64 = _zip64_eocd(data, eocd)
+    end_of_cd = eocd
+    if z64 is not None:
+        entries_here = z64["entries"]
+        cd_size = z64["cd_size"]
+        cd_offset = z64["cd_offset"]
+        end_of_cd = z64["record_offset"]
+
+    # Data in front of the archive whose offsets were not adjusted (a
+    # self-extracting stub added with `cat`, for example) shifts everything by
+    # the same amount; ZIP readers find the central directory from the end.
+    shift = 0
+    if entries_here and data[cd_offset : cd_offset + 4] != ZIP_CENTRAL_SIG:
+        cand = end_of_cd - cd_size
+        if 0 <= cand < len(data) and data[cand : cand + 4] == ZIP_CENTRAL_SIG:
+            shift = cand - cd_offset
+            cd_offset = cand
+            report.notes.append(
+                f"{shift} bytes precede the ZIP structure and its offsets were not "
+                "adjusted (self-extracting stub or prepended data); offsets were rebased"
+            )
+
     report.metadata.update(
         {
             "eocd_offset": eocd,
@@ -223,8 +329,8 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
             "entry_count": entries_here,
             "archive_comment_len": comment_len,
             "archive_comment": comment[:200].decode("utf-8", "replace"),
-            "zip64": zip64,
-            "prepended_bytes": eocd - (cd_offset + cd_size) if cd_size else 0,
+            "zip64": z64 is not None,
+            "offset_shift": shift,
         }
     )
 
@@ -235,6 +341,8 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
     extra_ids: set[str] = set()
     flags_seen: set[int] = set()
     timestamps: list[str] = []
+    name_counts: dict[str, int] = {}
+    backslash_names = 0
     index = 0
     for _ in range(entries_here):
         if data[pos : pos + 4] != ZIP_CENTRAL_SIG:
@@ -261,10 +369,21 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
         name = data[pos + 46 : pos + 46 + name_len].decode("utf-8", "replace")
         extra = data[pos + 46 + name_len : pos + 46 + name_len + extra_len]
         pos += 46 + name_len + extra_len + comment_len_e
+        usize, csize, local_offset = _zip64_sizes(extra, usize, csize, local_offset)
+        local_offset += shift
+
+        # APPNOTE 4.4.17 requires '/' separators; PowerShell 5.1's
+        # Compress-Archive writes '\'.  Lookups use the normalised name.
+        normalised = name.replace("\\", "/")
+        if normalised != name:
+            backslash_names += 1
+        name_counts[normalised] = name_counts.get(normalised, 0) + 1
 
         order.append(name)
+        encrypted = bool(flags & 0x01) or bool(flags & 0x40) or method == 99
         entry = {
             "name": name,
+            "name_normalised": normalised,
             "method": method,
             "compressed_size": csize,
             "uncompressed_size": usize,
@@ -273,6 +392,8 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
             "version_made_by": version_made,
             "local_header_offset": local_offset,
             "crc32": crc,
+            "encrypted": encrypted,
+            "duplicate_of": None,
             "stream_index": None,
         }
         report.entries.append(entry)
@@ -284,6 +405,10 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
         extra_ids.update(f["name"] for f in parsed_extra)
         timestamps.append(_dos_datetime(mtime, mdate))
 
+        if encrypted:
+            # the bytes are ciphertext: never parse or classify them
+            report.encrypted_entries += 1
+            continue
         if method != METHOD_DEFLATE:
             if method == METHOD_STORE:
                 report.stored_entries += 1
@@ -298,13 +423,15 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
             continue
         l_name_len, l_extra_len = struct.unpack_from("<HH", data, local_offset + 26)
         body = local_offset + 30 + l_name_len + l_extra_len
-        if csize == 0 or csize == 0xFFFFFFFF:
-            # data descriptor / zip64: fall back to the next signature
+        if csize == 0xFFFFFFFF:
+            # saturated size with no ZIP64 field: bound it by the next header
             end = data.find(ZIP_LOCAL_SIG, body)
             if end < 0:
                 end = cd_offset
             payload = data[body:end]
         else:
+            # the central directory's size is authoritative, including when the
+            # local header defers it to a data descriptor
             payload = data[body : body + csize]
 
         entry["stream_index"] = len(report.streams)
@@ -335,6 +462,28 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
         )
         index += 1
 
+    # Two entries with one name: legitimate writers never produce this (Python's
+    # zipfile does when a file is appended to edit a part), and readers disagree
+    # about which copy they show.  Mark every later copy.
+    duplicates = sorted(n for n, c in name_counts.items() if c > 1)
+    first_index: dict[str, int] = {}
+    for i, e in enumerate(report.entries):
+        key = e["name_normalised"]
+        if key in first_index:
+            e["duplicate_of"] = first_index[key]
+        else:
+            first_index[key] = i
+    if duplicates:
+        report.notes.append(
+            f"{len(duplicates)} entry name(s) occur more than once: "
+            + ", ".join(duplicates[:5]) + (" ..." if len(duplicates) > 5 else "")
+        )
+    if backslash_names:
+        report.notes.append(
+            f"{backslash_names} entry name(s) use '\\' separators, which APPNOTE "
+            "forbids (Windows PowerShell 5.1 Compress-Archive writes them)"
+        )
+    local_offsets = [e["local_header_offset"] for e in report.entries]
     report.metadata.update(
         {
             "entry_order": order[:200],
@@ -345,9 +494,14 @@ def extract_zip(data: bytes, path: str, container: str) -> ContainerReport:
             "first_timestamp": timestamps[0] if timestamps else None,
             "distinct_timestamps": len(set(timestamps)),
             "stored_entries": report.stored_entries,
+            "encrypted_entries": report.encrypted_entries,
             "deflate_entries": len(report.streams),
             "option_bits_seen": sorted({e["option_bits"] for e in report.entries
                                         if e["method"] == METHOD_DEFLATE}),
+            "duplicate_names": duplicates[:50],
+            "backslash_names": backslash_names,
+            # bytes before the first entry (a stub, or data prepended to the archive)
+            "prepended_bytes": min(local_offsets) if local_offsets else 0,
         }
     )
     report.claims = harvest_claims(data, report)
@@ -367,6 +521,8 @@ def read_entry(data: bytes, entry: dict, limit: int = 4_000_000) -> bytes | None
     """
     from .deflate import parse_stream
 
+    if entry.get("encrypted"):
+        return None
     off = entry["local_header_offset"]
     if data[off : off + 4] != ZIP_LOCAL_SIG:
         return None
@@ -401,10 +557,17 @@ def harvest_claims(data: bytes, report: ContainerReport) -> dict:
 
     These are the claims the consistency checks compare with the compressed
     data; they are as easy to forge as any other metadata, which is the point.
+
+    Names are matched case-insensitively with '\\' read as '/' (OPC part names
+    are case-insensitive, and Compress-Archive writes backslashes).  When a
+    name occurs more than once the *first* copy in central-directory order is
+    used and the duplication is recorded, so the choice is explicit.
     """
-    by_name = {e["name"]: e for e in report.entries}
+    by_name: dict[str, dict] = {}
+    for e in report.entries:
+        by_name.setdefault(e.get("name_normalised", e["name"]).lower(), e)
     claims: dict = {}
-    app = by_name.get("docProps/app.xml")
+    app = by_name.get("docprops/app.xml")
     if app:
         blob = read_entry(data, app)
         if blob:
@@ -417,57 +580,76 @@ def harvest_claims(data: bytes, report: ContainerReport) -> dict:
         if blob:
             claims["producer"] = _xml_text(blob, "generator")
             claims["source"] = "meta.xml"
-    manifest = by_name.get("META-INF/MANIFEST.MF")
+    manifest = by_name.get("meta-inf/manifest.mf")
     if manifest and "producer" not in claims:
         blob = read_entry(data, manifest)
         if blob:
-            for line in blob.decode("utf-8", "replace").splitlines():
+            for line in _manifest_lines(blob):
                 if line.lower().startswith("created-by:"):
                     claims["producer"] = line.split(":", 1)[1].strip()
                     claims["source"] = "META-INF/MANIFEST.MF"
                     break
     if claims.get("producer") is None:
         claims.pop("producer", None)
+    if claims and claims.get("source"):
+        source_key = claims["source"].lower()
+        copies = sum(1 for e in report.entries
+                     if e.get("name_normalised", e["name"]).lower() == source_key)
+        if copies > 1:
+            claims["source_copies"] = copies
     return claims
+
+
+def _manifest_lines(blob: bytes) -> list[str]:
+    """Header lines of a JAR manifest with 72-byte continuations joined.
+
+    The JAR specification wraps long values: a line starting with a single
+    space continues the previous one.
+    """
+    lines: list[str] = []
+    for raw in blob.decode("utf-8", "replace").splitlines():
+        if raw.startswith(" ") and lines:
+            lines[-1] += raw[1:]
+        else:
+            lines.append(raw)
+    return lines
 
 
 # --- GZIP / zlib / PNG / raw ----------------------------------------------
 
 
-def extract_gzip(data: bytes, path: str) -> ContainerReport:
-    report = ContainerReport(path=path, container="gzip")
-    if data[:2] != GZIP_MAGIC:
-        raise ContainerError("not a GZIP file")
-    method = data[2]
+def _gzip_member_header(data: bytes, start: int) -> tuple[dict, int]:
+    """Parse one RFC 1952 member header; return its metadata and payload start."""
+    if data[start : start + 2] != GZIP_MAGIC:
+        raise ContainerError(f"no GZIP member header at {start}")
+    method = data[start + 2]
     if method != METHOD_DEFLATE:
         raise ContainerError(f"GZIP compression method {method} is not DEFLATE")
-    flags = data[3]
-    mtime = int.from_bytes(data[4:8], "little")
-    xfl = data[8]
-    os_byte = data[9]
-    pos = 10
+    flags = data[start + 3]
+    mtime = int.from_bytes(data[start + 4 : start + 8], "little")
+    xfl = data[start + 8]
+    os_byte = data[start + 9]
+    pos = start + 10
     extra_meta: dict = {}
-    if flags & 0x04:  # FEXTRA
-        xlen = int.from_bytes(data[pos : pos + 2], "little")
-        extra_meta["fextra_len"] = xlen
-        pos += 2 + xlen
-    name = None
-    if flags & 0x08:  # FNAME
-        end = data.index(b"\x00", pos)
-        name = data[pos:end].decode("latin-1")
-        pos = end + 1
-    if flags & 0x10:  # FCOMMENT
-        end = data.index(b"\x00", pos)
-        extra_meta["fcomment"] = data[pos:end].decode("latin-1", "replace")
-        pos = end + 1
+    try:
+        if flags & 0x04:  # FEXTRA
+            xlen = int.from_bytes(data[pos : pos + 2], "little")
+            extra_meta["fextra_len"] = xlen
+            pos += 2 + xlen
+        name = None
+        if flags & 0x08:  # FNAME
+            end = data.index(b"\x00", pos)
+            name = data[pos:end].decode("latin-1")
+            pos = end + 1
+        if flags & 0x10:  # FCOMMENT
+            end = data.index(b"\x00", pos)
+            extra_meta["fcomment"] = data[pos:end].decode("latin-1", "replace")
+            pos = end + 1
+    except ValueError as exc:
+        raise ContainerError("truncated GZIP header") from exc
     if flags & 0x02:  # FHCRC
         pos += 2
-
-    trailer = data[-8:] if len(data) >= pos + 8 else b""
-    crc = int.from_bytes(trailer[:4], "little") if trailer else None
-    isize = int.from_bytes(trailer[4:], "little") if trailer else None
-
-    metadata = {
+    meta = {
         "flags": flags,
         "mtime": mtime,
         "xfl": xfl,
@@ -475,21 +657,80 @@ def extract_gzip(data: bytes, path: str) -> ContainerReport:
         "os_byte": os_byte,
         "os": GZIP_OS.get(os_byte, f"os{os_byte}"),
         "embedded_name": name,
-        "header_len": pos,
+        "header_offset": start,
+        "header_len": pos - start,
         **extra_meta,
     }
-    report.metadata = dict(metadata)
-    report.streams.append(
-        DeflateStream(
-            payload=data[pos : len(data) - 8],
-            name=name or Path(path).stem,
-            container="gzip",
-            source=path,
-            declared_crc32=crc,
-            declared_usize=isize,
-            metadata=metadata,
+    return meta, pos
+
+
+def extract_gzip(data: bytes, path: str) -> ContainerReport:
+    """Extract every member of a GZIP file.
+
+    RFC 1952 allows several members back to back (``cat a.gz b.gz``, appended
+    logs); each has its own header, DEFLATE stream and CRC32/ISIZE trailer, and
+    each may come from a different encoder, so every member becomes its own
+    stream.  The end of each member's DEFLATE data is found with this project's
+    parser; bytes after the last member are reported.
+    """
+    from .deflate import inflate
+
+    report = ContainerReport(path=path, container="gzip")
+    if data[:2] != GZIP_MAGIC:
+        raise ContainerError("not a GZIP file")
+    base = Path(path).stem
+    start = 0
+    member = 0
+    while True:
+        meta, body = _gzip_member_header(data, start)
+        rec = inflate(data, start_bit=body * 8, keep_output=False, strict=False)
+        name = meta["embedded_name"] or base
+        label = name if member == 0 else f"{name}#{member + 1}"
+        if rec.error is not None:
+            # damaged or truncated member: hand its bytes to the analyser,
+            # which reports the error, and stop looking for further members
+            stop = len(data) - 8 if member == 0 and len(data) - 8 > body else len(data)
+            report.streams.append(
+                DeflateStream(payload=data[body:stop], name=label, container="gzip",
+                              source=path, index=member, metadata=meta)
+            )
+            report.notes.append(f"GZIP member {member + 1} could not be parsed ({rec.error})")
+            member += 1
+            break
+        end = rec.end_bit // 8  # first byte after the final block's padding
+        trailer = data[end : end + 8]
+        crc = int.from_bytes(trailer[:4], "little") if len(trailer) == 8 else None
+        isize = int.from_bytes(trailer[4:], "little") if len(trailer) == 8 else None
+        report.streams.append(
+            DeflateStream(
+                payload=data[body:end],
+                name=label,
+                container="gzip",
+                source=path,
+                index=member,
+                declared_crc32=crc,
+                declared_usize=isize,
+                declared_csize=end - body,
+                metadata=meta,
+            )
         )
-    )
+        member += 1
+        start = end + 8
+        if start >= len(data):
+            break
+        if data[start : start + 2] != GZIP_MAGIC:
+            rest = data[start:]
+            report.metadata["trailing_bytes"] = len(rest)
+            report.notes.append(
+                f"{len(rest)} bytes follow the last GZIP member"
+                + (" (all zero padding)" if not rest.strip(b"\x00") else "")
+            )
+            break
+
+    first = report.streams[0].metadata if report.streams else {}
+    report.metadata = {**first, **report.metadata, "members": member}
+    if member > 1:
+        report.notes.append(f"the file holds {member} GZIP members, analysed separately")
     return report
 
 

@@ -15,8 +15,10 @@ Case studies (written to ``reports/demo`` by default):
 2. **Producer rewrite**: a genuine document (LibreOffice when installed) has
    its claimed producer changed to Microsoft Word without touching any
    compressed stream.
-3. **Mixed-encoder edit**: an archive written by Go's ``archive/zip`` has one
-   part edited and recompressed by a Python script (zlib).
+3. **Mixed-encoder edit**: an archive written by a non-zlib writer (Go's
+   ``archive/zip`` or 7-Zip, whichever is installed) has one part edited and
+   recompressed by a Python script (zlib); with only zlib writers available,
+   a Python-written archive is edited by another installed encoder instead.
 4. **Metadata robustness**: every forgeable ZIP field is rewritten; the
    bitstream feature vector does not move.
 5. *Extension, not part of the proposal*: the padding covert channel and its
@@ -35,7 +37,9 @@ from pathlib import Path
 
 def _print_verdict(title: str, v) -> None:
     print(f"\n== {title} ==")
-    print(f"  profile: {v.profile}" + (f" (setting {v.setting})" if v.setting else "")
+    print(f"  verdict: {v.status}; profile: {v.profile}"
+          + (f" (setting {v.setting})" if v.setting else "")
+          + (f", closest known profile {v.closest}" if v.closest else "")
           + f", share {v.share:.0%}, confidence {v.confidence:.0%}")
     for f in v.findings:
         if f.kind != "info":
@@ -104,15 +108,20 @@ def case_producer_rewrite(clf, out_dir: Path) -> None:
         docs = make_libreoffice_samples(out_dir / "libreoffice", _texts(1, seed=5),
                                         formats=("docx",))
         genuine = docs[0]
+        title = f"2a. Genuine LibreOffice document ({genuine.name})"
     else:
+        # Without LibreOffice the demo writes a stand-in itself: zlib streams (as
+        # LibreOffice writes) with a LibreOffice claim typed in by this demo.
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
             z.writestr("docProps/app.xml", _app_xml("LibreOffice/24.2.7.2$Linux_X86_64"))
             z.writestr("word/document.xml", _texts(1, seed=5)[0])
         genuine = out_dir / "libreoffice-like.docx"
         genuine.write_bytes(buf.getvalue())
+        title = ("2a. LibreOffice-like stand-in (LibreOffice is not installed: zlib streams "
+                 "with a LibreOffice claim written by this demo)")
     v = analyse_archive(str(genuine), clf)
-    _print_verdict(f"2a. Genuine document ({genuine.name})", v)
+    _print_verdict(title, v)
     forged = out_dir / "producer-rewritten-to-word.docx"
     forged.write_bytes(_word_claim(genuine.read_bytes()))
     vf = analyse_archive(str(forged), clf)
@@ -121,27 +130,46 @@ def case_producer_rewrite(clf, out_dir: Path) -> None:
     _write_report(vf, out_dir, forged.stem)
 
 
+#: non-zlib ZIP writers tried for the mixed-encoder case, with their setting
+_NON_ZLIB_WRITERS = (("go", "6"), ("7zip", "mx5"))
+
+
 def case_mixed_edit(clf, out_dir: Path) -> None:
     from .aggregate import analyse_archive
     from .encoders import get_encoder
     from .evaluate import edit_outcome
-    from .realfiles import edit_with_python
+    from .realfiles import edit_with_python, pick_editor
 
-    go = get_encoder("go")
-    if not go.available():
-        print("\n== 3. mixed-encoder edit: skipped (Go is not installed) ==")
-        return
     texts = _texts(4, seed=11)
-    path = out_dir / "written-by-go.docx"
-    go.write_zip([("word/document.xml", texts[0]), ("word/styles.xml", texts[1]),
-                  ("word/settings.xml", texts[2]), ("word/numbering.xml", texts[3])],
-                 str(path), "6")
-    v = analyse_archive(str(path), clf, reencode=False)
-    _print_verdict("3a. Archive written by Go's archive/zip", v)
-    edited = out_dir / "go-archive-edited-by-python.docx"
-    edited.write_bytes(edit_with_python(path.read_bytes(), "word/settings.xml", "zlib"))
-    ve = analyse_archive(str(edited), clf, reencode=False)
-    _print_verdict("3b. Same archive after a Python script edited word/settings.xml", ve)
+    entries = [("word/document.xml", texts[0]), ("word/styles.xml", texts[1]),
+               ("word/settings.xml", texts[2]), ("word/numbering.xml", texts[3])]
+    writer = next(((name, s) for name, s in _NON_ZLIB_WRITERS
+                   if get_encoder(name).available()), None)
+    if writer is not None:
+        # a non-zlib writer's archive, one part edited by a Python script (zlib)
+        name, setting = writer
+        path = out_dir / f"written-by-{name}.docx"
+        get_encoder(name).write_zip(entries, str(path), setting)
+        editor, title = "zlib", f"3a. Archive written by {name}"
+    else:
+        # only zlib writers here: a Python-written archive, one part edited by
+        # another installed encoder
+        editor = pick_editor("zlib")
+        if editor is None:
+            print("\n== 3. mixed-encoder edit: skipped (no non-zlib encoder installed) ==")
+            return
+        path = out_dir / "written-by-python.docx"
+        with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+            for n, d in entries:
+                z.writestr(n, d)
+        title = "3a. Archive written by Python's zipfile"
+    v = analyse_archive(str(path), clf)
+    _print_verdict(title, v)
+    edited = out_dir / f"{path.stem}-edited-by-{editor}.docx"
+    edited.write_bytes(edit_with_python(path.read_bytes(), "word/settings.xml", editor))
+    ve = analyse_archive(str(edited), clf)
+    _print_verdict(f"3b. Same archive after word/settings.xml was edited and recompressed "
+                   f"by {editor}", ve)
     print(f"  outcome: {edit_outcome(ve, 'word/settings.xml')}")
     _write_report(ve, out_dir, edited.stem)
 

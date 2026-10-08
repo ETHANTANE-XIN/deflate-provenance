@@ -77,7 +77,7 @@ def reencode_panel(raw: bytes) -> ReencodeResult:
         return ReencodeResult(error=f"stream does not decode: {rec.error}")
     raw = raw[: rec.compressed_bytes]
     output = rec.output
-    matches = [f"zlib/level {lv} memLevel {ml}" for lv, ml in zlib_reencode_matches(raw, output)]
+    matches = [f"zlib/{m.describe()}" for m in zlib_reencode_matches(raw, output)]
     for enc in list_encoders(only_available=True):
         if enc.name == "zlib":
             continue

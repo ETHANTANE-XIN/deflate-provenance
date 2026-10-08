@@ -105,12 +105,21 @@ def list_encoders(only_available: bool = True, include_synthetic: bool = True) -
     return encoders
 
 
+_REFERENCE: dict[str, "Encoder | None"] = {}
+
+
 def reference_for(library: str) -> Encoder | None:
-    """The available reference adapter of ``library``, if any."""
-    for enc in list_encoders(only_available=True):
-        if enc.library == library and enc.reference:
-            return enc
-    return None
+    """The available reference adapter of ``library``, if any.
+
+    Looked up once per process: checking availability can start a program
+    (``tar.exe --version``, the Java or .NET helper), and the analyser asks for
+    every entry of every file.
+    """
+    if library not in _REFERENCE:
+        _REFERENCE[library] = next(
+            (enc for enc in list_encoders(only_available=True)
+             if enc.library == library and enc.reference), None)
+    return _REFERENCE[library]
 
 
 _loaded = False

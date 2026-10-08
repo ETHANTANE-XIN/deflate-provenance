@@ -29,5 +29,5 @@ adversarial.py  metadata-robustness check, exact re-encoding test
 covert.py       extension beyond the proposal: padding covert channel
 """
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 __all__ = ["__version__"]

@@ -1,8 +1,8 @@
 {
-  "created": "2026-09-27T10:09:31+00:00",
-  "dfp_version": "2.0.0",
-  "python": "3.11.15",
-  "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
+  "created": "2026-10-08T06:44:57+00:00",
+  "dfp_version": "2.1.0",
+  "python": "3.12.3",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
   "encoders": [
     {
       "program": "zlib",
@@ -18,7 +18,10 @@
         "6",
         "7",
         "8",
-        "9"
+        "9",
+        "1f",
+        "6f",
+        "9f"
       ],
       "version": "zlib 1.3"
     },
@@ -31,7 +34,10 @@
         "1",
         "3",
         "6",
-        "9"
+        "9",
+        "1f",
+        "6f",
+        "9f"
       ],
       "version": "zlib-ng 2.2.5 (python-zlib-ng 1.0.0)"
     },
@@ -75,7 +81,7 @@
         "8",
         "9"
       ],
-      "version": "Java Ubuntu 21.0.10 java.util.zip.Deflater"
+      "version": "Java Ubuntu 21.0.12.1 java.util.zip.Deflater"
     },
     {
       "program": "node",
@@ -148,15 +154,15 @@
         "greedy",
         "lazy"
       ],
-      "version": "dfp purepy 2.0.0"
+      "version": "dfp purepy 2.1.0"
     }
   ],
   "profile_sharing": {
     "java": {
       "declared_library": "zlib",
       "reference": "zlib",
-      "identical_streams": 3132,
-      "streams": 3132,
+      "identical_streams": 2574,
+      "streams": 2574,
       "identical_rate": 1.0,
       "shares_profile": true,
       "profile": "zlib"
@@ -164,8 +170,8 @@
     "dotnet": {
       "declared_library": "zlib",
       "reference": "zlib",
-      "identical_streams": 1044,
-      "streams": 1044,
+      "identical_streams": 858,
+      "streams": 858,
       "identical_rate": 1.0,
       "shares_profile": true,
       "profile": "zlib"
@@ -173,15 +179,15 @@
     "libarchive": {
       "declared_library": "zlib",
       "reference": "zlib",
-      "identical_streams": 1044,
-      "streams": 1044,
+      "identical_streams": 858,
+      "streams": 858,
       "identical_rate": 1.0,
       "shares_profile": true,
       "profile": "zlib"
     }
   },
   "share_threshold": 0.95,
-  "n_sources": 348,
+  "n_sources": 286,
   "sources": [
     {
       "id": "syn:text:500:0",
@@ -1192,1084 +1198,712 @@
       "origin": "synthetic seed 9281883516732725577"
     },
     {
-      "id": "dir168:77797e4ebb10839c",
+      "id": "file:503327b1d52c8167",
       "content_type": "file",
-      "size": 21982,
-      "origin": "/usr/share/doc/fonts-ipafont-gothic/copyright"
+      "size": 256000,
+      "origin": "/usr/share/doc/python3.12/NEWS.gz"
     },
     {
-      "id": "dir168:0ba21769a9b04d84",
+      "id": "file:0ba21769a9b04d84",
       "content_type": "file",
       "size": 1051,
       "origin": "/usr/share/doc/libepubgen-0.1-1/changelog.Debian.gz"
     },
     {
-      "id": "dir168:74c13a92633b28d4",
-      "content_type": "file",
-      "size": 3278,
-      "origin": "/usr/share/doc/libpolkit-gobject-1-0/copyright"
-    },
-    {
-      "id": "dir168:00d1a8dcf5bcc336",
+      "id": "file:00d1a8dcf5bcc336",
       "content_type": "file",
       "size": 8978,
       "origin": "/usr/share/doc/dash/changelog.Debian.gz"
     },
     {
-      "id": "dir168:c8087695b08db817",
+      "id": "file:c8087695b08db817",
       "content_type": "file",
       "size": 1520,
       "origin": "/usr/share/doc/libxmlsec1t64-nss/copyright"
     },
     {
-      "id": "dir168:92e5c09d4194cf34",
+      "id": "file:92e5c09d4194cf34",
       "content_type": "file",
       "size": 13398,
       "origin": "/usr/share/doc/adduser/copyright"
     },
     {
-      "id": "dir168:b4777b17031e763e",
+      "id": "file:8d14644d2dc5ca96",
+      "content_type": "file",
+      "size": 158955,
+      "origin": "/usr/share/doc/libpoppler134/NEWS.gz"
+    },
+    {
+      "id": "file:b4777b17031e763e",
       "content_type": "file",
       "size": 21830,
       "origin": "/usr/share/doc/ure/copyright"
     },
     {
-      "id": "dir168:78e9df8f8153c91c",
+      "id": "file:d6d86a6f5ad1d7da",
       "content_type": "file",
-      "size": 1833,
-      "origin": "/usr/share/doc/libsqlite3-dev/copyright"
+      "size": 26211,
+      "origin": "/usr/share/doc/libdconf1/NEWS.gz"
     },
     {
-      "id": "dir168:76e988a2c3100c34",
+      "id": "file:05078871914543e4",
       "content_type": "file",
-      "size": 3964,
-      "origin": "/usr/share/doc/libedit2/changelog.Debian.gz"
+      "size": 1751,
+      "origin": "/usr/share/doc/pinentry-curses/AUTHORS"
     },
     {
-      "id": "dir168:8bea8cf2f94cd8b3",
-      "content_type": "file",
-      "size": 2701,
-      "origin": "/usr/share/doc/libgdbm-compat-dev/copyright"
-    },
-    {
-      "id": "dir168:c709c600f8ce42d2",
+      "id": "file:c709c600f8ce42d2",
       "content_type": "file",
       "size": 6548,
       "origin": "/usr/share/doc/libcairo2/changelog.Debian.gz"
     },
     {
-      "id": "dir168:1ed1b41eae332d4b",
-      "content_type": "file",
-      "size": 13475,
-      "origin": "/usr/share/doc/sudo/copyright"
-    },
-    {
-      "id": "dir168:a4c3e5b19700dd3c",
+      "id": "file:a4c3e5b19700dd3c",
       "content_type": "file",
       "size": 7044,
       "origin": "/usr/share/doc/passwd/copyright"
     },
     {
-      "id": "dir168:512c9a57fd8b449a",
+      "id": "file:512c9a57fd8b449a",
       "content_type": "file",
       "size": 15612,
       "origin": "/usr/share/doc/libdrm2/copyright"
     },
     {
-      "id": "dir168:240efe5bb16f60f0",
+      "id": "file:8ab8bb150c3c65ba",
       "content_type": "file",
-      "size": 34887,
-      "origin": "/usr/share/doc/php8.4-common/changelog.Debian.gz"
+      "size": 2030,
+      "origin": "/usr/share/doc/libclucene-core1t64/README"
     },
     {
-      "id": "dir168:2ad521e3adb9cf42",
-      "content_type": "file",
-      "size": 3535,
-      "origin": "/usr/share/doc/libgd3/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:dc91c0b004a1332d",
-      "content_type": "file",
-      "size": 8306,
-      "origin": "/usr/share/doc/pkg-config/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:cbf3d2eb38998daf",
-      "content_type": "file",
-      "size": 18288,
-      "origin": "/usr/share/doc/mesa-libgallium/copyright"
-    },
-    {
-      "id": "dir168:429176a11e4add83",
+      "id": "file:429176a11e4add83",
       "content_type": "file",
       "size": 862,
       "origin": "/usr/share/doc/libexttextcat-data/changelog.Debian.gz"
     },
     {
-      "id": "dir168:29e6f06b1dcd85f1",
-      "content_type": "file",
-      "size": 6364,
-      "origin": "/usr/share/doc/xtrans-dev/copyright"
-    },
-    {
-      "id": "dir168:fb1ea085945df53c",
+      "id": "file:fb1ea085945df53c",
       "content_type": "file",
       "size": 7035,
       "origin": "/usr/share/doc/libisl23/copyright"
     },
     {
-      "id": "dir168:676c75e54ff7e3b9",
-      "content_type": "file",
-      "size": 7501,
-      "origin": "/usr/share/doc/pkgconf-bin/copyright"
-    },
-    {
-      "id": "dir168:18834b9bd37876d7",
-      "content_type": "file",
-      "size": 4625,
-      "origin": "/usr/share/doc/fonts-freefont-ttf/copyright"
-    },
-    {
-      "id": "dir168:b61d0ffb10bb4c06",
-      "content_type": "file",
-      "size": 13985,
-      "origin": "/usr/share/doc/python3.11-lib2to3/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:a2dc8fac0f496e1c",
+      "id": "file:a2dc8fac0f496e1c",
       "content_type": "file",
       "size": 15465,
       "origin": "/usr/share/doc/xz-utils/copyright"
     },
     {
-      "id": "dir168:6a9bede62137f651",
+      "id": "file:6a9bede62137f651",
       "content_type": "file",
       "size": 867,
       "origin": "/usr/share/doc/libeot0/changelog.Debian.gz"
     },
     {
-      "id": "dir168:e85e1bcad3a915dc",
+      "id": "file:e85e1bcad3a915dc",
       "content_type": "file",
       "size": 18940,
       "origin": "/usr/share/doc/ca-certificates/copyright"
     },
     {
-      "id": "dir168:4e9a543d67659796",
+      "id": "file:d102fcbe685df4ce",
       "content_type": "file",
-      "size": 42371,
+      "size": 48823,
       "origin": "/usr/share/doc/libpython3.12-minimal/changelog.Debian.gz"
     },
     {
-      "id": "dir168:2d6c752315a9c174",
-      "content_type": "file",
-      "size": 1138,
-      "origin": "/usr/share/doc/libxcursor1/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:826a53dda5def053",
+      "id": "file:826a53dda5def053",
       "content_type": "file",
       "size": 5403,
       "origin": "/usr/share/doc/libunistring5/changelog.Debian.gz"
     },
     {
-      "id": "dir168:c4a64d631f4a7c88",
-      "content_type": "file",
-      "size": 2851,
-      "origin": "/usr/share/doc/libjs-jquery/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:e46dae36cc12656b",
+      "id": "file:e46dae36cc12656b",
       "content_type": "file",
       "size": 30641,
       "origin": "/usr/share/doc/libdbus-1-3/changelog.Debian.gz"
     },
     {
-      "id": "dir168:1c76065d1149aef8",
+      "id": "file:258888b04220a028",
       "content_type": "file",
-      "size": 6248,
-      "origin": "/usr/share/doc/bc/copyright"
+      "size": 29614,
+      "origin": "/usr/share/doc/librdf0t64/NEWS.gz"
     },
     {
-      "id": "dir168:55c642bb5d826fda",
-      "content_type": "file",
-      "size": 1162,
-      "origin": "/usr/share/doc/xauth/changelog.Debian.gz"
-    },
-    {
-      "id": "dir168:e1cf064ea92f833b",
+      "id": "file:e1cf064ea92f833b",
       "content_type": "file",
       "size": 1457,
       "origin": "/usr/share/doc/patch/changelog.Debian.gz"
     },
     {
-      "id": "dir168:8b6670fa7b8b37f4",
+      "id": "file:fe5876a94047cafb",
       "content_type": "file",
-      "size": 1592,
-      "origin": "/usr/share/doc/python3-toml/copyright"
+      "size": 1921,
+      "origin": "/usr/share/doc/libsemanage2/copyright"
     },
     {
-      "id": "dir204:b065e56028447d78",
-      "content_type": "xml",
-      "size": 3040,
-      "origin": "/usr/share/mime/application/x-gameboy-rom.xml"
-    },
-    {
-      "id": "dir204:f164cdf3173b04bf",
-      "content_type": "xml",
-      "size": 8693,
-      "origin": "/usr/share/mime/application/vnd.oasis.opendocument.presentation-template.xml"
-    },
-    {
-      "id": "dir204:1374abea017c0e56",
-      "content_type": "xml",
-      "size": 2352,
-      "origin": "/usr/share/mime/audio/x-pn-audibleaudio.xml"
-    },
-    {
-      "id": "dir204:990050753e146c81",
-      "content_type": "xml",
-      "size": 3194,
-      "origin": "/usr/share/mime/application/x-karbon.xml"
-    },
-    {
-      "id": "dir204:1a6a12e9fce71663",
-      "content_type": "xml",
-      "size": 3227,
-      "origin": "/usr/share/mime/image/x-sun-raster.xml"
-    },
-    {
-      "id": "dir204:e165361748cac028",
-      "content_type": "xml",
-      "size": 776,
-      "origin": "/usr/share/mime/application/x-ms-pdb.xml"
-    },
-    {
-      "id": "dir204:5bf622e2e274fea6",
-      "content_type": "xml",
-      "size": 3017,
-      "origin": "/usr/share/mime/application/x-gamecube-rom.xml"
-    },
-    {
-      "id": "dir204:fe3944216377571a",
-      "content_type": "xml",
-      "size": 2988,
-      "origin": "/usr/share/mime/application/x-java-jnlp-file.xml"
-    },
-    {
-      "id": "dir204:c9ef507b304b330b",
-      "content_type": "xml",
-      "size": 2328,
-      "origin": "/usr/share/mime/application/x-sms-rom.xml"
-    },
-    {
-      "id": "dir204:e31bfc7374e3fa83",
-      "content_type": "xml",
-      "size": 3632,
-      "origin": "/usr/share/mime/message/x-gnu-rmail.xml"
-    },
-    {
-      "id": "dir204:569a724812fdb59e",
-      "content_type": "xml",
-      "size": 2747,
-      "origin": "/usr/share/mime/x-content/video-vcd.xml"
-    },
-    {
-      "id": "dir204:82a85164bfd9e1ab",
-      "content_type": "xml",
-      "size": 3188,
-      "origin": "/usr/share/mime/text/vnd.graphviz.xml"
-    },
-    {
-      "id": "dir204:b46567082ba3479d",
-      "content_type": "xml",
-      "size": 939,
-      "origin": "/usr/share/mime/application/x-tex-pk.xml"
-    },
-    {
-      "id": "dir204:b3201f04e160dbd8",
-      "content_type": "xml",
-      "size": 2935,
-      "origin": "/usr/share/mime/application/x-mimearchive.xml"
-    },
-    {
-      "id": "dir204:cb6215d66f469da4",
-      "content_type": "xml",
-      "size": 3182,
-      "origin": "/usr/share/mime/video/wavelet.xml"
-    },
-    {
-      "id": "dir204:64124a7c816933a2",
-      "content_type": "xml",
-      "size": 3558,
-      "origin": "/usr/share/mime/audio/x-xm.xml"
-    },
-    {
-      "id": "dir204:a250f5402c462faa",
-      "content_type": "xml",
-      "size": 2706,
-      "origin": "/usr/share/mime/application/x-thomson-cartridge-memo7.xml"
-    },
-    {
-      "id": "dir204:3ac114cbefce478a",
-      "content_type": "xml",
-      "size": 3173,
-      "origin": "/usr/share/mime/video/x-flv.xml"
-    },
-    {
-      "id": "dir204:58126050f63cdc78",
+      "id": "file:44ce277b9b5e1a54",
       "content_type": "file",
-      "size": 20152,
-      "origin": "/usr/share/mime/types"
+      "size": 34145,
+      "origin": "/usr/share/doc/liblttng-ust-common1t64/copyright"
     },
     {
-      "id": "dir204:fed2591119e28b65",
+      "id": "file:ff3b614318fdadae",
+      "content_type": "file",
+      "size": 2405,
+      "origin": "/usr/share/doc/librasqal3t64/changelog.Debian.gz"
+    },
+    {
+      "id": "file:eee23313fcb4cac3",
+      "content_type": "file",
+      "size": 6293,
+      "origin": "/usr/share/doc/libwebp7/copyright"
+    },
+    {
+      "id": "file:0cbec745d85ea775",
+      "content_type": "file",
+      "size": 1947,
+      "origin": "/usr/share/doc/libattr1/copyright"
+    },
+    {
+      "id": "file:77b479d60669809a",
+      "content_type": "c",
+      "size": 7105,
+      "origin": "/usr/share/doc/lp-solve/examples/demo.c"
+    },
+    {
+      "id": "file:21a3540fe6a5687c",
+      "content_type": "file",
+      "size": 39516,
+      "origin": "/usr/share/doc/gcc-13-base/quadmath/changelog.gz"
+    },
+    {
+      "id": "file:02b3c490441ac3f3",
+      "content_type": "rst",
+      "size": 231,
+      "origin": "/usr/share/doc/python3-pip/html/reference/pip_install.rst"
+    },
+    {
+      "id": "file:403cb25244d45464",
+      "content_type": "file",
+      "size": 185433,
+      "origin": "/usr/share/doc/dotnet-apphost-pack-8.0/copyright"
+    },
+    {
+      "id": "file:9af64274b3458d44",
+      "content_type": "file",
+      "size": 1169,
+      "origin": "/usr/share/doc/libxdmcp6/changelog.Debian.gz"
+    },
+    {
+      "id": "file:9767d84342f02e11",
+      "content_type": "file",
+      "size": 61422,
+      "origin": "/usr/share/doc/libuuid1/changelog.Debian.gz"
+    },
+    {
+      "id": "file:a64f9233b8252f67",
+      "content_type": "file",
+      "size": 3007,
+      "origin": "/usr/share/doc/liblerc4/changelog.Debian.gz"
+    },
+    {
+      "id": "file:8bd348e303056ef4",
+      "content_type": "file",
+      "size": 2052,
+      "origin": "/usr/share/doc/libetonyek-0.1-1/changelog.Debian.gz"
+    },
+    {
+      "id": "file:25bb0547e9fbf2fc",
       "content_type": "xml",
-      "size": 939,
-      "origin": "/usr/share/mime/message/partial.xml"
+      "size": 256000,
+      "origin": "/usr/share/mime/packages/libreoffice.xml"
     },
     {
-      "id": "dir204:4cd4df408a8cbaa4",
-      "content_type": "xml",
-      "size": 3229,
-      "origin": "/usr/share/mime/application/x-java-jce-keystore.xml"
-    },
-    {
-      "id": "dir204:4eec6661307f2a82",
-      "content_type": "xml",
-      "size": 2817,
-      "origin": "/usr/share/mime/application/vnd.ms-visio.drawing.macroenabled.main+xml.xml"
-    },
-    {
-      "id": "dir204:a8f5ed52b07b2bbd",
-      "content_type": "xml",
-      "size": 2109,
-      "origin": "/usr/share/mime/text/x-kotlin.xml"
-    },
-    {
-      "id": "dir204:9cc55fe260336340",
-      "content_type": "xml",
-      "size": 2851,
-      "origin": "/usr/share/mime/x-content/image-picturecd.xml"
-    },
-    {
-      "id": "dir204:573d3a971079fa5a",
-      "content_type": "xml",
-      "size": 2732,
-      "origin": "/usr/share/mime/font/woff.xml"
-    },
-    {
-      "id": "dir204:598d344eb46c437a",
-      "content_type": "xml",
-      "size": 7953,
-      "origin": "/usr/share/mime/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.xml"
-    },
-    {
-      "id": "dir204:907b1f882607c5b3",
-      "content_type": "xml",
-      "size": 3246,
-      "origin": "/usr/share/mime/application/x-slp.xml"
-    },
-    {
-      "id": "dir204:5889767ae7545d79",
-      "content_type": "xml",
-      "size": 637,
-      "origin": "/usr/share/mime/application/x-msdownload.xml"
-    },
-    {
-      "id": "dir204:1efaa2bb3358a532",
-      "content_type": "xml",
-      "size": 3424,
-      "origin": "/usr/share/mime/audio/prs.sid.xml"
-    },
-    {
-      "id": "dir204:f34fd449510081f3",
-      "content_type": "xml",
-      "size": 3235,
-      "origin": "/usr/share/mime/image/x-lws.xml"
-    },
-    {
-      "id": "dir204:4209e25c6e5cf5cd",
-      "content_type": "xml",
-      "size": 3239,
-      "origin": "/usr/share/mime/text/x-literate-haskell.xml"
-    },
-    {
-      "id": "dir204:40e47beb07324cc7",
-      "content_type": "xml",
-      "size": 1152,
-      "origin": "/usr/share/mime/image/apng.xml"
-    },
-    {
-      "id": "dir204:d2272bd00e9b07cf",
-      "content_type": "xml",
-      "size": 3179,
-      "origin": "/usr/share/mime/application/x-font-libgrx.xml"
-    },
-    {
-      "id": "dir204:717d9211aebed129",
-      "content_type": "xml",
-      "size": 1022,
-      "origin": "/usr/share/mime/application/x-profile.xml"
-    },
-    {
-      "id": "dir204:e6b8f9dd4004a281",
-      "content_type": "xml",
-      "size": 1418,
-      "origin": "/usr/share/mime/video/vnd.radgamettools.bink.xml"
-    },
-    {
-      "id": "dir204:cdbc70a2fc8b6ca3",
-      "content_type": "xml",
-      "size": 2479,
-      "origin": "/usr/share/mime/application/x-ipynb+json.xml"
-    },
-    {
-      "id": "dir240:ceee94a2d2c153a4",
+      "id": "file:ceee94a2d2c153a4",
       "content_type": "ui",
       "size": 14599,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svx/ui/passwd.ui"
     },
     {
-      "id": "dir240:cac46cead2b132bc",
+      "id": "file:cac46cead2b132bc",
       "content_type": "ui",
       "size": 11545,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/optchartcolorspage.ui"
     },
     {
-      "id": "dir240:d7035ac40d746cc5",
+      "id": "file:d7035ac40d746cc5",
       "content_type": "xml",
       "size": 3010,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/oleobjectbar.xml"
     },
     {
-      "id": "dir240:be9873ec42bda70a",
+      "id": "file:be9873ec42bda70a",
       "content_type": "xml",
       "size": 1854,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/schart/toolbar/starshapes.xml"
     },
     {
-      "id": "dir240:ddc0f60bf684ff9f",
-      "content_type": "xml",
-      "size": 922,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/popupmenu/notebookbar.xml"
-    },
-    {
-      "id": "dir240:5d9dde87e2ee8204",
+      "id": "file:5d9dde87e2ee8204",
       "content_type": "ui",
       "size": 10165,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/newstyle.ui"
     },
     {
-      "id": "dir240:4005b7623f2b1719",
+      "id": "file:4005b7623f2b1719",
       "content_type": "xml",
       "size": 2441,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/insertbar.xml"
     },
     {
-      "id": "dir240:d107352cecb92a47",
-      "content_type": "ui",
-      "size": 11298,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/slidedesigndialog.ui"
-    },
-    {
-      "id": "dir240:e1f50b537cc3fa50",
+      "id": "file:e1f50b537cc3fa50",
       "content_type": "xml",
       "size": 2482,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swxform/toolbar/formsnavigationbar.xml"
     },
     {
-      "id": "dir240:92268281fbe1f149",
+      "id": "file:92268281fbe1f149",
       "content_type": "xml",
       "size": 3414,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/toolbar/flowchartshapes.xml"
     },
     {
-      "id": "dir240:d0b9be06c09c7202",
+      "id": "file:d0b9be06c09c7202",
       "content_type": "ui",
       "size": 3922,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/captiondialog.ui"
     },
     {
-      "id": "dir240:ba779f5111b7bc01",
-      "content_type": "ui",
-      "size": 41547,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/optimpressgeneralpage.ui"
-    },
-    {
-      "id": "dir240:5a36c02c012570ff",
+      "id": "file:5a36c02c012570ff",
       "content_type": "xml",
       "size": 3574,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/toolbar/tableobjectbar.xml"
     },
     {
-      "id": "dir240:da62e5a53f50cf4d",
+      "id": "file:da62e5a53f50cf4d",
       "content_type": "ui",
       "size": 3740,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/uui/ui/sslwarndialog.ui"
     },
     {
-      "id": "dir240:ba19bd364624f145",
+      "id": "file:ba19bd364624f145",
       "content_type": "ui",
       "size": 21981,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/schart/ui/tp_axisLabel.ui"
     },
     {
-      "id": "dir240:701cdabe53484c5f",
+      "id": "file:701cdabe53484c5f",
       "content_type": "ui",
       "size": 121449,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/notebookbar_groups.ui"
     },
     {
-      "id": "dir240:9e59ef52bcca0aa2",
-      "content_type": "xml",
-      "size": 2300,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/toolbar/symbolshapes.xml"
-    },
-    {
-      "id": "dir240:84ef79a52fe4baf8",
+      "id": "file:84ef79a52fe4baf8",
       "content_type": "ui",
       "size": 10966,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/optnewdictionarydialog.ui"
     },
     {
-      "id": "dir240:ad39c5fcaa6fb995",
+      "id": "file:ad39c5fcaa6fb995",
       "content_type": "xml",
       "size": 1452,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swreport/toolbar/mailmerge.xml"
     },
     {
-      "id": "dir240:5e8c4e3cb087661c",
-      "content_type": "ui",
-      "size": 1701,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/tabviewbar.ui"
-    },
-    {
-      "id": "dir240:d4552fcb7bf5188f",
+      "id": "file:d4552fcb7bf5188f",
       "content_type": "ui",
       "size": 6302,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/bookmarkdialog.ui"
     },
     {
-      "id": "dir240:a4f3c889723a8bee",
-      "content_type": "ui",
-      "size": 655,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/ui/navigatorcontextmenu.ui"
-    },
-    {
-      "id": "dir240:c951963d15183292",
+      "id": "file:c951963d15183292",
       "content_type": "xml",
       "size": 3571,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sglobal/toolbar/drawbar.xml"
     },
     {
-      "id": "dir240:f716d50c9575eeb7",
+      "id": "file:f716d50c9575eeb7",
       "content_type": "ui",
       "size": 22027,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/footnoteareapage.ui"
     },
     {
-      "id": "dir240:00a2b9237e08a6cc",
+      "id": "file:00a2b9237e08a6cc",
       "content_type": "ui",
       "size": 4937,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/panel.ui"
     },
     {
-      "id": "dir240:89cd0c05c400bd51",
+      "id": "file:89cd0c05c400bd51",
       "content_type": "ui",
       "size": 4281,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/helpbookmarkpage.ui"
     },
     {
-      "id": "dir240:7cbef79d96fe5810",
+      "id": "file:7cbef79d96fe5810",
       "content_type": "ui",
       "size": 2988,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svt/ui/calendar.ui"
     },
     {
-      "id": "dir240:d3ef7df09b55a950",
+      "id": "file:d3ef7df09b55a950",
       "content_type": "xml",
       "size": 1454,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swreport/toolbar/optimizetablebar.xml"
     },
     {
-      "id": "dir240:b66d288f57f32c4d",
-      "content_type": "ui",
-      "size": 6571,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/simpress/ui/layoutwindow.ui"
-    },
-    {
-      "id": "dir240:616651e1bcd501aa",
+      "id": "file:616651e1bcd501aa",
       "content_type": "ui",
       "size": 12720,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/ui/tocstylespage.ui"
     },
     {
-      "id": "dir240:13d1bc01fa9e7c72",
+      "id": "file:13d1bc01fa9e7c72",
       "content_type": "ui",
       "size": 31070,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/possizetabpage.ui"
     },
     {
-      "id": "dir240:3c7ea5661fc89610",
+      "id": "file:3c7ea5661fc89610",
       "content_type": "ui",
       "size": 4453,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svx/ui/inspectortextpanel.ui"
     },
     {
-      "id": "dir240:10afe6de3b2a840d",
+      "id": "file:10afe6de3b2a840d",
       "content_type": "ui",
       "size": 8228,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/ui/sharedleftfooterdialog.ui"
     },
     {
-      "id": "dir240:bf936a45da2e177d",
+      "id": "file:bf936a45da2e177d",
       "content_type": "ui",
       "size": 1204,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/svt/ui/tabbaredit.ui"
     },
     {
-      "id": "dir240:27198ef9e8348033",
-      "content_type": "xml",
-      "size": 2860,
-      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sdraw/toolbar/formcontrols.xml"
-    },
-    {
-      "id": "dir240:4f96f153f694d08f",
+      "id": "file:4f96f153f694d08f",
       "content_type": "ui",
       "size": 15600,
       "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/autoredactdialog.ui"
     },
     {
-      "id": "dir276:36791cfdcdf1cedf",
+      "id": "file:d0e17c49aa9b2504",
+      "content_type": "xml",
+      "size": 2585,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/swriter/toolbar/singlemode-form.xml"
+    },
+    {
+      "id": "file:e322fe1cc84be0fb",
+      "content_type": "ui",
+      "size": 12593,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/ui/solveroptionsdialog.ui"
+    },
+    {
+      "id": "file:fa9fbdb7bfcb4225",
+      "content_type": "ui",
+      "size": 9955,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/applyautofmtpage.ui"
+    },
+    {
+      "id": "file:6f451ef132f27644",
+      "content_type": "xml",
+      "size": 2843,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/sweb/popupmenu/graphic.xml"
+    },
+    {
+      "id": "file:05c3270648da0f95",
+      "content_type": "ui",
+      "size": 4772,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/licensedialog.ui"
+    },
+    {
+      "id": "file:70d8ba92ab10eaec",
+      "content_type": "ui",
+      "size": 7575,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/sfx/ui/helpsearchpage.ui"
+    },
+    {
+      "id": "file:627ad683c0f4fa0e",
+      "content_type": "ui",
+      "size": 10198,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/cui/ui/storedwebconnectiondialog.ui"
+    },
+    {
+      "id": "file:a48d04919c12d754",
+      "content_type": "xml",
+      "size": 1293,
+      "origin": "/usr/lib/libreoffice/share/config/soffice.cfg/modules/scalc/toolbar/formsfilterbar.xml"
+    },
+    {
+      "id": "file:36791cfdcdf1cedf",
       "content_type": "file",
       "size": 15157,
       "origin": "/usr/share/i18n/locales/translit_circle"
     },
     {
-      "id": "dir276:eb6a8c5cde98dd3f",
+      "id": "file:eb6a8c5cde98dd3f",
       "content_type": "file",
       "size": 3918,
       "origin": "/usr/share/i18n/locales/mag_IN"
     },
     {
-      "id": "dir276:04e2310efd3939e6",
+      "id": "file:04e2310efd3939e6",
       "content_type": "file",
       "size": 12980,
       "origin": "/usr/share/i18n/charmaps/ISO-8859-10.gz"
     },
     {
-      "id": "dir276:d0bc551c0610ed04",
+      "id": "file:d0bc551c0610ed04",
       "content_type": "file",
       "size": 7362,
       "origin": "/usr/share/i18n/charmaps/EBCDIC-ES-S.gz"
     },
     {
-      "id": "dir276:51c87dbbb1ba4a16",
+      "id": "file:51c87dbbb1ba4a16",
       "content_type": "file",
       "size": 11780,
       "origin": "/usr/share/i18n/charmaps/CP1257.gz"
     },
     {
-      "id": "dir276:35809ac9b25e07db",
+      "id": "file:35809ac9b25e07db",
       "content_type": "file",
       "size": 12340,
       "origin": "/usr/share/i18n/charmaps/ISO-8859-15.gz"
     },
     {
-      "id": "dir276:44aeb915d8fa4fe5",
+      "id": "file:44aeb915d8fa4fe5",
       "content_type": "file",
       "size": 7313,
       "origin": "/usr/share/i18n/charmaps/EBCDIC-US.gz"
     },
     {
-      "id": "dir276:34feec511fda1d39",
+      "id": "file:34feec511fda1d39",
       "content_type": "file",
       "size": 4419,
       "origin": "/usr/share/i18n/locales/so_DJ"
     },
     {
-      "id": "dir276:80912987bb96fe61",
+      "id": "file:80912987bb96fe61",
       "content_type": "file",
       "size": 2492,
       "origin": "/usr/share/i18n/locales/sq_MK"
     },
     {
-      "id": "dir276:5f4c2063e1b82713",
+      "id": "file:5f4c2063e1b82713",
       "content_type": "file",
       "size": 6284,
       "origin": "/usr/share/i18n/locales/dsb_DE"
     },
     {
-      "id": "dir276:f2bd7c0ff44cccef",
+      "id": "file:f2bd7c0ff44cccef",
       "content_type": "file",
       "size": 12097,
       "origin": "/usr/share/i18n/charmaps/HP-TURKISH8.gz"
     },
     {
-      "id": "dir276:2150cd703818b5a9",
+      "id": "file:2150cd703818b5a9",
       "content_type": "file",
       "size": 7317,
       "origin": "/usr/share/i18n/charmaps/EBCDIC-UK.gz"
     },
     {
-      "id": "dir276:8cb639c1a6d83798",
+      "id": "file:8cb639c1a6d83798",
       "content_type": "file",
       "size": 11970,
       "origin": "/usr/share/i18n/charmaps/IBM1004.gz"
     },
     {
-      "id": "dir276:343eaba589c4acdc",
+      "id": "file:343eaba589c4acdc",
       "content_type": "file",
       "size": 4572,
       "origin": "/usr/share/i18n/locales/en_HK"
     },
     {
-      "id": "dir276:7143c340df24f89c",
+      "id": "file:7143c340df24f89c",
       "content_type": "file",
       "size": 12329,
       "origin": "/usr/share/i18n/charmaps/CP1250.gz"
     },
     {
-      "id": "dir276:6782c602262aefc2",
+      "id": "file:6782c602262aefc2",
       "content_type": "file",
       "size": 12322,
       "origin": "/usr/share/i18n/charmaps/CP774.gz"
     },
     {
-      "id": "dir276:89a420cdf0a5f3a1",
+      "id": "file:89a420cdf0a5f3a1",
       "content_type": "file",
       "size": 11468,
       "origin": "/usr/share/i18n/locales/bg_BG"
     },
     {
-      "id": "dir276:dc413293a08f8972",
+      "id": "file:dc413293a08f8972",
       "content_type": "file",
       "size": 6986,
       "origin": "/usr/share/i18n/locales/mr_IN"
     },
     {
-      "id": "dir276:e95892fdd97f09e1",
+      "id": "file:e95892fdd97f09e1",
       "content_type": "file",
       "size": 256000,
       "origin": "/usr/share/i18n/locales/translit_hangul"
     },
     {
-      "id": "dir276:a60686071d192920",
+      "id": "file:a60686071d192920",
       "content_type": "file",
       "size": 2489,
       "origin": "/usr/share/i18n/locales/li_NL"
     },
     {
-      "id": "dir276:abccd3e73e2c5dd8",
+      "id": "file:abccd3e73e2c5dd8",
       "content_type": "file",
       "size": 2769,
       "origin": "/usr/share/i18n/locales/nl_AW"
     },
     {
-      "id": "dir276:7fc3fd90d570416b",
+      "id": "file:7fc3fd90d570416b",
       "content_type": "file",
       "size": 16268,
       "origin": "/usr/share/i18n/charmaps/ISO_8859-1,GL.gz"
     },
     {
-      "id": "dir276:fa36318e6c9ea047",
+      "id": "file:fa36318e6c9ea047",
       "content_type": "file",
       "size": 11517,
       "origin": "/usr/share/i18n/charmaps/IBM1164.gz"
     },
     {
-      "id": "dir276:045e4aaadb8881ca",
+      "id": "file:045e4aaadb8881ca",
       "content_type": "file",
       "size": 256000,
       "origin": "/usr/share/i18n/charmaps/UTF-8.gz"
     },
     {
-      "id": "dir276:121ffa7d9f3f4d44",
+      "id": "file:121ffa7d9f3f4d44",
       "content_type": "file",
       "size": 3508,
       "origin": "/usr/share/i18n/locales/eu_ES"
     },
     {
-      "id": "dir276:0041730a3d4fd05d",
+      "id": "file:0041730a3d4fd05d",
       "content_type": "file",
       "size": 4338,
       "origin": "/usr/share/i18n/locales/gez_ER"
     },
     {
-      "id": "dir276:2148faaedbe50216",
+      "id": "file:2148faaedbe50216",
       "content_type": "file",
       "size": 12624,
       "origin": "/usr/share/i18n/charmaps/SAMI-WS2.gz"
     },
     {
-      "id": "dir276:df9c883965626a16",
+      "id": "file:df9c883965626a16",
       "content_type": "file",
       "size": 4356,
       "origin": "/usr/share/i18n/locales/agr_PE"
     },
     {
-      "id": "dir276:5b20ce2fbde7e9dc",
+      "id": "file:5b20ce2fbde7e9dc",
       "content_type": "file",
       "size": 4762,
       "origin": "/usr/share/i18n/locales/ar_LB"
     },
     {
-      "id": "dir276:da0be545d004964a",
+      "id": "file:da0be545d004964a",
       "content_type": "file",
       "size": 6634,
       "origin": "/usr/share/i18n/locales/zu_ZA"
     },
     {
-      "id": "dir276:76ca45949a13e84a",
+      "id": "file:76ca45949a13e84a",
       "content_type": "file",
       "size": 3390,
       "origin": "/usr/share/i18n/locales/en_IE"
     },
     {
-      "id": "dir276:35df214fb9be8415",
+      "id": "file:35df214fb9be8415",
       "content_type": "file",
       "size": 11828,
       "origin": "/usr/share/i18n/charmaps/GEORGIAN-PS.gz"
     },
     {
-      "id": "dir276:95150062e60fcbd0",
+      "id": "file:95150062e60fcbd0",
       "content_type": "file",
       "size": 3779,
       "origin": "/usr/share/i18n/locales/ug_CN@latin"
     },
     {
-      "id": "dir276:4d5a4adaf5c1593b",
+      "id": "file:4d5a4adaf5c1593b",
       "content_type": "file",
       "size": 4502,
       "origin": "/usr/share/i18n/locales/ku_TR"
     },
     {
-      "id": "dir276:243fb45cb18ca082",
+      "id": "file:243fb45cb18ca082",
       "content_type": "file",
       "size": 5659,
       "origin": "/usr/share/i18n/locales/hi_IN"
     },
     {
-      "id": "dir276:9ed8a6f5570ab8ff",
+      "id": "file:9ed8a6f5570ab8ff",
       "content_type": "file",
       "size": 2889,
       "origin": "/usr/share/i18n/locales/fur_IT"
     },
     {
-      "id": "dir312:c159ba16d910a441",
+      "id": "file:936465cd0692d8ad",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
     },
     {
-      "id": "dir312:6c4e2b98a1215045",
-      "content_type": "file",
-      "size": 11448,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox2to.pcf.gz"
-    },
-    {
-      "id": "dir312:28b7cf90182996b9",
-      "content_type": "file",
-      "size": 10728,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox1h.pcf.gz"
-    },
-    {
-      "id": "dir312:c89c57fcfb7e048b",
-      "content_type": "afm",
-      "size": 15395,
-      "origin": "/usr/share/fonts/X11/Type1/c0419bt_.afm"
-    },
-    {
-      "id": "dir312:a742830aea98cbd2",
-      "content_type": "file",
-      "size": 9730,
-      "origin": "/usr/share/fonts/X11/util/map-ISO8859-11"
-    },
-    {
-      "id": "dir312:3a5371b1326bf955",
-      "content_type": "file",
-      "size": 17860,
-      "origin": "/usr/share/fonts/X11/cyrillic/koi8x13.pcf.gz"
-    },
-    {
-      "id": "dir312:a0261377294fbf07",
-      "content_type": "alias",
-      "size": 3607,
-      "origin": "/usr/share/fonts/X11/cyrillic/fonts.alias"
-    },
-    {
-      "id": "dir312:a00e489ed170b6e4",
-      "content_type": "file",
-      "size": 13804,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox4h.pcf.gz"
-    },
-    {
-      "id": "dir312:0f127fe7e6528a2b",
-      "content_type": "file",
-      "size": 10696,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox1t.pcf.gz"
-    },
-    {
-      "id": "dir312:419c155c39648d90",
-      "content_type": "file",
-      "size": 12144,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox3t.pcf.gz"
-    },
-    {
-      "id": "dir312:3cc5e20194a74a8c",
-      "content_type": "otf",
-      "size": 256000,
-      "origin": "/usr/share/fonts/opentype/unifont/unifont_sample.otf"
-    },
-    {
-      "id": "dir312:9ecc1d370c5ee96c",
-      "content_type": "pfb",
-      "size": 39511,
-      "origin": "/usr/share/fonts/X11/Type1/c0582bt_.pfb"
-    },
-    {
-      "id": "dir312:d8c8b20497e63f31",
-      "content_type": "file",
-      "size": 73575,
-      "origin": "/usr/share/fonts/X11/encodings/large/jisx0212.1990-0.enc.gz"
-    },
-    {
-      "id": "dir312:d00410bd88128fd8",
-      "content_type": "file",
-      "size": 10724,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox1hb.pcf.gz"
-    },
-    {
-      "id": "dir312:3fc9b87a29f1ecaa",
+      "id": "file:fd75e762f2086713",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
     },
     {
-      "id": "dir312:35d8fa51fed06e84",
-      "content_type": "file",
-      "size": 13924,
-      "origin": "/usr/share/fonts/X11/cyrillic/koi5x8.pcf.gz"
-    },
-    {
-      "id": "dir312:f2640e1dbeb1371e",
+      "id": "file:f3c5d1a6cdb5e672",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
     },
     {
-      "id": "dir312:8d9a9b63246d8c4c",
-      "content_type": "file",
-      "size": 5718,
-      "origin": "/usr/share/fonts/X11/encodings/ibm-cp437.enc.gz"
-    },
-    {
-      "id": "dir312:4bea5cf4b048e3b7",
-      "content_type": "file",
-      "size": 8553,
-      "origin": "/usr/share/fonts/X11/util/map-ISO8859-8"
-    },
-    {
-      "id": "dir312:e0d5abb324cc4536",
+      "id": "file:4ce5f4e6e9a3357e",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     },
     {
-      "id": "dir312:ab54aa13caf21a94",
-      "content_type": "file",
-      "size": 2564,
-      "origin": "/usr/share/fonts/X11/encodings/large/sun.unicode.india-0.enc.gz"
+      "id": "file:a5251173370e3076",
+      "content_type": "ttf",
+      "size": 254960,
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf"
     },
     {
-      "id": "dir312:165dca534bd0f39d",
+      "id": "file:3d7955616e69721f",
+      "content_type": "ttf",
+      "size": 253448,
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf"
+    },
+    {
+      "id": "file:4e92fd616db01f8f",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     },
     {
-      "id": "dir312:99d7dcd6d6790468",
-      "content_type": "afm",
-      "size": 15407,
-      "origin": "/usr/share/fonts/X11/Type1/c0582bt_.afm"
+      "id": "file:dcfa7a7fea8f6f7f",
+      "content_type": "ttf",
+      "size": 208872,
+      "origin": "/usr/share/fonts/truetype/libreoffice/opens___.ttf"
     },
     {
-      "id": "dir312:976d48dfff033c7b",
-      "content_type": "file",
-      "size": 10628,
-      "origin": "/usr/share/fonts/X11/util/map-ISO8859-9"
-    },
-    {
-      "id": "dir312:248f6588aa8ff98e",
-      "content_type": "file",
-      "size": 3245,
-      "origin": "/usr/share/fonts/X11/encodings/microsoft-cp1257.enc.gz"
-    },
-    {
-      "id": "dir312:bc24c6077057917b",
+      "id": "file:51c382e3a1b3b3db",
       "content_type": "ttf",
       "size": 256000,
-      "origin": "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
-    },
-    {
-      "id": "dir312:a7906a91ec3a4ac7",
-      "content_type": "file",
-      "size": 10498,
-      "origin": "/usr/share/fonts/X11/util/map-ISO8859-3"
-    },
-    {
-      "id": "dir312:a2ffd35f572aa7c9",
-      "content_type": "ttf",
-      "size": 256000,
-      "origin": "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
-    },
-    {
-      "id": "dir312:52026556ee7b322c",
-      "content_type": "file",
-      "size": 11118,
-      "origin": "/usr/share/fonts/X11/encodings/adobe-dingbats.enc.gz"
-    },
-    {
-      "id": "dir312:133e6af2dcdfea62",
-      "content_type": "otf",
-      "size": 52036,
-      "origin": "/usr/share/fonts/opentype/tlwg/Loma-Oblique.otf"
-    },
-    {
-      "id": "dir312:354a9227f7b82d67",
-      "content_type": "file",
-      "size": 27516,
-      "origin": "/usr/share/fonts/X11/cyrillic/koi12x24b.pcf.gz"
-    },
-    {
-      "id": "dir312:858535cc22ffcb88",
-      "content_type": "file",
-      "size": 1078,
-      "origin": "/usr/share/fonts/X11/encodings/mulearabic-2.enc.gz"
-    },
-    {
-      "id": "dir312:1d0d54f537a3bea0",
-      "content_type": "file",
-      "size": 18004,
-      "origin": "/usr/share/fonts/X11/cyrillic/koi6x13.pcf.gz"
-    },
-    {
-      "id": "dir312:ad1aa75f167286fb",
-      "content_type": "file",
-      "size": 13232,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox4t.pcf.gz"
-    },
-    {
-      "id": "dir312:3b76c9fb69f3010b",
-      "content_type": "file",
-      "size": 10724,
-      "origin": "/usr/share/fonts/X11/cyrillic/crox1hbo.pcf.gz"
-    },
-    {
-      "id": "dir312:fe64f38e11eff1b0",
-      "content_type": "ttf",
-      "size": 256000,
-      "origin": "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf"
+      "origin": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
     }
   ],
   "params": {
@@ -2284,7 +1918,53 @@
     ]
   },
   "errors": [],
-  "app_profiles": {},
+  "app_profiles": {
+    "word": {
+      "profile": "word",
+      "description": "Microsoft Word 16.0 (Windows), documents saved by Word",
+      "files": 60,
+      "streams": 674,
+      "train_files": 30,
+      "holdout_files": 30,
+      "holdout_streams_shared_with_training": 208,
+      "holdout_file_names": [
+        "doc000.docx",
+        "doc005.docx",
+        "doc006.docx",
+        "doc008.docx",
+        "doc011.docx",
+        "doc013.docx",
+        "doc014.docx",
+        "doc017.docx",
+        "doc024.docx",
+        "doc025.docx",
+        "doc027.docx",
+        "doc028.docx",
+        "doc030.docx",
+        "doc031.docx",
+        "doc033.docx",
+        "doc035.docx",
+        "doc036.docx",
+        "doc037.docx",
+        "doc038.docx",
+        "doc039.docx",
+        "doc042.docx",
+        "doc046.docx",
+        "doc047.docx",
+        "doc050.docx",
+        "doc051.docx",
+        "doc052.docx",
+        "doc053.docx",
+        "doc055.docx",
+        "doc057.docx",
+        "doc059.docx"
+      ],
+      "reproduced_by": {
+        "None": 200
+      },
+      "shares_library": false
+    }
+  },
   "feature_names": [
     "blk_count",
     "blk_per_100kb",
@@ -2310,6 +1990,10 @@
     "blk_tokens_mean",
     "blk_tokens_cv",
     "blk_tokens_near_litbuf",
+    "blk_flush_markers",
+    "blk_empty_coded_nonfinal",
+    "blk_term_empty_stored",
+    "blk_term_empty_coded",
     "cl_hclen_mean",
     "cl_hclen_min",
     "cl_hclen_max",

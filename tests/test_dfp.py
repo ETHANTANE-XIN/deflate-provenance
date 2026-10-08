@@ -202,8 +202,13 @@ class TestEncoders(unittest.TestCase):
             for setting, raw in enc.compress_many(data, enc.settings()).items():
                 self.assertEqual(inflate(raw, strict=True).output, data, f"{enc.name}/{setting}")
 
-    def test_zlib_levels_are_one_to_nine(self):
-        self.assertEqual(get_encoder("zlib").settings(), [str(i) for i in range(1, 10)])
+    def test_zlib_levels_are_one_to_nine_plus_flushed_variants(self):
+        settings = get_encoder("zlib").settings()
+        self.assertEqual(settings[:9], [str(i) for i in range(1, 10)])
+        self.assertEqual(settings[9:], ["1f", "6f", "9f"])
+        raw = get_encoder("zlib").compress(xml(5000), "6f").raw_deflate
+        self.assertTrue(raw.endswith(b"\x00\x00\xff\xff\x03\x00"))
+        self.assertEqual(zlib.decompress(raw, -15), xml(5000))
 
     def test_purepy_is_synthetic(self):
         enc = get_encoder("purepy")
@@ -289,6 +294,16 @@ class TestClassifier(unittest.TestCase):
         self.assertGreater(cal["held_out_sources"], 0)
         self.assertIn("min_confidence", cal)
         self.assertGreater(self.clf.max_distance, 0)
+        # the high-precision threshold is never below the ordinary one
+        self.assertGreaterEqual(self.clf.strong_confidence, self.clf.min_confidence)
+        # the minimum evidence size never drops below the floor, and the
+        # held-out measurement is recorded beside it
+        self.assertGreaterEqual(self.clf.min_evidence_bytes, self.clf.min_evidence_floor)
+        self.assertIn("min_evidence_bytes_measured", cal)
+        # the novelty rule reports what it does on known and simulated unseen encoders
+        nov = cal["novelty"]
+        self.assertIn("rejected_by_novelty", nov["known"])
+        self.assertTrue(nov["unseen_rejected_by_novelty"])
 
     def test_prediction_has_setting_and_explanation(self):
         row = next(i for i, r in enumerate(self.corpus.rows) if r["profile"])
@@ -353,11 +368,11 @@ class TestModelStore(unittest.TestCase):
         self.assertTrue(str(path).startswith(str(modelstore.BUNDLED_DIR)))
         clf = modelstore.load()  # fails if the features changed without retraining
         self.assertIn("zlib", clf.classes)
-        self.assertEqual(clf.training.get("training_sources"), 348)
+        self.assertGreater(clf.training.get("training_sources", 0), 100)
         doc = TMPDIR / "store-claims-word.docx"
         doc.write_bytes(make_docx([("word/document.xml", xml(30000, 8))],
                                   app="Microsoft Office Word"))
-        v = analyse_archive(str(doc), clf, reencode=False)
+        v = analyse_archive(str(doc), clf)
         self.assertEqual(v.profile, "zlib")
         self.assertIn(("producer", "inconsistent"), {(f.check, f.kind) for f in v.findings})
 
@@ -490,9 +505,12 @@ class TestProducers(unittest.TestCase):
         from dfp.producers import check_producer
 
         word = {"producer": "Microsoft Office Word", "source": "docProps/app.xml"}
-        f = check_producer(word, "zlib", ["zlib", "go-flate"], [0])
+        f = check_producer(word, "go-flate", ["zlib", "go-flate", "word"], [0])
         self.assertEqual({(x.check, x.kind) for x in f},
                          {("producer", "inconsistent"), ("option-bits", "inconsistent")})
+        # some Word builds compress exactly as zlib does: no contradiction
+        f = check_producer(word, "zlib", ["zlib", "word"], [3])
+        self.assertTrue(all(x.kind == "consistent" for x in f))
         lo = {"producer": "LibreOffice/24.2", "source": "meta.xml"}
         f = check_producer(lo, "zlib", ["zlib"], [0])
         self.assertTrue(all(x.kind == "consistent" for x in f))
@@ -550,7 +568,8 @@ class TestBaselines(unittest.TestCase):
         from dfp.baselines import zlib_reencode_matches
 
         matches = zlib_reencode_matches(zc(text(20000), 6))
-        self.assertIn((6, 8), matches)
+        self.assertIn((6, 8), [(m.level, m.mem_level) for m in matches])
+        self.assertFalse(any(m.sync_flush for m in matches))
         self.assertEqual(zlib_reencode_matches(get_encoder("purepy").compress(
             text(5000), "lazy").raw_deflate), [])
 

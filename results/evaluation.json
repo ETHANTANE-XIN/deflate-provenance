@@ -1,14 +1,14 @@
 {
   "tool": {
     "name": "dfp",
-    "version": "2.0.0",
-    "generated": "2026-09-27 10:28:47 UTC"
+    "version": "2.1.0",
+    "generated": "2026-10-08 07:04:36 UTC"
   },
   "corpus": {
-    "created": "2026-09-27T10:09:31+00:00",
-    "dfp_version": "2.0.0",
-    "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
-    "n_sources": 348,
+    "created": "2026-10-08T06:44:57+00:00",
+    "dfp_version": "2.1.0",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "n_sources": 286,
     "params": {
       "per_combo": 4,
       "sizes": null,
@@ -24,8 +24,8 @@
       "java": {
         "declared_library": "zlib",
         "reference": "zlib",
-        "identical_streams": 3132,
-        "streams": 3132,
+        "identical_streams": 2574,
+        "streams": 2574,
         "identical_rate": 1.0,
         "shares_profile": true,
         "profile": "zlib"
@@ -33,8 +33,8 @@
       "dotnet": {
         "declared_library": "zlib",
         "reference": "zlib",
-        "identical_streams": 1044,
-        "streams": 1044,
+        "identical_streams": 858,
+        "streams": 858,
         "identical_rate": 1.0,
         "shares_profile": true,
         "profile": "zlib"
@@ -42,8 +42,8 @@
       "libarchive": {
         "declared_library": "zlib",
         "reference": "zlib",
-        "identical_streams": 1044,
-        "streams": 1044,
+        "identical_streams": 858,
+        "streams": 858,
         "identical_rate": 1.0,
         "shares_profile": true,
         "profile": "zlib"
@@ -63,7 +63,10 @@
           "6",
           "7",
           "8",
-          "9"
+          "9",
+          "1f",
+          "6f",
+          "9f"
         ]
       },
       {
@@ -74,7 +77,10 @@
           "1",
           "3",
           "6",
-          "9"
+          "9",
+          "1f",
+          "6f",
+          "9f"
         ]
       },
       {
@@ -100,7 +106,7 @@
       {
         "program": "java",
         "library": "zlib",
-        "version": "Java Ubuntu 21.0.10 java.util.zip.Deflater",
+        "version": "Java Ubuntu 21.0.12.1 java.util.zip.Deflater",
         "settings": [
           "1",
           "2",
@@ -168,7 +174,7 @@
       {
         "program": "purepy",
         "library": "purepy",
-        "version": "dfp purepy 2.0.0",
+        "version": "dfp purepy 2.1.0",
         "settings": [
           "greedy",
           "lazy"
@@ -177,12 +183,30 @@
     ]
   },
   "split": {
-    "train_sources": 243,
-    "test_sources": 105,
-    "train_rows": 5890,
-    "test_rows": 2673,
-    "test_rows_sharing_a_training_source": 0,
-    "ambiguous_test_rows": 92
+    "train_sources": 201,
+    "test_sources": 85,
+    "train_rows": 6353,
+    "test_rows": 2689,
+    "app_train_rows": 545,
+    "app_test_rows": 129,
+    "families": {
+      "real_sources": 118,
+      "families": 72,
+      "largest_family": 13,
+      "pairs_joined_by_name": 33,
+      "pairs_joined_by_content": 136,
+      "unreadable_sources": 0,
+      "jaccard_threshold": 0.5,
+      "name_prefix": 6
+    },
+    "overlap_checks": {
+      "test_sources_identical_to_a_training_source": 0,
+      "test_sources_near_duplicate_of_a_training_source": 0,
+      "checked_sources": 286,
+      "app_test_streams": 129,
+      "app_test_streams_identical_to_a_training_stream": 0
+    },
+    "ambiguous_test_rows": 131
   },
   "model": {
     "profiles": [
@@ -190,287 +214,418 @@
       "chromium-zlib",
       "go-flate",
       "libdeflate",
+      "word",
       "zlib",
       "zlib-ng",
       "zopfli"
     ],
     "calibration": {
-      "held_out_rows": 1179,
-      "held_out_sources": 49,
-      "raw_accuracy": 0.9050042408821035,
-      "temperature": 0.4375,
-      "min_confidence": 0.6,
-      "max_distance": 1.6885760702339676,
+      "held_out_rows": 1144,
+      "held_out_sources": 52,
+      "raw_accuracy": 0.9195804195804196,
+      "temperature": 0.375,
+      "min_confidence": 0.59,
+      "strong_confidence": 0.86,
+      "max_distance": 6.598062053237702,
       "min_evidence_bytes": 256,
+      "min_evidence_bytes_measured": 0,
+      "min_evidence_floor": 256,
+      "note": "",
       "target_precision": 0.95,
-      "reliability_target": 0.9
+      "strong_precision": 0.99,
+      "reliability_target": 0.9,
+      "novelty": {
+        "features": "decision features (dec_*, huf_*)",
+        "threshold": 6.598062053237702,
+        "quantile_of_known": 0.99,
+        "known": {
+          "rejected_by_confidence": 0.06031468531468531,
+          "rejected_by_novelty": 0.01048951048951049,
+          "rejected_by_either": 0.07080419580419581
+        },
+        "unseen_rejected_by_novelty": {
+          "7zip": 0.0213,
+          "chromium-zlib": 0.0278,
+          "go-flate": 0.065,
+          "libdeflate": 0.0,
+          "word": 0.0,
+          "zlib": 0.0508,
+          "zlib-ng": 0.1495,
+          "zopfli": 0.6111
+        }
+      }
     },
     "top_features": [
       {
+        "feature": "blk_term_empty_stored",
+        "importance": 0.07437258588892845
+      },
+      {
         "feature": "tok_len3_frac",
-        "importance": 0.036132174324689
+        "importance": 0.03668221042834267
       },
       {
-        "feature": "blk_frac_stored",
-        "importance": 0.03489244205241784
-      },
-      {
-        "feature": "blk_out_min",
-        "importance": 0.03454802038047066
-      },
-      {
-        "feature": "huf_lit_excess_mean",
-        "importance": 0.03282150817723175
-      },
-      {
-        "feature": "len_code_0",
-        "importance": 0.030696194141106577
+        "feature": "str_final_pad_bits",
+        "importance": 0.03523760368554989
       },
       {
         "feature": "dec_min_match_len",
-        "importance": 0.028797072640981334
+        "importance": 0.029856960963661465
       },
       {
-        "feature": "blk_out_cv",
-        "importance": 0.026347780951885873
+        "feature": "huf_lit_excess_mean",
+        "importance": 0.028726845882791743
       },
       {
-        "feature": "blk_last_is_stored",
-        "importance": 0.024671971264139447
+        "feature": "len_code_0",
+        "importance": 0.027304885198292717
       },
       {
-        "feature": "huf_unused_lit_mean",
-        "importance": 0.024553499614439325
-      },
-      {
-        "feature": "dec_match_nearest_frac",
-        "importance": 0.023829951176697218
-      },
-      {
-        "feature": "dec_match_farther_log2_mean",
-        "importance": 0.022858644931754525
+        "feature": "dec_lazy_defer_frac",
+        "importance": 0.021905224202583503
       },
       {
         "feature": "huf_lit_optimal_frac",
-        "importance": 0.020820835753790297
+        "importance": 0.02104861111946226
       },
       {
-        "feature": "huf_dst_excess_mean",
-        "importance": 0.017259678824452864
+        "feature": "blk_flush_markers",
+        "importance": 0.020865819363421193
+      },
+      {
+        "feature": "blk_term_empty_coded",
+        "importance": 0.019869583227742398
+      },
+      {
+        "feature": "huf_unused_lit_mean",
+        "importance": 0.01979247945284728
+      },
+      {
+        "feature": "dec_match_farther_log2_mean",
+        "importance": 0.019102638329106768
+      },
+      {
+        "feature": "dec_match_nearest_frac",
+        "importance": 0.017701720838324594
       },
       {
         "feature": "dec_lit_avail_len_mean",
-        "importance": 0.016784451015433032
+        "importance": 0.017042118750195748
       },
       {
-        "feature": "blk_bits_cv",
-        "importance": 0.014757925134469814
+        "feature": "dec_missed_match_frac",
+        "importance": 0.013588894431281702
       }
     ]
   },
   "closed_set": {
-    "n": 2673,
-    "accuracy": 0.9161990273101385,
-    "macro_f1": 0.9126108818691491,
-    "coverage": 0.9012345679012346,
-    "accuracy_on_answered": 0.950186799501868,
+    "n": 2689,
+    "accuracy": 0.9222759390107846,
+    "macro_f1": 0.9265806541130395,
+    "per_profile": [
+      {
+        "profile": "7zip",
+        "support": 246,
+        "precision": 0.9504504504504504,
+        "recall": 0.8577235772357723,
+        "f1": 0.9017094017094015
+      },
+      {
+        "profile": "chromium-zlib",
+        "support": 290,
+        "precision": 0.8830188679245283,
+        "recall": 0.8068965517241379,
+        "f1": 0.8432432432432433
+      },
+      {
+        "profile": "go-flate",
+        "support": 305,
+        "precision": 0.9967320261437909,
+        "recall": 1.0,
+        "f1": 0.9983633387888707
+      },
+      {
+        "profile": "libdeflate",
+        "support": 299,
+        "precision": 0.8490566037735849,
+        "recall": 0.903010033444816,
+        "f1": 0.8752025931928687
+      },
+      {
+        "profile": "word",
+        "support": 129,
+        "precision": 1.0,
+        "recall": 0.9844961240310077,
+        "f1": 0.9921875
+      },
+      {
+        "profile": "zlib",
+        "support": 784,
+        "precision": 0.9044205495818399,
+        "recall": 0.9655612244897959,
+        "f1": 0.9339913633559531
+      },
+      {
+        "profile": "zlib-ng",
+        "support": 494,
+        "precision": 0.9214876033057852,
+        "recall": 0.902834008097166,
+        "f1": 0.9120654396728016
+      },
+      {
+        "profile": "zopfli",
+        "support": 142,
+        "precision": 1.0,
+        "recall": 0.9154929577464789,
+        "f1": 0.9558823529411764
+      }
+    ],
+    "end_to_end_accuracy": 0.8118259576050576,
+    "end_to_end_macro_f1": 0.8773001174240749,
+    "per_profile_end_to_end": [
+      {
+        "profile": "7zip",
+        "support": 246,
+        "precision": 0.9538461538461539,
+        "recall": 0.7560975609756098,
+        "f1": 0.8435374149659864
+      },
+      {
+        "profile": "chromium-zlib",
+        "support": 290,
+        "precision": 0.9326923076923077,
+        "recall": 0.6689655172413793,
+        "f1": 0.7791164658634537
+      },
+      {
+        "profile": "go-flate",
+        "support": 305,
+        "precision": 0.996078431372549,
+        "recall": 0.8327868852459016,
+        "f1": 0.9071428571428571
+      },
+      {
+        "profile": "libdeflate",
+        "support": 299,
+        "precision": 0.9271255060728745,
+        "recall": 0.7658862876254181,
+        "f1": 0.8388278388278387
+      },
+      {
+        "profile": "word",
+        "support": 129,
+        "precision": 1.0,
+        "recall": 0.9844961240310077,
+        "f1": 0.9921875
+      },
+      {
+        "profile": "zlib",
+        "support": 784,
+        "precision": 0.9438502673796791,
+        "recall": 0.9005102040816326,
+        "f1": 0.9216710182767623
+      },
+      {
+        "profile": "zlib-ng",
+        "support": 494,
+        "precision": 0.9842931937172775,
+        "recall": 0.7611336032388664,
+        "f1": 0.858447488584475
+      },
+      {
+        "profile": "zopfli",
+        "support": 142,
+        "precision": 1.0,
+        "recall": 0.7816901408450704,
+        "f1": 0.8774703557312252
+      }
+    ],
+    "coverage": 0.8452956489401264,
+    "accuracy_on_answered": 0.9604047514298284,
     "labels": [
       "7zip",
       "chromium-zlib",
       "go-flate",
       "libdeflate",
+      "word",
       "zlib",
       "zlib-ng",
       "zopfli"
     ],
     "confusion": [
       [
-        277,
+        211,
         0,
         1,
-        10,
-        18,
-        1,
+        9,
+        0,
+        20,
+        5,
         0
       ],
       [
         0,
-        339,
+        234,
         0,
-        13,
-        1,
-        15,
-        0
-      ],
-      [
-        0,
-        0,
-        379,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
         14,
-        19,
         0,
-        315,
-        22,
+        29,
+        13,
+        0
+      ],
+      [
+        0,
+        0,
+        305,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
         12,
-        2
-      ],
-      [
-        3,
-        2,
         0,
-        3,
-        706,
-        2,
+        270,
+        0,
+        7,
+        5,
         0
       ],
       [
         0,
-        34,
         0,
-        19,
-        19,
-        273,
+        0,
+        0,
+        127,
+        2,
+        0,
         0
       ],
       [
+        2,
         5,
         0,
+        6,
         0,
-        5,
-        3,
+        757,
+        14,
+        0
+      ],
+      [
+        0,
+        14,
+        0,
+        12,
+        0,
+        22,
+        446,
+        0
+      ],
+      [
+        4,
+        0,
+        0,
+        7,
+        0,
+        0,
         1,
-        160
+        130
       ]
     ],
     "confusion_with_unknown": [
       [
-        257,
+        194,
         0,
+        1,
+        5,
+        0,
+        16,
+        3,
+        0,
+        27
+      ],
+      [
+        0,
+        212,
         0,
         4,
-        12,
+        0,
+        15,
         1,
+        0,
+        58
+      ],
+      [
+        0,
+        0,
+        291,
+        0,
+        0,
+        0,
+        0,
+        0,
+        14
+      ],
+      [
+        4,
+        8,
+        0,
+        245,
+        0,
+        5,
+        4,
         0,
         33
       ],
       [
         0,
-        313,
-        0,
-        7,
-        1,
-        2,
-        0,
-        45
-      ],
-      [
-        0,
-        0,
-        361,
         0,
         0,
         0,
-        0,
-        18
-      ],
-      [
-        7,
-        9,
-        0,
-        284,
-        15,
-        4,
-        2,
-        63
-      ],
-      [
-        1,
-        1,
-        0,
-        1,
-        690,
-        0,
-        0,
-        23
-      ],
-      [
-        0,
-        16,
-        0,
-        10,
-        18,
-        231,
-        0,
-        70
-      ],
-      [
+        127,
         2,
         0,
         0,
-        4,
+        0
+      ],
+      [
         2,
         1,
-        153,
-        12
+        0,
+        2,
+        0,
+        752,
+        8,
+        0,
+        19
+      ],
+      [
+        0,
+        6,
+        0,
+        5,
+        0,
+        17,
+        419,
+        0,
+        47
+      ],
+      [
+        3,
+        0,
+        0,
+        6,
+        0,
+        0,
+        1,
+        126,
+        6
       ]
     ],
-    "per_profile": [
-      {
-        "profile": "7zip",
-        "support": 307,
-        "precision": 0.9264214046822743,
-        "recall": 0.9022801302931596,
-        "f1": 0.9141914191419143
-      },
-      {
-        "profile": "chromium-zlib",
-        "support": 368,
-        "precision": 0.8604060913705583,
-        "recall": 0.9211956521739131,
-        "f1": 0.889763779527559
-      },
-      {
-        "profile": "go-flate",
-        "support": 379,
-        "precision": 0.9973684210526316,
-        "recall": 1.0,
-        "f1": 0.9986824769433464
-      },
-      {
-        "profile": "libdeflate",
-        "support": 384,
-        "precision": 0.863013698630137,
-        "recall": 0.8203125,
-        "f1": 0.8411214953271028
-      },
-      {
-        "profile": "zlib",
-        "support": 716,
-        "precision": 0.918075422626788,
-        "recall": 0.9860335195530726,
-        "f1": 0.9508417508417508
-      },
-      {
-        "profile": "zlib-ng",
-        "support": 345,
-        "precision": 0.8980263157894737,
-        "recall": 0.7913043478260869,
-        "f1": 0.8412942989214175
-      },
-      {
-        "profile": "zopfli",
-        "support": 174,
-        "precision": 0.9876543209876543,
-        "recall": 0.9195402298850575,
-        "f1": 0.9523809523809523
-      }
-    ]
+    "min_evidence_bytes": 256,
+    "metric_note": "'accuracy', 'macro_f1' and 'per_profile' are forced-choice (the unknown rule and the minimum evidence size switched off); the end_to_end_* figures, coverage and accuracy_on_answered score what the tool actually outputs, counting 'unknown encoder' and 'insufficient evidence' as misses"
   },
   "size_bands": {
     "bands": [
@@ -478,221 +633,277 @@
         "band": "0 B - 256 B",
         "lo": 0,
         "hi": 256,
-        "n": 121,
-        "accuracy": 0.8264462809917356,
-        "coverage": 0.5619834710743802,
-        "accuracy_on_answered": 0.8823529411764706
+        "n": 259,
+        "accuracy": 0.7953667953667953,
+        "end_to_end_accuracy": 0.0,
+        "coverage": 0.0,
+        "classifier_coverage": 0.8185328185328186,
+        "accuracy_on_answered": 0.8632075471698113
       },
       {
         "band": "256 B - 1 KiB",
         "lo": 256,
         "hi": 1024,
-        "n": 836,
-        "accuracy": 0.8576555023923444,
-        "coverage": 0.861244019138756,
-        "accuracy_on_answered": 0.9111111111111111
+        "n": 688,
+        "accuracy": 0.8808139534883721,
+        "end_to_end_accuracy": 0.8226744186046512,
+        "coverage": 0.8880813953488372,
+        "classifier_coverage": 0.8880813953488372,
+        "accuracy_on_answered": 0.9263502454991817
       },
       {
         "band": "1 KiB - 4 KiB",
         "lo": 1024,
         "hi": 4096,
-        "n": 889,
-        "accuracy": 0.9516310461192351,
-        "coverage": 0.9595050618672666,
-        "accuracy_on_answered": 0.9648300117233294
+        "n": 918,
+        "accuracy": 0.9684095860566448,
+        "end_to_end_accuracy": 0.9444444444444444,
+        "coverage": 0.9651416122004357,
+        "classifier_coverage": 0.9651416122004357,
+        "accuracy_on_answered": 0.9785553047404063
       },
       {
         "band": "4 KiB - 16 KiB",
         "lo": 4096,
         "hi": 16384,
-        "n": 586,
-        "accuracy": 0.9522184300341296,
-        "coverage": 0.9436860068259386,
-        "accuracy_on_answered": 0.972875226039783
+        "n": 251,
+        "accuracy": 0.9681274900398407,
+        "end_to_end_accuracy": 0.9681274900398407,
+        "coverage": 1.0,
+        "classifier_coverage": 1.0,
+        "accuracy_on_answered": 0.9681274900398407
       },
       {
         "band": "16 KiB - 64 KiB",
         "lo": 16384,
         "hi": 65536,
-        "n": 157,
-        "accuracy": 0.9808917197452229,
-        "coverage": 0.9490445859872612,
-        "accuracy_on_answered": 1.0
+        "n": 245,
+        "accuracy": 0.9755102040816327,
+        "end_to_end_accuracy": 0.9428571428571428,
+        "coverage": 0.9551020408163265,
+        "classifier_coverage": 0.9551020408163265,
+        "accuracy_on_answered": 0.9871794871794872
       },
       {
         "band": ">= 64 KiB",
         "lo": 65536,
         "hi": 1000000000000,
-        "n": 84,
-        "accuracy": 0.8809523809523809,
-        "coverage": 0.7857142857142857,
-        "accuracy_on_answered": 0.9545454545454546
+        "n": 328,
+        "accuracy": 0.9054878048780488,
+        "end_to_end_accuracy": 0.8414634146341463,
+        "coverage": 0.8871951219512195,
+        "classifier_coverage": 0.8871951219512195,
+        "accuracy_on_answered": 0.9484536082474226
       }
     ],
     "reliability_target": 0.9,
+    "min_evidence_bytes": 256,
     "smallest_reliable_compressed_size": 256
   },
   "settings": {
     "7zip": {
-      "n": 257,
-      "accuracy": 0.9260700389105059
+      "n": 194,
+      "accuracy": 0.9536082474226805
     },
     "chromium-zlib": {
-      "n": 313,
-      "accuracy": 0.8210862619808307
+      "n": 212,
+      "accuracy": 0.8443396226415094
     },
     "go-flate": {
-      "n": 361,
-      "accuracy": 0.8670360110803325
+      "n": 291,
+      "accuracy": 0.8556701030927835
     },
     "libdeflate": {
-      "n": 284,
-      "accuracy": 0.9366197183098591
+      "n": 245,
+      "accuracy": 0.926530612244898
+    },
+    "word": {
+      "n": 127,
+      "accuracy": 1.0
     },
     "zlib": {
-      "n": 690,
-      "accuracy": 0.691304347826087
+      "n": 752,
+      "accuracy": 0.6928191489361702
     },
     "zlib-ng": {
-      "n": 231,
-      "accuracy": 0.9913419913419913
+      "n": 419,
+      "accuracy": 0.9618138424821002
     },
     "zopfli": {
-      "n": 153,
-      "accuracy": 0.5947712418300654
+      "n": 126,
+      "accuracy": 0.6428571428571429
     }
   },
   "synthetic_unknown": {
     "encoder": "purepy (team's own encoder, never trained on)",
-    "n": 177,
-    "rejection_rate": 0.2655367231638418,
+    "n": 140,
+    "rejection_rate": 0.3,
     "misattributed_to": {
-      "zlib": 91,
+      "zlib": 69,
       "7zip": 12,
-      "zlib-ng": 22,
-      "libdeflate": 5
+      "zlib-ng": 16,
+      "libdeflate": 1
     }
   },
   "leave_one_encoder_out": {
     "7zip": {
-      "n": 285,
-      "rejection_rate": 0.4105263157894737,
-      "rejection_rate_ge_1kib": 0.5141242937853108,
+      "n": 228,
+      "rejection_rate": 0.3201754385964912,
+      "rejection_rate_ge_1kib": 0.32857142857142857,
+      "rejected_by_confidence_rule": 0.2807017543859649,
+      "rejected_by_novelty_rule": 0.07456140350877193,
       "misattributed_to": {
-        "zlib": 71,
-        "libdeflate": 50,
-        "zopfli": 46,
-        "zlib-ng": 1
-      }
+        "zlib": 72,
+        "zopfli": 57,
+        "libdeflate": 20,
+        "zlib-ng": 6
+      },
+      "trees": 150
     },
     "chromium-zlib": {
-      "n": 355,
-      "rejection_rate": 0.11267605633802817,
-      "rejection_rate_ge_1kib": 0.07659574468085106,
+      "n": 275,
+      "rejection_rate": 0.08363636363636363,
+      "rejection_rate_ge_1kib": 0.07526881720430108,
+      "rejected_by_confidence_rule": 0.04727272727272727,
+      "rejected_by_novelty_rule": 0.04,
       "misattributed_to": {
-        "zlib-ng": 243,
-        "libdeflate": 39,
-        "zlib": 33
-      }
+        "zlib-ng": 184,
+        "libdeflate": 37,
+        "zlib": 27,
+        "go-flate": 4
+      },
+      "trees": 150
     },
     "go-flate": {
-      "n": 379,
-      "rejection_rate": 0.3720316622691293,
-      "rejection_rate_ge_1kib": 0.2869198312236287,
+      "n": 305,
+      "rejection_rate": 0.2360655737704918,
+      "rejection_rate_ge_1kib": 0.28421052631578947,
+      "rejected_by_confidence_rule": 0.09508196721311475,
+      "rejected_by_novelty_rule": 0.18032786885245902,
       "misattributed_to": {
-        "chromium-zlib": 221,
-        "zlib-ng": 11,
-        "libdeflate": 3,
-        "7zip": 3
-      }
+        "chromium-zlib": 195,
+        "zlib-ng": 21,
+        "libdeflate": 10,
+        "7zip": 7
+      },
+      "trees": 150
     },
     "libdeflate": {
-      "n": 380,
-      "rejection_rate": 0.018421052631578946,
-      "rejection_rate_ge_1kib": 0.012875536480686695,
+      "n": 297,
+      "rejection_rate": 0.09090909090909091,
+      "rejection_rate_ge_1kib": 0.10810810810810811,
+      "rejected_by_confidence_rule": 0.0707070707070707,
+      "rejected_by_novelty_rule": 0.020202020202020204,
       "misattributed_to": {
-        "chromium-zlib": 120,
-        "zlib-ng": 103,
-        "zlib": 95,
-        "7zip": 42,
-        "zopfli": 13
-      }
+        "chromium-zlib": 90,
+        "zlib-ng": 84,
+        "zlib": 59,
+        "7zip": 23,
+        "zopfli": 14
+      },
+      "trees": 150
+    },
+    "word": {
+      "n": 129,
+      "rejection_rate": 0.0,
+      "rejection_rate_ge_1kib": 0.0,
+      "rejected_by_confidence_rule": 0.0,
+      "rejected_by_novelty_rule": 0.0,
+      "misattributed_to": {
+        "zlib": 129
+      },
+      "trees": 150
     },
     "zlib": {
-      "n": 668,
-      "rejection_rate": 0.3323353293413174,
-      "rejection_rate_ge_1kib": 0.3206751054852321,
+      "n": 709,
+      "rejection_rate": 0.2637517630465444,
+      "rejection_rate_ge_1kib": 0.27524752475247527,
+      "rejected_by_confidence_rule": 0.14527503526093088,
+      "rejected_by_novelty_rule": 0.19746121297602257,
       "misattributed_to": {
-        "zlib-ng": 153,
-        "libdeflate": 148,
-        "7zip": 80,
-        "chromium-zlib": 65
-      }
+        "zlib-ng": 221,
+        "libdeflate": 170,
+        "7zip": 111,
+        "chromium-zlib": 16,
+        "word": 4
+      },
+      "trees": 150
     },
     "zlib-ng": {
-      "n": 340,
-      "rejection_rate": 0.3264705882352941,
-      "rejection_rate_ge_1kib": 0.3235294117647059,
+      "n": 473,
+      "rejection_rate": 0.28752642706131076,
+      "rejection_rate_ge_1kib": 0.3323076923076923,
+      "rejected_by_confidence_rule": 0.021141649048625793,
+      "rejected_by_novelty_rule": 0.2748414376321353,
       "misattributed_to": {
-        "chromium-zlib": 105,
-        "libdeflate": 73,
-        "zlib": 51
-      }
+        "chromium-zlib": 194,
+        "zlib": 79,
+        "libdeflate": 61,
+        "7zip": 2,
+        "go-flate": 1
+      },
+      "trees": 150
     },
     "zopfli": {
-      "n": 174,
-      "rejection_rate": 0.23563218390804597,
-      "rejection_rate_ge_1kib": 0.26851851851851855,
+      "n": 142,
+      "rejection_rate": 0.8028169014084507,
+      "rejection_rate_ge_1kib": 0.8372093023255814,
+      "rejected_by_confidence_rule": 0.07042253521126761,
+      "rejected_by_novelty_rule": 0.7323943661971831,
       "misattributed_to": {
-        "7zip": 116,
-        "libdeflate": 14,
-        "zlib": 2,
-        "zlib-ng": 1
-      }
+        "libdeflate": 16,
+        "7zip": 10,
+        "zlib-ng": 2
+      },
+      "trees": 150
     }
   },
   "baselines": {
     "n_streams": 280,
     "methods": {
       "DeflateProvenance": {
-        "accuracy": 0.8357142857142857,
-        "misattribution_rate": 0.05357142857142857,
-        "no_answer_rate": 0.11071428571428571,
+        "accuracy": 0.8321428571428572,
+        "misattribution_rate": 0.03571428571428571,
+        "no_answer_rate": 0.13214285714285715,
+        "zlib_detector": {
+          "precision": 0.8809523809523809,
+          "recall": 0.925
+        },
         "per_profile": {
           "7zip": {
-            "correct": 0.825,
-            "wrong": 0.0,
-            "no answer": 0.175
-          },
-          "chromium-zlib": {
             "correct": 0.925,
             "wrong": 0.0,
             "no answer": 0.075
           },
+          "chromium-zlib": {
+            "correct": 0.65,
+            "wrong": 0.125,
+            "no answer": 0.225
+          },
           "go-flate": {
-            "correct": 0.9,
+            "correct": 0.85,
             "wrong": 0.0,
-            "no answer": 0.1
+            "no answer": 0.15
           },
           "libdeflate": {
-            "correct": 0.75,
-            "wrong": 0.125,
-            "no answer": 0.125
+            "correct": 0.8,
+            "wrong": 0.025,
+            "no answer": 0.175
           },
           "zlib": {
             "correct": 0.925,
-            "wrong": 0.025,
-            "no answer": 0.05
+            "wrong": 0.0,
+            "no answer": 0.075
           },
           "zlib-ng": {
-            "correct": 0.6,
-            "wrong": 0.2,
-            "no answer": 0.2
+            "correct": 0.85,
+            "wrong": 0.05,
+            "no answer": 0.1
           },
           "zopfli": {
-            "correct": 0.925,
-            "wrong": 0.025,
-            "no answer": 0.05
+            "correct": 0.825,
+            "wrong": 0.05,
+            "no answer": 0.125
           }
         }
       },
@@ -700,6 +911,10 @@
         "accuracy": 0.14285714285714285,
         "misattribution_rate": 0.0,
         "no_answer_rate": 0.8571428571428571,
+        "zlib_detector": {
+          "precision": 1.0,
+          "recall": 1.0
+        },
         "per_profile": {
           "7zip": {
             "correct": 0.0,
@@ -739,19 +954,23 @@
         }
       },
       "preflate-rs 0.7.6 estimate": {
-        "accuracy": 0.23214285714285715,
-        "misattribution_rate": 0.5821428571428572,
-        "no_answer_rate": 0.18571428571428572,
+        "accuracy": 0.2571428571428571,
+        "misattribution_rate": 0.6535714285714286,
+        "no_answer_rate": 0.08928571428571429,
+        "zlib_detector": {
+          "precision": 0.5434782608695652,
+          "recall": 0.625
+        },
         "per_profile": {
           "7zip": {
             "correct": 0.0,
-            "wrong": 0.775,
-            "no answer": 0.225
+            "wrong": 0.85,
+            "no answer": 0.15
           },
           "chromium-zlib": {
-            "correct": 0.1,
-            "wrong": 0.8,
-            "no answer": 0.1
+            "correct": 0.05,
+            "wrong": 0.775,
+            "no answer": 0.175
           },
           "go-flate": {
             "correct": 0.0,
@@ -759,29 +978,31 @@
             "no answer": 0.025
           },
           "libdeflate": {
-            "correct": 0.875,
-            "wrong": 0.125,
+            "correct": 0.925,
+            "wrong": 0.075,
             "no answer": 0.0
           },
           "zlib": {
-            "correct": 0.55,
+            "correct": 0.625,
             "wrong": 0.3,
-            "no answer": 0.15
+            "no answer": 0.075
           },
           "zlib-ng": {
-            "correct": 0.1,
-            "wrong": 0.85,
-            "no answer": 0.05
+            "correct": 0.2,
+            "wrong": 0.775,
+            "no answer": 0.025
           },
           "zopfli": {
             "correct": 0.0,
-            "wrong": 0.25,
-            "no answer": 0.75
+            "wrong": 0.825,
+            "no answer": 0.175
           }
         }
       }
     },
-    "notes": []
+    "notes": [
+      "Brute-force zlib re-encoding can only answer 'zlib' or nothing: it is a proof-level zlib detector (see zlib_detector), not a profile classifier, so its overall accuracy is bounded by the share of zlib streams in the sample."
+    ]
   },
   "archives": {
     "train_archives": 72,
@@ -796,8 +1017,11 @@
     ],
     "genuine": {
       "dp_accuracy": 1.0,
-      "metadata_baseline_accuracy": 0.8333333333333334,
-      "false_alarm_rate": 0.0
+      "metadata_baseline_profile_accuracy": 1.0,
+      "metadata_baseline_writer_accuracy": 0.8333333333333334,
+      "false_alarm_rate": 0.0,
+      "false_alarm_rate_zlib_only": 0.0,
+      "note": "the genuine archives claim 'dfp test writer (...)', which is not in the producer table, so this false-alarm rate covers the mixed-encoder and duplicate-name checks; producer checks are measured on real application files"
     },
     "metadata_impersonation": {
       "metadata_baseline_followed_forgery": 0.9583333333333334,
@@ -806,31 +1030,42 @@
     },
     "producer_rewrite": {
       "flagged": 1.0,
+      "flagged_by_streams": 1.0,
       "dp_kept_attribution": 1.0
     },
     "mixed_encoder_edit": {
-      "flagged": 0.9027777777777778,
-      "localised": 0.9027777777777778,
-      "edited_entry_had_enough_evidence": 0.9027777777777778,
-      "flagged_when_enough_evidence": 1.0
+      "editors": {
+        "go": 48,
+        "zlib": 24
+      },
+      "flagged": 0.9722222222222222,
+      "localised": 0.9722222222222222,
+      "edited_entry_had_enough_evidence": 1.0,
+      "flagged_when_enough_evidence": 0.9722222222222222,
+      "flagged_zlib_only": 0.8333333333333334,
+      "localised_zlib_only": 0.8333333333333334
     },
     "writer_errors": [],
+    "impersonation_skipped": 0,
+    "edits_skipped_no_editor": 0,
     "per_writer": {
       "7zip": {
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 1.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 1.0,
         "dp_kept_attribution": 1.0,
         "claim_rewrite_flagged": 1.0,
-        "edit_flagged": 0.75,
-        "edit_localised": 0.75
+        "edit_flagged": 0.8333333333333334,
+        "edit_localised": 0.8333333333333334
       },
       "dotnet": {
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 0.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 1.0,
         "dp_kept_attribution": 1.0,
@@ -842,17 +1077,19 @@
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 1.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 0.75,
         "dp_kept_attribution": 1.0,
         "claim_rewrite_flagged": 1.0,
-        "edit_flagged": 0.6666666666666666,
-        "edit_localised": 0.6666666666666666
+        "edit_flagged": 1.0,
+        "edit_localised": 1.0
       },
       "java": {
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 1.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 1.0,
         "dp_kept_attribution": 1.0,
@@ -864,6 +1101,7 @@
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 1.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 1.0,
         "dp_kept_attribution": 1.0,
@@ -875,6 +1113,7 @@
         "archives": 12,
         "dp_accuracy": 1.0,
         "metadata_accuracy": 1.0,
+        "metadata_profile_accuracy": 1.0,
         "false_alarm_rate": 0.0,
         "metadata_followed_forgery": 1.0,
         "dp_kept_attribution": 1.0,
@@ -882,214 +1121,382 @@
         "edit_flagged": 1.0,
         "edit_localised": 1.0
       }
-    }
+    },
+    "false_alarms": [],
+    "edits_missed_or_not_localised": [
+      {
+        "archive": "7zip-006.docx",
+        "writer": "7zip",
+        "editor": "zlib",
+        "entry": "word/styles.xml",
+        "flagged": false,
+        "named": [],
+        "edited_entry_label": "zlib",
+        "entries": {
+          "[Content_Types].xml": "insufficient evidence",
+          "docProps/app.xml": "insufficient evidence",
+          "word/document.xml": "insufficient evidence",
+          "word/media/part.bin": "7zip",
+          "word/numbering.xml": "7zip",
+          "word/settings.xml": "zlib",
+          "word/styles.xml": "zlib"
+        },
+        "findings": [
+          {
+            "check": "mixed-encoders",
+            "kind": "cannot-confirm",
+            "entries": []
+          },
+          {
+            "check": "producer",
+            "kind": "cannot-confirm",
+            "entries": []
+          }
+        ]
+      },
+      {
+        "archive": "7zip-010.docx",
+        "writer": "7zip",
+        "editor": "zlib",
+        "entry": "word/settings.xml",
+        "flagged": false,
+        "named": [],
+        "edited_entry_label": "zlib",
+        "entries": {
+          "[Content_Types].xml": "insufficient evidence",
+          "docProps/app.xml": "insufficient evidence",
+          "word/document.xml": "7zip",
+          "word/media/part.bin": "7zip",
+          "word/numbering.xml": "7zip",
+          "word/settings.xml": "zlib",
+          "word/styles.xml": "7zip"
+        },
+        "findings": [
+          {
+            "check": "mixed-encoders",
+            "kind": "cannot-confirm",
+            "entries": []
+          },
+          {
+            "check": "producer",
+            "kind": "cannot-confirm",
+            "entries": []
+          }
+        ]
+      }
+    ]
   },
   "second_test_set": {
-    "description": "files from /usr/lib/python3.11, /usr/share/perl, /usr/share/X11",
+    "description": "files from /usr/lib/python3.12, /usr/share/perl, /usr/share/X11",
     "sources": 120,
     "closed_set": {
-      "n": 2961,
-      "accuracy": 0.8713272543059777,
-      "macro_f1": 0.8679215544590149,
-      "coverage": 0.8449848024316109,
-      "accuracy_on_answered": 0.9308553157474021,
-      "labels": [
-        "7zip",
-        "chromium-zlib",
-        "go-flate",
-        "libdeflate",
-        "zlib",
-        "zlib-ng",
-        "zopfli"
-      ],
-      "confusion": [
-        [
-          300,
-          0,
-          0,
-          5,
-          39,
-          0,
-          8
-        ],
-        [
-          0,
-          356,
-          0,
-          20,
-          9,
-          25,
-          0
-        ],
-        [
-          0,
-          0,
-          414,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          18,
-          55,
-          0,
-          302,
-          48,
-          16,
-          0
-        ],
-        [
-          1,
-          0,
-          0,
-          1,
-          766,
-          0,
-          0
-        ],
-        [
-          0,
-          44,
-          0,
-          46,
-          36,
-          250,
-          0
-        ],
-        [
-          2,
-          0,
-          0,
-          6,
-          2,
-          0,
-          192
-        ]
-      ],
-      "confusion_with_unknown": [
-        [
-          279,
-          0,
-          0,
-          3,
-          30,
-          0,
-          4,
-          36
-        ],
-        [
-          0,
-          276,
-          0,
-          0,
-          0,
-          0,
-          0,
-          134
-        ],
-        [
-          0,
-          0,
-          413,
-          0,
-          0,
-          0,
-          0,
-          1
-        ],
-        [
-          10,
-          10,
-          0,
-          222,
-          39,
-          1,
-          0,
-          157
-        ],
-        [
-          1,
-          0,
-          0,
-          0,
-          753,
-          0,
-          0,
-          14
-        ],
-        [
-          0,
-          20,
-          0,
-          17,
-          29,
-          194,
-          0,
-          116
-        ],
-        [
-          2,
-          0,
-          0,
-          5,
-          2,
-          0,
-          192,
-          1
-        ]
-      ],
+      "n": 3530,
+      "accuracy": 0.8682719546742209,
+      "macro_f1": 0.8651761091746755,
       "per_profile": [
         {
           "profile": "7zip",
-          "support": 352,
-          "precision": 0.9345794392523364,
-          "recall": 0.8522727272727273,
-          "f1": 0.8915304606240715
+          "support": 349,
+          "precision": 0.933993399339934,
+          "recall": 0.8108882521489972,
+          "f1": 0.8680981595092024
         },
         {
           "profile": "chromium-zlib",
-          "support": 410,
-          "precision": 0.7824175824175824,
-          "recall": 0.8682926829268293,
-          "f1": 0.823121387283237
+          "support": 408,
+          "precision": 0.8035714285714286,
+          "recall": 0.6617647058823529,
+          "f1": 0.7258064516129031
         },
         {
           "profile": "go-flate",
-          "support": 414,
+          "support": 419,
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0
         },
         {
           "profile": "libdeflate",
-          "support": 439,
-          "precision": 0.7947368421052632,
-          "recall": 0.6879271070615034,
-          "f1": 0.7374847374847375
+          "support": 436,
+          "precision": 0.7404063205417607,
+          "recall": 0.7522935779816514,
+          "f1": 0.7463026166097838
+        },
+        {
+          "profile": "word",
+          "support": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
         },
         {
           "profile": "zlib",
-          "support": 768,
-          "precision": 0.8511111111111112,
-          "recall": 0.9973958333333334,
-          "f1": 0.918465227817746
+          "support": 1053,
+          "precision": 0.8280507131537242,
+          "recall": 0.9924026590693258,
+          "f1": 0.9028077753779697
         },
         {
           "profile": "zlib-ng",
-          "support": 376,
-          "precision": 0.8591065292096219,
-          "recall": 0.6648936170212766,
-          "f1": 0.7496251874062968
+          "support": 666,
+          "precision": 0.9446428571428571,
+          "recall": 0.7942942942942943,
+          "f1": 0.8629690048939642
         },
         {
           "profile": "zopfli",
-          "support": 202,
-          "precision": 0.96,
-          "recall": 0.9504950495049505,
-          "f1": 0.9552238805970149
+          "support": 199,
+          "precision": 0.9408866995073891,
+          "recall": 0.9597989949748744,
+          "f1": 0.9502487562189056
         }
-      ]
+      ],
+      "end_to_end_accuracy": 0.7864022662889518,
+      "end_to_end_macro_f1": 0.8242887393444321,
+      "per_profile_end_to_end": [
+        {
+          "profile": "7zip",
+          "support": 349,
+          "precision": 0.9732824427480916,
+          "recall": 0.7306590257879656,
+          "f1": 0.8346972176759411
+        },
+        {
+          "profile": "chromium-zlib",
+          "support": 408,
+          "precision": 0.8961538461538462,
+          "recall": 0.571078431372549,
+          "f1": 0.6976047904191616
+        },
+        {
+          "profile": "go-flate",
+          "support": 419,
+          "precision": 1.0,
+          "recall": 0.9284009546539379,
+          "f1": 0.9628712871287128
+        },
+        {
+          "profile": "libdeflate",
+          "support": 436,
+          "precision": 0.8222222222222222,
+          "recall": 0.5940366972477065,
+          "f1": 0.6897470039946738
+        },
+        {
+          "profile": "word",
+          "support": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "profile": "zlib",
+          "support": 1053,
+          "precision": 0.8730569948186528,
+          "recall": 0.9601139601139601,
+          "f1": 0.9145183175033921
+        },
+        {
+          "profile": "zlib-ng",
+          "support": 666,
+          "precision": 0.9877049180327869,
+          "recall": 0.7237237237237237,
+          "f1": 0.8353552859618717
+        },
+        {
+          "profile": "zopfli",
+          "support": 199,
+          "precision": 0.9607843137254902,
+          "recall": 0.7386934673366834,
+          "f1": 0.8352272727272727
+        }
+      ],
+      "coverage": 0.8569405099150141,
+      "accuracy_on_answered": 0.9176859504132231,
+      "labels": [
+        "7zip",
+        "chromium-zlib",
+        "go-flate",
+        "libdeflate",
+        "word",
+        "zlib",
+        "zlib-ng",
+        "zopfli"
+      ],
+      "confusion": [
+        [
+          283,
+          0,
+          0,
+          4,
+          0,
+          50,
+          0,
+          12
+        ],
+        [
+          0,
+          270,
+          0,
+          46,
+          0,
+          72,
+          20,
+          0
+        ],
+        [
+          0,
+          0,
+          419,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          17,
+          23,
+          0,
+          328,
+          0,
+          57,
+          11,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          2,
+          4,
+          1045,
+          0,
+          0
+        ],
+        [
+          0,
+          43,
+          0,
+          57,
+          0,
+          37,
+          529,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          6,
+          0,
+          1,
+          0,
+          191
+        ]
+      ],
+      "confusion_with_unknown": [
+        [
+          256,
+          0,
+          0,
+          2,
+          0,
+          34,
+          0,
+          6,
+          51
+        ],
+        [
+          0,
+          240,
+          0,
+          25,
+          0,
+          55,
+          3,
+          0,
+          85
+        ],
+        [
+          0,
+          0,
+          410,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9
+        ],
+        [
+          6,
+          8,
+          0,
+          262,
+          0,
+          45,
+          3,
+          0,
+          112
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          3,
+          1031,
+          0,
+          0,
+          18
+        ],
+        [
+          0,
+          19,
+          0,
+          24,
+          0,
+          23,
+          494,
+          0,
+          106
+        ],
+        [
+          0,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          154,
+          39
+        ]
+      ],
+      "min_evidence_bytes": 256,
+      "metric_note": "'accuracy', 'macro_f1' and 'per_profile' are forced-choice (the unknown rule and the minimum evidence size switched off); the end_to_end_* figures, coverage and accuracy_on_answered score what the tool actually outputs, counting 'unknown encoder' and 'insufficient evidence' as misses"
     },
     "size_bands": {
       "bands": [
@@ -1097,70 +1504,354 @@
           "band": "0 B - 256 B",
           "lo": 0,
           "hi": 256,
-          "n": 83,
-          "accuracy": 0.7590361445783133,
-          "coverage": 0.7469879518072289,
-          "accuracy_on_answered": 0.8064516129032258
+          "n": 117,
+          "accuracy": 0.7606837606837606,
+          "end_to_end_accuracy": 0.0,
+          "coverage": 0.0,
+          "classifier_coverage": 0.7264957264957265,
+          "accuracy_on_answered": 0.8352941176470589
         },
         {
           "band": "256 B - 1 KiB",
           "lo": 256,
           "hi": 1024,
-          "n": 881,
-          "accuracy": 0.8183881952326901,
-          "coverage": 0.7786606129398411,
-          "accuracy_on_answered": 0.9125364431486881
+          "n": 1053,
+          "accuracy": 0.8433048433048433,
+          "end_to_end_accuracy": 0.7587844254510921,
+          "coverage": 0.8452041785375118,
+          "classifier_coverage": 0.8452041785375118,
+          "accuracy_on_answered": 0.8977528089887641
         },
         {
           "band": "1 KiB - 4 KiB",
           "lo": 1024,
           "hi": 4096,
-          "n": 1121,
-          "accuracy": 0.864406779661017,
-          "coverage": 0.8617305976806423,
-          "accuracy_on_answered": 0.9182194616977226
+          "n": 1323,
+          "accuracy": 0.8586545729402872,
+          "end_to_end_accuracy": 0.799697656840514,
+          "coverage": 0.8858654572940288,
+          "classifier_coverage": 0.8858654572940288,
+          "accuracy_on_answered": 0.9027303754266212
         },
         {
           "band": "4 KiB - 16 KiB",
           "lo": 4096,
           "hi": 16384,
-          "n": 671,
-          "accuracy": 0.9418777943368107,
-          "coverage": 0.9016393442622951,
-          "accuracy_on_answered": 0.9652892561983472
+          "n": 722,
+          "accuracy": 0.9127423822714681,
+          "end_to_end_accuracy": 0.8864265927977839,
+          "coverage": 0.9349030470914127,
+          "classifier_coverage": 0.9349030470914127,
+          "accuracy_on_answered": 0.9481481481481482
         },
         {
           "band": "16 KiB - 64 KiB",
           "lo": 16384,
           "hi": 65536,
-          "n": 202,
-          "accuracy": 0.9504950495049505,
-          "coverage": 0.8910891089108911,
-          "accuracy_on_answered": 0.9944444444444445
+          "n": 277,
+          "accuracy": 0.9350180505415162,
+          "end_to_end_accuracy": 0.8916967509025271,
+          "coverage": 0.9169675090252708,
+          "classifier_coverage": 0.9169675090252708,
+          "accuracy_on_answered": 0.9724409448818898
         },
         {
           "band": ">= 64 KiB",
           "lo": 65536,
           "hi": 1000000000000,
-          "n": 3,
-          "accuracy": 1.0,
-          "coverage": 1.0,
-          "accuracy_on_answered": 1.0
+          "n": 38,
+          "accuracy": 0.8947368421052632,
+          "end_to_end_accuracy": 0.8421052631578947,
+          "coverage": 0.8947368421052632,
+          "classifier_coverage": 0.8947368421052632,
+          "accuracy_on_answered": 0.9411764705882353
         }
       ],
       "reliability_target": 0.9,
-      "smallest_reliable_compressed_size": 256
+      "min_evidence_bytes": 256,
+      "smallest_reliable_compressed_size": 1024
     }
   },
   "real_files": {
-    "files": 30,
+    "files": 60,
     "false_alarm_rate": 0.0,
     "genuine": [
       {
         "file": "doc000.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc005.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc006.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc008.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc011.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc013.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc014.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc017.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc024.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc025.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc027.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc028.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc030.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc031.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc033.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc035.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc036.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc037.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc038.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc039.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc042.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc046.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc047.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "inconclusive",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc050.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc051.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "inconclusive",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc052.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc053.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc055.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc057.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc059.docx",
+        "claim": "Microsoft Office Word",
+        "profile": "word",
+        "setting": "word:saved",
+        "status": "consistent",
+        "flagged": false,
+        "findings": []
+      },
+      {
+        "file": "doc000.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "5",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1168,7 +1859,8 @@
         "file": "doc000.odt",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "8",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1176,7 +1868,8 @@
         "file": "doc001.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "5",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1184,7 +1877,8 @@
         "file": "doc001.odt",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "8",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1193,6 +1887,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1201,6 +1896,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1208,7 +1904,8 @@
         "file": "doc003.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "5",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1217,6 +1914,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1224,7 +1922,8 @@
         "file": "doc004.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "4",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1232,7 +1931,8 @@
         "file": "doc004.odt",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1240,7 +1940,8 @@
         "file": "doc005.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "5",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1248,7 +1949,8 @@
         "file": "doc005.odt",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1256,7 +1958,8 @@
         "file": "doc006.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "4",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1264,7 +1967,8 @@
         "file": "doc006.odt",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1272,7 +1976,8 @@
         "file": "doc007.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "5",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1281,6 +1986,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1288,7 +1994,8 @@
         "file": "doc008.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "4",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1297,6 +2004,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1304,7 +2012,8 @@
         "file": "doc009.docx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "4",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1313,6 +2022,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1320,7 +2030,8 @@
         "file": "sheet000.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "8",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1328,7 +2039,8 @@
         "file": "sheet001.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1336,7 +2048,8 @@
         "file": "sheet002.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "4",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1344,7 +2057,8 @@
         "file": "sheet003.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1353,6 +2067,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1360,7 +2075,8 @@
         "file": "sheet005.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1369,6 +2085,7 @@
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
         "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1376,7 +2093,8 @@
         "file": "sheet007.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1384,7 +2102,8 @@
         "file": "sheet008.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "7",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       },
@@ -1392,643 +2111,1698 @@
         "file": "sheet009.xlsx",
         "claim": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
         "profile": "zlib",
-        "setting": "8",
+        "setting": "6",
+        "status": "consistent",
         "flagged": false,
         "findings": []
       }
     ],
     "edit_editor": "zlib",
-    "edit_flagged_rate": 0.0,
-    "edit_localised_rate": 0.0,
+    "edit_flagged_rate": 1.0,
+    "edit_localised_rate": 1.0,
+    "edit_same_encoder_skipped": 30,
     "edits": [
       {
         "file": "doc000.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc000.odt",
-        "entry": "content.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc001.docx",
-        "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc001.odt",
-        "entry": "content.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc002.docx",
-        "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc002.odt",
-        "entry": "content.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc003.docx",
-        "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc003.odt",
-        "entry": "styles.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc004.docx",
-        "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc004.odt",
-        "entry": "styles.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
         "file": "doc005.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc005.odt",
-        "entry": "styles.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
         "file": "doc006.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc006.odt",
-        "entry": "content.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc007.docx",
-        "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc007.odt",
-        "entry": "styles.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
         "file": "doc008.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "doc008.odt",
-        "entry": "styles.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
-      },
-      {
-        "file": "doc009.docx",
+        "file": "doc011.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "doc009.odt",
-        "entry": "content.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc013.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet000.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc014.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet001.xlsx",
-        "entry": "xl/sharedStrings.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc017.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet002.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc024.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet003.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc025.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet004.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc027.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet005.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc028.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet006.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc030.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet007.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc031.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet008.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc033.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       },
       {
-        "file": "sheet009.xlsx",
-        "entry": "xl/worksheets/sheet1.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": true,
-        "edited_entry_label": "zlib"
+        "file": "doc035.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc036.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc037.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc038.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc039.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc042.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc046.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc047.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc050.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc051.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc052.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc053.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc055.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc057.docx",
+        "entry": "word/document.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
+      },
+      {
+        "file": "doc059.docx",
+        "entry": "word/styles.xml",
+        "editor": "zlib",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "zlib",
+        "evidence": true
       }
     ],
     "cross_editor": "go",
-    "cross_edit_flagged_rate": 0.9666666666666667,
-    "cross_edit_localised_rate": 0.9666666666666667,
+    "cross_edit_flagged_rate": 1.0,
+    "cross_edit_localised_rate": 1.0,
+    "cross_edit_same_encoder_skipped": 0,
     "cross_edits": [
       {
         "file": "doc000.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc005.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc006.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc008.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc011.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc013.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc014.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc017.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc024.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc025.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc027.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc028.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc030.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc031.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc033.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc035.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc036.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc037.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc038.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc039.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc042.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc046.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc047.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc050.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc051.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc052.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc053.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc055.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc057.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc059.docx",
+        "entry": "word/styles.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
+      },
+      {
+        "file": "doc000.docx",
+        "entry": "word/document.xml",
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc000.odt",
         "entry": "content.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "content.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc001.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc001.odt",
         "entry": "content.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "content.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc002.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc002.odt",
         "entry": "content.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "content.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc003.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc003.odt",
         "entry": "styles.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc004.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc004.odt",
         "entry": "styles.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc005.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc005.odt",
         "entry": "styles.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc006.docx",
         "entry": "word/document.xml",
-        "flagged": false,
-        "localised": false,
-        "evidence": false,
-        "edited_entry_label": "unknown encoder"
+        "editor": "go",
+        "flagged": true,
+        "localised": true,
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc006.odt",
         "entry": "content.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "content.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc007.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc007.odt",
         "entry": "styles.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc008.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc008.odt",
         "entry": "styles.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "styles.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc009.docx",
         "entry": "word/document.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "word/document.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "doc009.odt",
         "entry": "content.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "content.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet000.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet001.xlsx",
         "entry": "xl/sharedStrings.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/sharedStrings.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet002.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet003.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet004.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet005.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet006.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet007.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet008.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       },
       {
         "file": "sheet009.xlsx",
         "entry": "xl/worksheets/sheet1.xml",
+        "editor": "go",
         "flagged": true,
         "localised": true,
-        "evidence": true,
-        "edited_entry_label": "go-flate"
+        "named_untouched_entries": 0,
+        "named": [
+          "xl/worksheets/sheet1.xml"
+        ],
+        "edited_entry_label": "go-flate",
+        "evidence": true
       }
     ],
+    "inconclusive_rate": 0.03333333333333333,
     "rewrite_flag_rate": 1.0,
+    "rewrite_flagged_by_streams_rate": 1.0,
     "rewrite_kept_attribution_rate": 1.0,
     "rewrites": [
       {
         "file": "doc000.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
         "kept_attribution": true,
-        "flagged": true
-      },
-      {
-        "file": "doc001.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
-        "kept_attribution": true,
-        "flagged": true
-      },
-      {
-        "file": "doc002.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
-        "kept_attribution": true,
-        "flagged": true
-      },
-      {
-        "file": "doc003.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
-        "kept_attribution": true,
-        "flagged": true
-      },
-      {
-        "file": "doc004.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
-        "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "doc005.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "doc006.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
         "kept_attribution": true,
-        "flagged": true
-      },
-      {
-        "file": "doc007.docx",
-        "profile_before": "zlib",
-        "profile_after": "zlib",
-        "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "doc008.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc011.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc013.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc014.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc017.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc024.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc025.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc027.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc028.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc030.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc031.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc033.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc035.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc036.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc037.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc038.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc039.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc042.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc046.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc047.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc050.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc051.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc052.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc053.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc055.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc057.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc059.docx",
+        "claim_before": "Microsoft Office Word",
+        "claim_after": "LibreOffice/24.2.7.2$Linux_X86_64",
+        "profile_before": "word",
+        "profile_after": "word",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc000.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc001.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc002.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc003.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc004.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc005.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc006.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc007.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
+      },
+      {
+        "file": "doc008.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
+        "profile_before": "zlib",
+        "profile_after": "zlib",
+        "kept_attribution": true,
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "doc009.docx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet000.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet001.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet002.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet003.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet004.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet005.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet006.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet007.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet008.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       },
       {
         "file": "sheet009.xlsx",
+        "claim_before": "LibreOffice/24.2.7.2$Linux_X86_64 LibreOffice_project/420$Build-2",
+        "claim_after": "Microsoft Office Word",
         "profile_before": "zlib",
         "profile_after": "zlib",
         "kept_attribution": true,
-        "flagged": true
+        "flagged": true,
+        "flagged_by_streams": true
       }
     ]
   },

@@ -38,8 +38,9 @@ def _build_corpus(args):
     from .corpus import build_corpus, directory_sources, synthetic_sources
 
     sources = synthetic_sources(per_combo=args.per_combo, sizes=args.sizes)
+    seen: set[str] = set()  # one content digest = one source, across all directories
     for d in args.sources or []:
-        sources += directory_sources(d, limit=args.source_limit, label=f"dir{len(sources)}")
+        sources += directory_sources(d, limit=args.source_limit, seen=seen)
     print(f"building corpus from {len(sources)} sources "
           "(each is compressed with every available encoder and setting)...")
     corpus = build_corpus(sources, encoders=args.encoders, workers=args.workers,
@@ -70,12 +71,16 @@ def cmd_app(args) -> int:
     corpus = Corpus.load(args.corpus)
     info = add_app_files(corpus, args.docs, args.name, args.description)
     corpus.save(args.corpus)
-    print(json.dumps(info, indent=2))
+    print(json.dumps({k: v for k, v in info.items() if k != "holdout_file_names"}, indent=2))
     if info["shares_library"]:
         print(f"'{args.name}' streams are reproduced by {info['profile']}: they join that profile")
     else:
         print(f"'{args.name}' becomes its own profile ({info['train_files']} files train, "
               f"{info['holdout_files']} held out for testing)")
+    if info.get("holdout_file_names"):
+        print("held-out files (use only these with `dfp evaluate --real`):")
+        for name in info["holdout_file_names"]:
+            print(f"  {name}")
     return 0
 
 
@@ -89,15 +94,25 @@ def cmd_train(args) -> int:
     cal = clf.calibration
     print(f"held-out calibration: accuracy {cal.get('raw_accuracy', 0):.3f} on "
           f"{cal.get('held_out_sources', 0)} source files; unknown if confidence < "
-          f"{clf.min_confidence} or distance > {clf.max_distance:.2f}; insufficient evidence "
-          f"below {clf.min_evidence_bytes} compressed bytes")
+          f"{clf.min_confidence} or novelty > {clf.max_distance:.2f}; high-precision "
+          f"confidence {clf.strong_confidence}; insufficient evidence below "
+          f"{clf.min_evidence_bytes} compressed bytes")
     if args.out:
         clf.save(args.out)
         print(f"model saved to {args.out}")
     if args.save_as or not args.out:
-        from .modelstore import save
+        from .modelstore import bundled_profiles, save
 
         name = args.save_as or "default"
+        if name == "default" and not args.force:
+            bundled = bundled_profiles("default")
+            missing = sorted(set(bundled) - set(clf.classes))
+            if missing:
+                print(f"refusing to replace the 'default' model: the bundled one knows "
+                      f"{len(bundled)} profiles and this one lacks {', '.join(missing)} (only "
+                      "the encoders installed on this machine were in the corpus). Save it "
+                      "under another name with --save-as NAME, or pass --force.")
+                return 2
         path = save(clf, name)
         print(f"model saved as '{name}' in the model store: {path}")
         if name == "default":
@@ -151,7 +166,9 @@ def cmd_analyse(args) -> int:
     html_path.write_text(analysis_html(v), encoding="utf-8")
     json_path.write_text(analysis_json(v), encoding="utf-8")
 
+    print(f"verdict: {v.status}")
     print(f"profile: {v.profile}" + (f" (setting {v.setting})" if v.setting else "")
+          + (f"  closest known profile: {v.closest}" if v.closest else "")
           + f"  share {v.share:.0%}  confidence {v.confidence:.0%}")
     counts = v.to_dict(False)["counts"]
     print("entries: " + ", ".join(f"{k} {n}" for k, n in counts.items() if n))
@@ -167,6 +184,18 @@ def cmd_evaluate(args) -> int:
     from .realfiles import list_documents, make_libreoffice_samples
     from .report import evaluation_html, evaluation_json
 
+    if args.cross_editor not in ("auto", "none"):
+        # checked now: the real-file test runs last, hours into an evaluation
+        from .encoders import get_encoder
+
+        try:
+            ok = get_encoder(args.cross_editor).available()
+        except KeyError:
+            ok = False
+        if not ok:
+            print(f"--cross-editor {args.cross_editor}: no such encoder installed "
+                  "(see `python -m dfp encoders`, or use 'auto' or 'none')", file=sys.stderr)
+            return 2
     corpus = Corpus.load(args.corpus) if args.corpus else _build_corpus(args)
     out_dir = Path(args.outdir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -174,11 +203,16 @@ def cmd_evaluate(args) -> int:
     second = None
     second_sources = []
     if args.second_sources:
-        second_sources = directory_sources(args.second_sources, limit=args.second_limit,
-                                           label="second")
-        print(f"second test set: {len(second_sources)} files from a different corpus")
+        # never test on content the training corpus already contains
+        training_ids = {m["id"] for m in corpus.manifest.get("sources", [])}
+        candidates = directory_sources(args.second_sources, limit=args.second_limit * 2)
+        second_sources = [s for s in candidates if s.id not in training_ids][: args.second_limit]
+        dropped = sum(1 for s in candidates if s.id in training_ids)
+        print(f"second test set: {len(second_sources)} files from a different corpus"
+              + (f" ({dropped} skipped: already in the training corpus)" if dropped else ""))
         second = build_corpus(second_sources, workers=args.workers, progress=_progress,
-                              params={"description": "files from " + ", ".join(args.second_sources)})
+                              params={"description": "files from " + ", ".join(args.second_sources),
+                                      "skipped_as_training_duplicates": dropped})
         print()
 
     real_files = list_documents(args.real) if args.real else []
@@ -197,7 +231,8 @@ def cmd_evaluate(args) -> int:
         corpus, out_dir / "work", n_estimators=args.trees, second_corpus=second,
         real_files=real_files or None, python_docs=python_docs or None,
         loeo=not args.quick, baselines=not args.quick, archives=not args.quick,
-        workers=args.workers, progress=lambda m: print(f"  {m}...", flush=True))
+        workers=args.workers, progress=lambda m: print(f"  {m}...", flush=True),
+        cross_editor=None if args.cross_editor == "none" else args.cross_editor)
     (out_dir / "evaluation.html").write_text(evaluation_html(result), encoding="utf-8")
     (out_dir / "evaluation.json").write_text(evaluation_json(result), encoding="utf-8")
     if args.model:
@@ -207,8 +242,11 @@ def cmd_evaluate(args) -> int:
 
         print(f"evaluated model saved as '{args.save_as}': {save(clf, args.save_as)}")
     cs = result["closed_set"]
-    print(f"\naccuracy {cs['accuracy']:.3f}  macro-F1 {cs['macro_f1']:.3f}  "
-          f"coverage {cs['coverage']:.2f}  accuracy on answered {cs['accuracy_on_answered']:.3f}")
+    print(f"\nend to end: accuracy {cs['end_to_end_accuracy']:.3f}  macro-F1 "
+          f"{cs['end_to_end_macro_f1']:.3f}  (answers {cs['coverage']:.0%} of streams, "
+          f"{cs['accuracy_on_answered']:.3f} correct when it answers)")
+    print(f"forced choice (unknown rule off): accuracy {cs['accuracy']:.3f}  "
+          f"macro-F1 {cs['macro_f1']:.3f}")
     print(f"report: {out_dir / 'evaluation.html'}")
     return 0
 
@@ -281,7 +319,8 @@ def cmd_producers(args) -> int:
         bits = ", ".join(OPTION_BITS[b] for b in sorted(p.option_bits)) if p.option_bits else "-"
         print(f"{p.label}\n  claim pattern: {p.pattern}\n  expected profiles: "
               f"{sorted(p.expected) if p.expected else '-'}  excluded: "
-              f"{sorted(p.excluded) or '-'}  option bits: {bits}\n  basis: {p.basis}\n")
+              f"{sorted(p.excluded) or '-'}  option bits: {bits}  stream endings: "
+              f"{sorted(p.endings) if p.endings else '-'}\n  basis: {p.basis}\n")
     return 0
 
 
@@ -369,6 +408,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="name in the model store (default: 'default' unless -o is given)")
     q.add_argument("-o", "--out", default=None, help="also (or only) save to this file")
     q.add_argument("--trees", type=int, default=150)
+    q.add_argument("--force", action="store_true",
+                   help="replace 'default' even if the new model knows fewer profiles than "
+                        "the bundled one")
     _corpus_args(q)
     q.set_defaults(func=cmd_train)
 
@@ -402,6 +444,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="generate this many LibreOffice documents per format as real files")
     q.add_argument("--python-docx", type=int, default=0,
                    help="generate this many python-docx documents (they claim Word)")
+    q.add_argument("--cross-editor", default="auto",
+                   help="non-zlib encoder that edits one part of each real file "
+                        "(default: the first installed of go, 7zip, node, libdeflate, "
+                        "zlib-ng, zopfli; 'none' skips that test)")
     q.add_argument("--model", default=None, help="also save the evaluated model to this file")
     q.add_argument("--save-as", default=None, help="also save it in the model store")
     q.add_argument("--quick", action="store_true",

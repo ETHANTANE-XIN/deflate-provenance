@@ -8,3 +8,4 @@ dfp_model.json
 model*.json
 stego.deflate
 tools/preflate-estimate/target/
+.venv/

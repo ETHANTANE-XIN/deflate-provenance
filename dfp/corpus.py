@@ -218,6 +218,7 @@ def directory_sources(
     max_bytes: int = 256_000,
     min_bytes: int = 200,
     label: str = "file",
+    seen: set[str] | None = None,
 ) -> list[Source]:
     """Real files as sources (for example a Govdocs1 sample).
 
@@ -225,6 +226,12 @@ def directory_sources(
     of their path), gzip files are decompressed first, and files that are
     already compressed (PNG, JPEG, ZIP, 7z, xz, ...) are skipped because their
     content is close to random.  Content is capped at ``max_bytes``.
+
+    A source's id is its content digest (``file:<digest>``), so the same
+    content found in two directories is one source and can never fall on both
+    sides of a train/test split.  Pass the same ``seen`` set to several calls
+    to deduplicate across them; ``limit`` applies to each call.  ``label`` is
+    kept for compatibility and recorded in the origin only.
     """
     import gzip
 
@@ -234,7 +241,7 @@ def directory_sources(
         paths += [p for p in Path(d).rglob("*") if p.is_file() and not p.is_symlink()]
     paths.sort(key=lambda p: hashlib.sha256(str(p).encode()).hexdigest())
     out: list[Source] = []
-    seen: set[str] = set()
+    seen = set() if seen is None else seen
     for path in paths:
         try:
             data = path.read_bytes()
@@ -253,7 +260,7 @@ def directory_sources(
         seen.add(digest)
         suffix = path.suffix.lower().lstrip(".")
         ctype = suffix if suffix and suffix != "gz" else "file"
-        out.append(Source(f"{label}:{digest}", ctype, data, str(path)))
+        out.append(Source(f"file:{digest}", ctype, data, str(path)))
         if limit and len(out) >= limit:
             break
     return out

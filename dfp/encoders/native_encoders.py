@@ -44,12 +44,19 @@ class ZlibNgEncoder(Encoder):
         return f"zlib-ng {mod.ZLIBNG_RUNTIME_VERSION} (python-zlib-ng {_pkg_version('zlib-ng')})"
 
     def settings(self) -> list[str]:
-        return ["1", "3", "6", "9"]
+        # "<level>f": sync flush before finishing, as for zlib
+        return ["1", "3", "6", "9", "1f", "6f", "9f"]
 
     def compress(self, data: bytes, setting: str) -> EncoderResult:
         mod = self._mod()
-        comp = mod.compressobj(int(setting), mod.DEFLATED, -15, 8, mod.Z_DEFAULT_STRATEGY)
-        return self.result(comp.compress(data) + comp.flush(), setting)
+        flush = setting.endswith("f")
+        level = int(setting[:-1] if flush else setting)
+        comp = mod.compressobj(level, mod.DEFLATED, -15, 8, mod.Z_DEFAULT_STRATEGY)
+        if flush:
+            raw = comp.compress(data) + comp.flush(mod.Z_SYNC_FLUSH) + comp.flush(mod.Z_FINISH)
+        else:
+            raw = comp.compress(data) + comp.flush()
+        return self.result(raw, setting)
 
 
 class LibdeflateEncoder(Encoder):

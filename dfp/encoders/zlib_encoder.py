@@ -21,14 +21,28 @@ def zlib_raw(
     mem_level: int = 8,
     wbits: int = 15,
     strategy: int = zlib.Z_DEFAULT_STRATEGY,
+    sync_flush: bool = False,
 ) -> bytes:
-    """Raw DEFLATE from CPython's zlib with every parameter exposed."""
+    """Raw DEFLATE from CPython's zlib with every parameter exposed.
+
+    ``sync_flush`` writes the data, then ``Z_SYNC_FLUSH`` (an empty stored
+    block), then ``Z_FINISH`` (an empty fixed-code final block): the shape
+    streaming writers produce when they flush before closing.
+    """
     comp = zlib.compressobj(level, zlib.DEFLATED, -wbits, mem_level, strategy)
+    if sync_flush:
+        return comp.compress(data) + comp.flush(zlib.Z_SYNC_FLUSH) + comp.flush(zlib.Z_FINISH)
     return comp.compress(data) + comp.flush()
 
 
+#: levels also produced with a sync flush before finishing (setting "<level>f"),
+#: so the corpus shows that flush markers are not specific to one encoder
+FLUSH_LEVELS = (1, 6, 9)
+
+
 class ZlibEncoder(Encoder):
-    """zlib levels 1 to 9 (proposal III.B); strategies as optional extras."""
+    """zlib levels 1 to 9 (proposal III.B), plus flushed variants at levels 1,
+    6 and 9; strategies as optional extras."""
 
     name = "zlib"
     library = "zlib"
@@ -44,7 +58,7 @@ class ZlibEncoder(Encoder):
         return f"zlib {zlib.ZLIB_RUNTIME_VERSION}"
 
     def settings(self) -> list[str]:
-        base = [str(i) for i in range(1, 10)]
+        base = [str(i) for i in range(1, 10)] + [f"{i}f" for i in FLUSH_LEVELS]
         if not self.include_strategies:
             return base
         return base + [f"6{s}" for s in ("filt", "huff", "rle", "fixed")]
@@ -52,11 +66,14 @@ class ZlibEncoder(Encoder):
     def compress(self, data: bytes, setting: str) -> EncoderResult:
         if setting.isdigit():
             n, strategy, sname = int(setting), zlib.Z_DEFAULT_STRATEGY, "def"
+            raw = zlib_raw(data, n, strategy=strategy)
+        elif setting.endswith("f") and setting[:-1].isdigit():
+            n, sname = int(setting[:-1]), "sync-flush"
+            raw = zlib_raw(data, n, sync_flush=True)
         else:
             n = int(setting[0])
             sname = setting[1:]
-            strategy = STRATEGIES[sname]
-        raw = zlib_raw(data, n, strategy=strategy)
+            raw = zlib_raw(data, n, strategy=STRATEGIES[sname])
         return self.result(raw, setting, numeric_level=n, strategy=sname)
 
 

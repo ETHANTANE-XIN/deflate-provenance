@@ -95,7 +95,16 @@ class Huffman:
 
     __slots__ = ("counts", "symbols", "lengths", "max_length", "used", "_table")
 
-    def __init__(self, lengths: list[int]) -> None:
+    def __init__(self, lengths: list[int], kind: str | None = None) -> None:
+        """Build the decoder.
+
+        ``kind`` applies zlib's completeness rules (``inftrees.c``) to a code
+        read from a dynamic block header: ``"codes"`` (the code-length code)
+        must be complete; ``"lens"`` and ``"dists"`` may be incomplete only in
+        the single-code case (one code of length 1), and ``"dists"`` may also
+        be empty.  ``None`` skips the check, which the fixed tables of RFC 1951
+        3.2.6 need (30 five-bit distance codes do not fill the code space).
+        """
         self.lengths = lengths
         counts = [0] * 16
         for length in lengths:
@@ -104,8 +113,6 @@ class Huffman:
             counts[length] += 1
         self.counts = counts
         self.used = len(lengths) - counts[0]
-        # Reject over-subscribed sets; an incomplete set is legal only in the
-        # single-code case that real encoders emit for a one-symbol alphabet.
         left = 1
         for length in range(1, 16):
             left <<= 1
@@ -113,6 +120,9 @@ class Huffman:
             if left < 0:
                 raise DeflateError("over-subscribed Huffman code")
         self.max_length = max((i for i in range(1, 16) if counts[i]), default=0)
+        if kind is not None and left > 0 and self.max_length:
+            if kind == "codes" or self.max_length != 1:
+                raise DeflateError(f"incomplete Huffman code ({kind})")
         offsets = [0] * 16
         for length in range(1, 15):
             offsets[length + 1] = offsets[length] + counts[length]
@@ -199,6 +209,10 @@ def _static_tables() -> tuple[Huffman, Huffman]:
 
 # --- records ---------------------------------------------------------------
 
+_ZERO_256: tuple[int, ...] = (0,) * 256
+_ZERO_29: tuple[int, ...] = (0,) * 29
+_ZERO_30: tuple[int, ...] = (0,) * 30
+
 
 @dataclass
 class BlockRecord:
@@ -237,9 +251,11 @@ class BlockRecord:
     n_literals: int = 0
     n_matches: int = 0
     out_size: int = 0
-    literal_hist: list[int] = field(default_factory=lambda: [0] * 256)
-    length_code_hist: list[int] = field(default_factory=lambda: [0] * 29)
-    dist_code_hist: list[int] = field(default_factory=lambda: [0] * 30)
+    # Shared read-only zeros until the block decodes a token: a stream of empty
+    # blocks must not cost ~4 KB of histograms per block (a few bytes of input).
+    literal_hist: list[int] | tuple[int, ...] = _ZERO_256
+    length_code_hist: list[int] | tuple[int, ...] = _ZERO_29
+    dist_code_hist: list[int] | tuple[int, ...] = _ZERO_30
     match_len_sum: int = 0
     match_len_min: int = 0
     match_len_max: int = 0
@@ -318,6 +334,9 @@ class StreamRecord:
     output: bytes | None = None
     truncated: bool = False
     error: str | None = None
+    #: parsing stopped at a block boundary after ``max_bytes`` (analysis cap);
+    #: the record then describes a prefix of the stream
+    capped: bool = False
 
     # stream-level token totals (cheap to keep, avoids re-walking blocks)
     n_literals: int = 0
@@ -386,8 +405,10 @@ def _read_dynamic_tables(
     hdist = reader.read_bits(5) + 1
     hclen = reader.read_bits(4) + 4
     block.hlit, block.hdist, block.hclen = hlit, hdist, hclen
-    if hlit > 288 or hdist > 32:
-        raise DeflateError(f"illegal HLIT/HDIST ({hlit}/{hdist})")
+    # RFC 1951 3.2.7 allows the 5-bit fields to encode up to 288/32, but only
+    # 286 literal/length and 30 distance symbols exist; zlib rejects more.
+    if hlit > 286 or hdist > 30:
+        raise DeflateError(f"too many length or distance symbols ({hlit}/{hdist})")
 
     cl_lengths = [0] * 19
     transmitted: list[int] = []
@@ -397,7 +418,7 @@ def _read_dynamic_tables(
         cl_lengths[CODE_LENGTH_ORDER[i]] = value
     block.cl_code_lengths = transmitted
 
-    cl_table = Huffman(cl_lengths)
+    cl_table = Huffman(cl_lengths, "codes")
 
     lengths: list[int] = []
     counts: dict[int, int] = {}
@@ -433,10 +454,10 @@ def _read_dynamic_tables(
     block.literal_lengths = literal_lengths
     block.distance_lengths = distance_lengths
 
-    literal_table = Huffman(literal_lengths)
+    literal_table = Huffman(literal_lengths, "lens")
     if literal_lengths[END_OF_BLOCK] == 0:
         raise DeflateError("end-of-block symbol has no code")
-    distance_table = Huffman(distance_lengths)
+    distance_table = Huffman(distance_lengths, "dists")
     block.literal_tree_shape = literal_table.code_length_histogram()
     block.distance_tree_shape = distance_table.code_length_histogram()
     block.tree_bits = reader.bit_pos - tree_start
@@ -471,11 +492,11 @@ def _decode_block_body(
     from_bytes = int.from_bytes
 
     tokens: list[tuple[int, int]] | None = [] if keep_tokens else None
-    lit_hist = block.literal_hist
+    lit_hist = block.literal_hist = [0] * 256
     literal_run = 0
     prev_was_match = False
-    len_hist = block.length_code_hist
-    dist_hist = block.dist_code_hist
+    len_hist = block.length_code_hist = [0] * 29
+    dist_hist = block.dist_code_hist = [0] * 30
     min_len = 0
     n_literals = 0
 
@@ -572,6 +593,10 @@ def _decode_block_body(
                 tokens.append((length, distance))
     finally:
         block.n_literals += n_literals
+        if not n_literals and not block.n_matches:
+            block.literal_hist = _ZERO_256
+            block.length_code_hist = _ZERO_29
+            block.dist_code_hist = _ZERO_30
         if pos > total_bits:
             reader.seek_bit(total_bits)
         else:
@@ -597,6 +622,7 @@ def inflate(
     keep_tokens: bool = False,
     max_blocks: int = 1_000_000,
     strict: bool = True,
+    max_bytes: int | None = None,
 ) -> StreamRecord:
     """Parse a raw DEFLATE stream and return a :class:`StreamRecord`.
 
@@ -617,6 +643,10 @@ def inflate(
         Raise :class:`DeflateError` on malformed input.  When False, the error
         is recorded on the returned record and parsing stops -- the behaviour
         wanted for damaged evidence.
+    max_bytes:
+        Stop after the first block that ends beyond this many compressed bytes
+        and mark the record ``capped`` (it then describes a prefix of the
+        stream).  ``None`` parses everything.
     """
     reader = BitReader(data, start_bit)
     record = StreamRecord(start_bit=start_bit)
@@ -649,7 +679,10 @@ def inflate(
                 nlen = int.from_bytes(reader.read_aligned_bytes(2), "little")
                 block.stored_len = length
                 block.stored_nlen_ok = (nlen == (~length & 0xFFFF))
-                if strict and not block.stored_nlen_ok:
+                if not block.stored_nlen_ok:
+                    # Not a DEFLATE stream (or a damaged one): record and stop
+                    # in non-strict mode, as zlib does, instead of copying LEN
+                    # bytes of whatever follows and classifying them.
                     raise DeflateError(f"stored block LEN/NLEN mismatch ({length}/{nlen})")
                 out += reader.read_aligned_bytes(length)
                 block.n_literals = length
@@ -673,6 +706,9 @@ def inflate(
             index += 1
             if bfinal:
                 break
+            if max_bytes is not None and (reader.bit_pos - start_bit) // 8 >= max_bytes:
+                record.capped = True
+                break
     except (DeflateError, BitStreamError) as exc:
         record.truncated = isinstance(exc, BitStreamError)
         record.error = str(exc)
@@ -689,7 +725,7 @@ def inflate(
     record.out_size = len(out)
     if keep_output:
         record.output = bytes(out)
-    if record.error is None:
+    if record.error is None and not record.capped:
         pad_bits, pad_value = reader.align_to_byte()
         record.final_pad_bits = pad_bits
         record.final_pad_value = pad_value
@@ -723,7 +759,8 @@ def _accumulate(record: StreamRecord, block: BlockRecord) -> None:
 
 
 def parse_stream(
-    data: bytes, start_bit: int = 0, keep_tokens: bool = False, strict: bool = False
+    data: bytes, start_bit: int = 0, keep_tokens: bool = False, strict: bool = False,
+    max_bytes: int | None = None,
 ) -> StreamRecord:
     """Convenience wrapper used by the feature layer (non-strict by default)."""
     return inflate(
@@ -732,4 +769,5 @@ def parse_stream(
         keep_output=True,
         keep_tokens=keep_tokens,
         strict=strict,
+        max_bytes=max_bytes,
     )
