@@ -11,7 +11,16 @@ Implements proposal section III.A ("How It Works"):
   below a threshold **or** the sample lies farther than a set distance from
   every known profile, so an encoder it was never trained on is rejected
   rather than misattributed (open-set recognition, Scheirer et al.).  Both
-  thresholds are set from the held-out part, not guessed;
+  thresholds are set from the held-out part, not guessed.  The distance is a
+  *novelty score* measured on the decision features only (the encoder's
+  choices, which depend on the encoder more than on the content): the
+  distance to the nearest training stream of each profile, divided by how far
+  apart that profile's own streams typically are, minimised over profiles.
+  During fitting each profile is also treated in turn as unseen, so the
+  report states how often an unseen encoder is rejected by this rule;
+* a second, stricter confidence threshold (``strong_confidence``, 99%
+  held-out precision) marks attributions strong enough to support a
+  "different encoders" finding without exact re-encoding;
 * each prediction is **traced through its trees** to report the features
   that contributed most (see :mod:`dfp.ml.forest`);
 * a second, per-profile forest estimates the **setting** (for example the
@@ -92,12 +101,22 @@ class ProvenanceClassifier:
     seed: int = 12345
     calibration_fraction: float = 0.2
     target_precision: float = 0.95
+    strong_precision: float = 0.99
     distance_quantile: float = 0.99
     reliability_target: float = 0.90
+    #: training streams kept per profile for the novelty score
+    novelty_refs: int = 400
+    #: smallest minimum-evidence size ever applied: below 256 compressed bytes a
+    #: stream holds too few tokens for a held-out measurement on one fifth of
+    #: the sources to be trusted (the measured value is recorded alongside)
+    min_evidence_floor: int = 256
 
     classes: list[str] = field(default_factory=list)
     feature_names: list[str] = field(default_factory=lambda: list(FEATURE_NAMES))
     min_confidence: float = 0.5
+    #: confidence at which held-out attributions reach ``strong_precision``
+    #: (above 1.0 when no threshold reaches it)
+    strong_confidence: float = 1.01
     max_distance: float = float("inf")
     min_evidence_bytes: int = 0
     temperature: float = 1.0
@@ -106,23 +125,68 @@ class ProvenanceClassifier:
     profile_info: dict = field(default_factory=dict)
     #: how and on what the model was trained (dfp version, date, corpus)
     training: dict = field(default_factory=dict)
+    #: what the novelty rule does on held-out data (known and simulated unseen)
+    novelty_info: dict = field(default_factory=dict)
     _forest: RandomForest | None = None
     _mean: np.ndarray | None = None
     _std: np.ndarray | None = None
-    _centroids: np.ndarray | None = None
-    _spread: np.ndarray | None = None
+    _novelty_idx: np.ndarray | None = None
+    _refs: list | None = None  # per class: scaled reference rows (decision subspace)
+    _ref_scale: np.ndarray | None = None
     _setting_models: dict = field(default_factory=dict)
 
     # -- helpers ---------------------------------------------------------------
     def _scale(self, X: np.ndarray) -> np.ndarray:
         return np.clip((X - self._mean) / self._std, -10.0, 10.0)
 
-    def _distances(self, Xs: np.ndarray) -> np.ndarray:
-        """Distance to the nearest profile centroid, in units of that
-        profile's own spread (1.0 = a typical member)."""
-        diff = Xs[:, None, :] - self._centroids[None, :, :]
-        d = np.linalg.norm(diff, axis=2) / self._spread[None, :]
-        return d.min(axis=1)
+    @staticmethod
+    def novelty_feature_index(names: list[str]) -> np.ndarray:
+        """Columns used by the novelty score: the decision features."""
+        return np.array([i for i, n in enumerate(names)
+                         if n.startswith("dec_") or n.startswith("huf_")], dtype=np.int64)
+
+    def _class_novelty(self, Z: np.ndarray, c: int) -> np.ndarray:
+        """Nearest-neighbour distance of each row of ``Z`` to profile ``c``'s
+        reference streams, in units of that profile's typical spacing."""
+        ref = self._refs[c]
+        if ref is None or not len(ref):
+            return np.full(len(Z), np.inf)
+        out = np.empty(len(Z))
+        for start in range(0, len(Z), 256):
+            block = Z[start : start + 256]
+            d = np.sqrt(((block[:, None, :] - ref[None, :, :]) ** 2).sum(axis=2))
+            out[start : start + 256] = d.min(axis=1)
+        return out / self._ref_scale[c]
+
+    def _distances(self, Xs: np.ndarray, exclude: int | None = None) -> np.ndarray:
+        """Novelty score: the smallest per-profile novelty (1.0 = as close as a
+        typical stream of that profile is to its nearest neighbour)."""
+        Z = Xs[:, self._novelty_idx]
+        per = [self._class_novelty(Z, c) for c in range(len(self.classes)) if c != exclude]
+        return np.min(np.vstack(per), axis=0) if per else np.full(len(Z), np.inf)
+
+    def _fit_novelty(self, Xs: np.ndarray, y: np.ndarray, fit_mask: np.ndarray) -> None:
+        rng = np.random.default_rng(self.seed + 99)
+        self._novelty_idx = self.novelty_feature_index(self.feature_names)
+        Z = Xs[:, self._novelty_idx]
+        refs, scales = [], []
+        for c in range(len(self.classes)):
+            rows = np.where(fit_mask & (y == c))[0]
+            if len(rows) > self.novelty_refs:
+                rows = np.sort(rng.choice(rows, self.novelty_refs, replace=False))
+            ref = Z[rows]
+            refs.append(ref)
+            if len(ref) >= 2:
+                d = np.sqrt(((ref[:, None, :] - ref[None, :, :]) ** 2).sum(axis=2))
+                np.fill_diagonal(d, np.inf)
+                nn = d.min(axis=1)
+                # duplicates (tiny streams share all-zero decision features)
+                # would make the typical spacing zero; use the non-zero ones
+                nn = nn[np.isfinite(nn) & (nn > 1e-9)]
+                scales.append(max(float(np.median(nn)) if len(nn) else 1.0, 0.05))
+            else:
+                scales.append(1.0)
+        self._refs, self._ref_scale = refs, np.array(scales)
 
     def _calibrate(self, proba: np.ndarray, t: float | None = None) -> np.ndarray:
         t = self.temperature if t is None else t
@@ -183,15 +247,7 @@ class ProvenanceClassifier:
                                     max_depth=self.max_depth, seed=self.seed)
         self._forest.fit(Xs[fit_mask], y[fit_mask], len(self.classes))
 
-        cent = np.zeros((len(self.classes), Xs.shape[1]))
-        spread = np.ones(len(self.classes))
-        for c in range(len(self.classes)):
-            rows = Xs[fit_mask & (y == c)]
-            if len(rows):
-                cent[c] = rows.mean(axis=0)
-                d = np.linalg.norm(rows - cent[c], axis=1)
-                spread[c] = max(float(np.sqrt(np.mean(d ** 2))), 1e-6)
-        self._centroids, self._spread = cent, spread
+        self._fit_novelty(Xs, y, fit_mask)
 
         if hold.any():
             raw = self._forest.predict_proba(Xs[hold])
@@ -200,25 +256,37 @@ class ProvenanceClassifier:
             cal = self._calibrate(raw)
             conf = cal.max(axis=1)
             correct = cal.argmax(axis=1) == yh
-            self.min_confidence = self._choose_confidence(conf, correct)
+            self.min_confidence = self._choose_confidence(conf, correct, self.target_precision)
+            self.strong_confidence = max(
+                self._choose_confidence(conf, correct, self.strong_precision, never=1.01),
+                self.min_confidence)
             dist = self._distances(Xs[hold])
             self.max_distance = float(np.quantile(dist, self.distance_quantile))
             answered = (conf >= self.min_confidence) & (dist <= self.max_distance)
-            self.min_evidence_bytes = self._reliable_size(sizes[hold], correct, answered)
+            measured = self._reliable_size(sizes[hold], correct, answered)
+            self.min_evidence_bytes = max(measured, self.min_evidence_floor)
+            self.novelty_info = self._novelty_report(Xs[hold], yh, conf, dist)
             self.calibration = {
                 "held_out_rows": int(hold.sum()),
                 "held_out_sources": int(len(set(groups_a[hold].tolist()))),
                 "raw_accuracy": float(correct.mean()),
                 "temperature": self.temperature,
                 "min_confidence": self.min_confidence,
+                "strong_confidence": self.strong_confidence,
                 "max_distance": self.max_distance,
                 "min_evidence_bytes": self.min_evidence_bytes,
+                "min_evidence_bytes_measured": measured,
+                "min_evidence_floor": self.min_evidence_floor,
                 "note": self.calibration_note,
                 "target_precision": self.target_precision,
+                "strong_precision": self.strong_precision,
                 "reliability_target": self.reliability_target,
+                "novelty": self.novelty_info,
             }
         else:
-            self.calibration = {"held_out_rows": 0, "note": "too few sources to hold out"}
+            self.min_evidence_bytes = self.min_evidence_floor
+            self.calibration = {"held_out_rows": 0, "note": "too few sources to hold out",
+                                "min_evidence_bytes": self.min_evidence_bytes}
 
         # per-profile setting models (trained on all rows of the profile)
         self._setting_models = {}
@@ -238,14 +306,45 @@ class ProvenanceClassifier:
                 self._setting_models[name] = {"classes": distinct, "forest": rf}
         return self
 
-    def _choose_confidence(self, conf: np.ndarray, correct: np.ndarray) -> float:
+    def _choose_confidence(self, conf: np.ndarray, correct: np.ndarray,
+                           target: float | None = None, never: float = 0.99) -> float:
         """Smallest threshold whose accepted held-out rows reach the target
-        precision (never below 0.4, so a coin-flip is never accepted)."""
+        precision (never below 0.4, so a coin-flip is never accepted).
+        ``never`` is returned when no threshold reaches it."""
+        target = self.target_precision if target is None else target
         for t in np.linspace(0.4, 0.99, 60):
             keep = conf >= t
-            if keep.sum() >= max(5, int(0.05 * len(conf))) and correct[keep].mean() >= self.target_precision:
+            if keep.sum() >= max(5, int(0.05 * len(conf))) and correct[keep].mean() >= target:
                 return float(round(t, 3))
-        return 0.99
+        return never
+
+    def _novelty_report(self, Xs_hold: np.ndarray, y_hold: np.ndarray,
+                        conf: np.ndarray, dist: np.ndarray) -> dict:
+        """How the two rejection rules act on held-out data.
+
+        Known streams: the share each rule rejects.  Simulated unseen
+        encoders: each profile's held-out streams scored as if that profile
+        had never been trained on (its reference streams removed from the
+        novelty score), giving the share the novelty rule alone rejects.
+        """
+        known = {
+            "rejected_by_confidence": float(np.mean(conf < self.min_confidence)),
+            "rejected_by_novelty": float(np.mean(dist > self.max_distance)),
+            "rejected_by_either": float(np.mean((conf < self.min_confidence)
+                                                | (dist > self.max_distance))),
+        }
+        unseen = {}
+        for c, name in enumerate(self.classes):
+            rows = y_hold == c
+            if rows.sum() < 5:
+                continue
+            d = self._distances(Xs_hold[rows], exclude=c)
+            unseen[name] = round(float(np.mean(d > self.max_distance)), 4)
+        return {"features": "decision features (dec_*, huf_*)",
+                "threshold": self.max_distance,
+                "quantile_of_known": self.distance_quantile,
+                "known": known,
+                "unseen_rejected_by_novelty": unseen}
 
     #: compressed-size band edges used for the minimum-evidence measurement
     SIZE_EDGES = (0, 256, 1024, 4096, 16384, 65536)
@@ -298,7 +397,8 @@ class ProvenanceClassifier:
                 reasons.append(f"confidence {conf:.2f} below {self.min_confidence:.2f}")
             if dist[i] > self.max_distance:
                 reasons.append(
-                    f"distance {dist[i]:.1f} beyond {self.max_distance:.1f} from every known profile")
+                    f"novelty {dist[i]:.1f} beyond {self.max_distance:.1f}: unlike every known "
+                    "profile's encoder decisions")
             abstain = bool(reasons)
             name = self.classes[top[i]]
             setting = setting_conf = None
@@ -352,20 +452,23 @@ class ProvenanceClassifier:
     def save(self, path: str) -> None:
         """Write the model as JSON; a ``.gz`` suffix writes it compressed."""
         blob = {
-            "format": "dfp-model-2",
+            "format": "dfp-model-3",
             "classes": self.classes,
             "feature_names": self.feature_names,
             "temperature": self.temperature,
             "min_confidence": self.min_confidence,
+            "strong_confidence": self.strong_confidence,
             "max_distance": self.max_distance,
             "min_evidence_bytes": self.min_evidence_bytes,
             "calibration": self.calibration,
             "profile_info": self.profile_info,
             "training": self.training,
+            "novelty_info": self.novelty_info,
             "mean": self._mean.tolist(),
             "std": self._std.tolist(),
-            "centroids": self._centroids.tolist(),
-            "spread": self._spread.tolist(),
+            "novelty_index": self._novelty_idx.tolist(),
+            "novelty_refs": [np.round(r, 5).tolist() for r in self._refs],
+            "novelty_scale": self._ref_scale.tolist(),
             "forest": self._forest.to_dict(),
             "settings": {
                 k: {"classes": v["classes"],
@@ -383,7 +486,7 @@ class ProvenanceClassifier:
         opener = gzip.open if str(path).endswith(".gz") else open
         with opener(path, "rt", encoding="utf-8") as fh:
             blob = json.load(fh)
-        if blob.get("format") != "dfp-model-2":
+        if blob.get("format") != "dfp-model-3":
             raise ValueError("model file is from an older dfp version; retrain with `dfp train`")
         if blob["feature_names"] != list(FEATURE_NAMES):
             raise ValueError("model was trained on a different feature set; retrain it")
@@ -392,15 +495,19 @@ class ProvenanceClassifier:
         obj.feature_names = blob["feature_names"]
         obj.temperature = blob["temperature"]
         obj.min_confidence = blob["min_confidence"]
+        obj.strong_confidence = blob.get("strong_confidence", 1.01)
         obj.max_distance = blob["max_distance"]
         obj.min_evidence_bytes = blob["min_evidence_bytes"]
         obj.calibration = blob.get("calibration", {})
         obj.profile_info = blob.get("profile_info", {})
         obj.training = blob.get("training", {})
+        obj.novelty_info = blob.get("novelty_info", {})
         obj._mean = np.array(blob["mean"])
         obj._std = np.array(blob["std"])
-        obj._centroids = np.array(blob["centroids"])
-        obj._spread = np.array(blob["spread"])
+        obj._novelty_idx = np.array(blob["novelty_index"], dtype=np.int64)
+        obj._refs = [np.array(r, dtype=np.float64).reshape(-1, len(obj._novelty_idx))
+                     for r in blob["novelty_refs"]]
+        obj._ref_scale = np.array(blob["novelty_scale"])
         obj._forest = RandomForest.from_dict(blob["forest"])
         obj._setting_models = {
             k: {"classes": v["classes"],

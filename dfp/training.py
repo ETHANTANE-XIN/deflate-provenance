@@ -17,6 +17,13 @@ from .ml import ProvenanceClassifier
 
 def training_mask(corpus: Corpus, exclude_profiles: set[str] | None = None,
                   sources: set[str] | None = None) -> np.ndarray:
+    """Rows to train on.
+
+    ``sources`` restricts the *corpus* rows to a set of source ids (the
+    evaluation's training split).  Application rows added with ``dfp app``
+    carry their own file split and are always included from their 'train'
+    half, never from the 'holdout' half.
+    """
     exclude_profiles = exclude_profiles or set()
 
     def keep(r: dict) -> bool:
@@ -25,7 +32,7 @@ def training_mask(corpus: Corpus, exclude_profiles: set[str] | None = None,
             and not r["synthetic"]
             and r.get("split") != "holdout"
             and r["profile"] not in exclude_profiles
-            and (sources is None or r["source_id"] in sources)
+            and (sources is None or r["source_id"] in sources or r.get("origin") == "app")
         )
 
     return corpus.mask(keep)

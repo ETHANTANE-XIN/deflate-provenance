@@ -33,27 +33,80 @@ from pathlib import Path
 
 import numpy as np
 
+import zlib
+from typing import NamedTuple
+
 from .containers import ContainerReport, METHOD_DEFLATE
 from .deflate import parse_stream
-from .encoders.zlib_encoder import zlib_raw
 from .ml.forest import RandomForest
 
 # --- 1. brute-force zlib -------------------------------------------------------
 
+#: the bytes a stream ends with after Z_SYNC_FLUSH then Z_FINISH: an empty
+#: stored block (LEN 0, NLEN 0xFFFF) and an empty fixed-code final block
+SYNC_FLUSH_TAIL = b"\x00\x00\xff\xff\x03\x00"
+_CHUNK = 1 << 16
+
+
+class ZlibMatch(NamedTuple):
+    """One zlib setting that reproduces a stream byte for byte."""
+
+    level: int
+    mem_level: int
+    sync_flush: bool = False
+
+    def describe(self) -> str:
+        return (f"level {self.level} memLevel {self.mem_level}"
+                + (" + sync flush" if self.sync_flush else ""))
+
+
+def _zlib_reproduces(output: bytes, raw: bytes, level: int, mem_level: int,
+                     sync_flush: bool) -> bool:
+    """Compress ``output`` and compare with ``raw`` as the bytes appear.
+
+    zlib's output with ``Z_NO_FLUSH`` does not depend on how the input is
+    split, so the input is fed in chunks and the comparison stops at the first
+    differing byte -- for a wrong setting that is almost always inside the
+    first block, which makes the 81-setting search cheap even on large entries.
+    """
+    comp = zlib.compressobj(level, zlib.DEFLATED, -15, mem_level, zlib.Z_DEFAULT_STRATEGY)
+    done = 0
+    for start in range(0, len(output), _CHUNK):
+        part = comp.compress(output[start : start + _CHUNK])
+        if part:
+            if raw[done : done + len(part)] != part:
+                return False
+            done += len(part)
+    if sync_flush:
+        tail = comp.flush(zlib.Z_SYNC_FLUSH) + comp.flush(zlib.Z_FINISH)
+    else:
+        tail = comp.flush()
+    return raw[done:] == tail
+
 
 def zlib_reencode_matches(
     raw: bytes, output: bytes | None = None, levels=range(1, 10), mem_levels=range(1, 10),
-) -> list[tuple[int, int]]:
-    """Every (level, memLevel) at which CPython zlib reproduces ``raw`` exactly."""
+) -> list[ZlibMatch]:
+    """Every zlib setting at which CPython zlib reproduces ``raw`` exactly.
+
+    Tries every (level, memLevel) combination, and, when the stream ends the
+    way a sync flush before finishing leaves it, the same combinations with a
+    sync flush.  All matches are returned, because several settings often give
+    identical output.
+    """
     if output is None:
         rec = parse_stream(raw, strict=False)
         if rec.error:
             return []
         output = rec.output
-    return [
-        (lv, ml) for lv in levels for ml in mem_levels
-        if zlib_raw(output, lv, ml) == raw
-    ]
+    if raw is None or output is None:
+        return []
+    found = [ZlibMatch(lv, ml) for lv in levels for ml in mem_levels
+             if _zlib_reproduces(output, raw, lv, ml, False)]
+    if not found and raw.endswith(SYNC_FLUSH_TAIL):
+        found = [ZlibMatch(lv, ml, True) for lv in levels for ml in mem_levels
+                 if _zlib_reproduces(output, raw, lv, ml, True)]
+    return found
 
 
 def zlib_baseline_label(raw: bytes, output: bytes | None = None) -> str:

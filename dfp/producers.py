@@ -10,6 +10,12 @@ named in the container (``docProps/app.xml`` ``Application``, ODF
 ``option_bits`` the ZIP general-purpose-flag compression option (bits 1-2) it
                sets on DEFLATE entries (0 normal, 1 maximum, 2 fast,
                3 super fast);
+``endings``    how it ends every compressed part (see
+               :data:`dfp.aggregate.ENDINGS`): "data" (a final block that
+               carries data, as zlib's finish writes), "flush" (a sync flush
+               and an empty final block) or "stored" (an empty stored final
+               block).  This is structure, not statistics: it is checked on
+               every entry without a model;
 ``basis``      where that knowledge comes from, printed in every report.
 
 Entries are only as good as their basis, so every one records it.  Values
@@ -18,7 +24,7 @@ machine (see the README); the Microsoft Word values come from the team's
 preliminary check described in the proposal.  Producers without verified
 values carry ``None`` and are reported as "not yet profiled" rather than
 guessed.  The team extends the table by profiling saved documents
-(``dfp app add``) and adding an entry here.
+(``python -m dfp app CORPUS DOCS --name NAME``) and adding an entry here.
 
 Order matters: more specific patterns (openpyxl's "Microsoft Excel
 Compatible / Openpyxl") come before the generic ones they contain.
@@ -39,51 +45,66 @@ class Producer:
     excluded: frozenset[str] = field(default_factory=frozenset)
     option_bits: frozenset[int] | None = None
     basis: str = ""
+    endings: frozenset[str] | None = None
 
     def matches(self, claim: str) -> bool:
         return re.search(self.pattern, claim, re.I) is not None
 
 
-_ZLIB = frozenset({"zlib"})
+# Programs that compress through the zlib API get whichever library the
+# platform provides: zlib, zlib-ng in compatibility mode (Fedora 40 and later)
+# or Chromium's fork.
+_ZLIB_API = frozenset({"zlib", "zlib-ng", "chromium-zlib"})
+_DATA = frozenset({"data"})
 _MEASURED = "measured with dfp on the reference machine"
 
 PRODUCERS: list[Producer] = [
     Producer(
         "openpyxl", "openpyxl (Python)", r"openpyxl",
-        expected=_ZLIB, option_bits=frozenset({0}),
-        basis=f"{_MEASURED}: openpyxl 3.1.5 writes through Python's zipfile; "
-              "9/9 parts exactly reproduced by CPython zlib, option bits 'normal'",
+        expected=_ZLIB_API, option_bits=frozenset({0}), endings=_DATA,
+        basis=f"{_MEASURED}: openpyxl 3.1.5 writes through Python's zipfile (the zlib "
+              "API); 9/9 parts exactly reproduced by CPython zlib, each ending with a "
+              "final block that carries data, option bits 'normal'",
     ),
     Producer(
         "libreoffice", "LibreOffice", r"LibreOffice",
-        expected=_ZLIB, option_bits=frozenset({0}),
-        basis=f"{_MEASURED}: LibreOffice 24.2.7.2 (Linux) DOCX, XLSX and ODT; "
-              "25/25 parts exactly reproduced by CPython zlib, option bits 'normal'",
+        expected=_ZLIB_API, option_bits=frozenset({0}), endings=_DATA,
+        basis=f"{_MEASURED}: LibreOffice 24.2.7.2 (Linux) writes through the zlib API; "
+              "30/30 DOCX, XLSX and ODT files end every part with a final block that "
+              "carries data, their parts are exactly reproduced by CPython zlib, and "
+              "option bits are 'normal'",
     ),
     Producer(
         "microsoft-word", "Microsoft Word",
         r"^Microsoft (Office )?Word$|^Microsoft Macintosh Word$",
-        expected=frozenset({"word"}), excluded=_ZLIB, option_bits=frozenset({3}),
-        basis="team's preliminary check (proposal section I): zlib reproduced none "
-              "of the 38 compressed parts of two Word-saved documents under any of "
-              "81 level/memLevel combinations, and Word set 'super fast' on every "
-              "entry.  Note: python-docx also writes 'Microsoft Macintosh Word' "
-              "here while compressing with zlib (measured).",
+        # some Word builds compress parts exactly as zlib level 1 with a sync
+        # flush does, so a zlib match is no evidence against Word
+        expected=frozenset({"word", "zlib"}), option_bits=frozenset({3}),
+        endings=frozenset({"flush"}),
+        basis=f"{_MEASURED}: 60/60 documents saved by Word 16 (Windows) set 'super "
+              "fast' on every entry and end every part with a sync flush and an empty "
+              "final block.  Word builds differ in their match finder: the parts of "
+              "these documents match no zlib setting, while other Word-saved files "
+              "have parts that zlib level 1 with a sync flush reproduces exactly.  "
+              "python-docx writes 'Microsoft Macintosh Word' while compressing with "
+              "zlib's finish and 'normal' option bits (measured), which Word never "
+              "does.  Mac builds of Word were not measured.",
     ),
     Producer(
         "microsoft-excel", "Microsoft Excel", r"^Microsoft (Office )?Excel$|^Microsoft Macintosh Excel$",
-        basis="not yet profiled: add Excel-saved files with `dfp app add`",
+        basis="not yet profiled: add Excel-saved files with `python -m dfp app CORPUS DOCS --name excel`",
     ),
     Producer(
         "microsoft-powerpoint", "Microsoft PowerPoint",
         r"^Microsoft (Office )?PowerPoint$|^Microsoft Macintosh PowerPoint$",
-        basis="not yet profiled: add PowerPoint-saved files with `dfp app add`",
+        basis="not yet profiled: add PowerPoint-saved files with `python -m dfp app CORPUS DOCS --name powerpoint`",
     ),
     Producer(
         "jdk-jar", "JDK jar tool", r"^\d+(\.\d+)*\S*\s*\([^)]*\)$",
-        expected=_ZLIB, option_bits=frozenset({0}),
-        basis=f"{_MEASURED}: `jar` from OpenJDK 21.0.10 (java.util.zip, built on "
-              "zlib); 2/2 parts exactly reproduced by CPython zlib, option bits 'normal'",
+        expected=_ZLIB_API, option_bits=frozenset({0}), endings=_DATA,
+        basis=f"{_MEASURED}: `jar` from OpenJDK 21.0.10 (java.util.zip, the zlib API); "
+              "2/2 parts exactly reproduced by CPython zlib, each ending with a final "
+              "block that carries data, option bits 'normal'",
     ),
 ]
 
@@ -116,8 +137,29 @@ def check_producer(
     verdict: str,
     model_profiles: list[str],
     option_bits_seen: list[int] | None,
+    verdict_established: bool = True,
+    zlib_proofs: int = 0,
 ) -> list[Finding]:
-    """Compare the claimed producer with the stream evidence."""
+    """Compare the claimed producer with the stream evidence.
+
+    A contradiction is only reported when the verdict is *established* (exact
+    re-encoding, or confidence at the model's high-precision threshold);
+    otherwise the claim can be neither confirmed nor contradicted.
+    """
+    if not verdict_established and verdict != "unknown":
+        claim = claims.get("producer")
+        producer = match_producer(claim) if claim else None
+        if producer is not None and (verdict in producer.excluded or (
+                producer.expected is not None and verdict not in producer.expected)):
+            where = claims.get("source", "container")
+            out = [Finding(
+                "cannot-confirm", "producer",
+                f"{where} names {producer.label}; the streams lean to '{verdict}', which "
+                f"does not match it, but that attribution is neither confirmed by exact "
+                "re-encoding nor high-confidence, so the claim is not contradicted")]
+            return out + [f for f in check_producer(claims, verdict, model_profiles,
+                                                    option_bits_seen, True, zlib_proofs)
+                          if f.check == "option-bits"]
     findings: list[Finding] = []
     claim = claims.get("producer")
     if not claim:
@@ -157,7 +199,7 @@ def check_producer(
                 "cannot-confirm", "producer",
                 f"{where} names {producer.label}; its profile "
                 f"{sorted(producer.expected)} is not in this model yet (add saved "
-                f"files with `dfp app add`), and '{verdict}' is not excluded for it"))
+                f"files with `python -m dfp app CORPUS DOCS --name {sorted(producer.expected)[0]}`), and '{verdict}' is not excluded for it"))
     elif producer.expected is not None:
         findings.append(Finding(
             "consistent", "producer",

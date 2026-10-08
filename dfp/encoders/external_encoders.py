@@ -456,6 +456,12 @@ def _seven_zip() -> str | None:
         path = shutil.which(name)
         if path:
             return path
+    # the Windows installer does not put 7-Zip on PATH
+    for root in (os.environ.get("ProgramFiles"), os.environ.get("ProgramFiles(x86)")):
+        if root:
+            cand = Path(root) / "7-Zip" / "7z.exe"
+            if cand.is_file():
+                return str(cand)
     return None
 
 
@@ -523,7 +529,22 @@ class LibarchiveEncoder(Encoder):
     _version: str | None = None
 
     def _bin(self) -> str | None:
-        return shutil.which("bsdtar")
+        exe = shutil.which("bsdtar")
+        if exe:
+            return exe
+        # Windows 10 and later ship bsdtar as tar.exe in System32
+        windir = os.environ.get("SystemRoot") or os.environ.get("WINDIR")
+        if windir:
+            cand = Path(windir) / "System32" / "tar.exe"
+            if cand.is_file():
+                try:
+                    out = subprocess.run([str(cand), "--version"], capture_output=True,
+                                         text=True, timeout=20).stdout
+                except Exception:
+                    return None
+                if "bsdtar" in out:
+                    return str(cand)
+        return None
 
     def available(self) -> bool:
         exe = self._bin()

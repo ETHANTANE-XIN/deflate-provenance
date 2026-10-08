@@ -217,8 +217,11 @@ def _matching_features(record: StreamRecord, f: dict[str, float]) -> None:
     usable = [t for t in toks if t[0] + MIN_MATCH <= len(buf)]
     if not usable:
         return
-    step = max(1, len(usable) // MAX_POSITIONS)
-    sample = usable[::step][:MAX_POSITIONS]
+    n = len(usable)
+    if n <= MAX_POSITIONS:
+        sample = usable
+    else:  # evenly spaced over the whole stream, first and last included
+        sample = [usable[(i * (n - 1)) // (MAX_POSITIONS - 1)] for i in range(MAX_POSITIONS)]
 
     n_match = longest = 0
     shortfall_sum = 0.0
@@ -288,10 +291,15 @@ def _matching_features(record: StreamRecord, f: dict[str, float]) -> None:
 
 
 def _block_features(record: StreamRecord, f: dict[str, float]) -> None:
-    blocks = record.blocks
+    # Empty blocks are flush markers and end-of-stream terminators, not choices
+    # about where to split content; :mod:`dfp.features` describes them itself.
+    blocks = [b for b in record.blocks if b.out_size > 0]
     coded = [b for b in blocks if b.btype != BTYPE_STORED]
-    # symbols per non-final block (EOB included, as encoders count it)
-    nonfinal = [b.n_tokens + 1 for b in coded if not b.bfinal]
+    # symbols per block except the last block that carries data (EOB included,
+    # as encoders count it); a flush or an empty terminator after it does not
+    # make that last block an interior one
+    last = blocks[-1] if blocks else None
+    nonfinal = [b.n_tokens + 1 for b in coded if b is not last]
     if nonfinal:
         mode, mode_n = Counter(nonfinal).most_common(1)[0]
         f["dec_blk_tokens_mode_frac"] = mode_n / len(nonfinal)

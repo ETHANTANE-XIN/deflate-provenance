@@ -75,6 +75,7 @@ def _reproducing_library(raw: bytes, output: bytes) -> str | None:
 def add_app_files(corpus: Corpus, directory: str | Path, name: str,
                   description: str = "") -> dict:
     """Add saved documents in ``directory`` to ``corpus`` as application ``name``."""
+    directory = Path(directory)
     docs = list_documents(directory)
     if not docs:
         raise ValueError(f"no documents found in {directory}")
@@ -88,9 +89,14 @@ def add_app_files(corpus: Corpus, directory: str | Path, name: str,
                 continue
             streams.append((path, split, s, record, feats))
 
-    # does an existing library reproduce these streams?
+    # does an existing library reproduce these streams?  Only parts large
+    # enough for encoders to diverge are checked: tiny parts can coincide
+    # byte for byte across encoders (see aggregate.PROOF_MIN_BYTES)
+    from .aggregate import PROOF_MIN_BYTES
+
     reproduced: dict[str | None, int] = {}
-    for _, _, s, record, _ in streams[:200]:
+    large = [x for x in streams if x[3].compressed_bytes >= PROOF_MIN_BYTES] or streams
+    for _, _, s, record, _ in large[:200]:
         lib = _reproducing_library(s.payload[: record.compressed_bytes], record.output)
         reproduced[lib] = reproduced.get(lib, 0) + 1
     checked = sum(reproduced.values())
@@ -98,8 +104,17 @@ def add_app_files(corpus: Corpus, directory: str | Path, name: str,
     shares = best is not None and reproduced[best] / checked >= 0.95
     profile = best if shares else name
 
+    # documents saved from one template share byte-identical parts (theme,
+    # font table, settings): a stream that also occurs in a training document
+    # is training data, so the held-out half is never scored on memorised bytes
+    train_hashes = {hashlib.sha256(s.payload).hexdigest()
+                    for _, split, s, _, _ in streams if split == "train"}
+    shared = 0
     X, rows = [], []
     for path, split, s, record, feats in streams:
+        if split == "holdout" and hashlib.sha256(s.payload).hexdigest() in train_hashes:
+            split = "train"
+            shared += 1
         X.append(features_to_vector(feats))
         digest = hashlib.sha256(path.read_bytes()).hexdigest()[:16]
         rows.append({
@@ -127,6 +142,13 @@ def add_app_files(corpus: Corpus, directory: str | Path, name: str,
         "streams": len(rows),
         "train_files": sum(1 for d in docs if file_split(d) == "train"),
         "holdout_files": sum(1 for d in docs if file_split(d) == "holdout"),
+        # streams of held-out documents identical to a training document's,
+        # moved to training
+        "holdout_streams_shared_with_training": shared,
+        # which documents were kept aside, so the team can test with exactly
+        # those (paths relative to the directory, so subfolders are kept apart)
+        "holdout_file_names": sorted(d.relative_to(directory).as_posix()
+                                     for d in docs if file_split(d) == "holdout"),
         "reproduced_by": {str(k): v for k, v in reproduced.items()},
         "shares_library": shares,
     }
@@ -202,54 +224,147 @@ def edit_with_python(data: bytes, entry: str, editor: str = "zlib") -> bytes:
     return replace_entry(data, entry, new, raw)
 
 
-def _word_claim(data: bytes) -> bytes:
-    """Rewrite the claimed producer to Microsoft Word and copy Word's option
-    bits (super fast) onto every entry, leaving all DEFLATE streams intact."""
+def _claim_with_bits(data: bytes, producer: str, option_bits: int) -> bytes:
+    """Rewrite the claimed producer and set the ZIP option bits every DEFLATE
+    entry carries to ``option_bits``, leaving all DEFLATE streams intact (a
+    careful forger copies the claimed writer's header habits too)."""
     entries, _ = read_zip(data)
     tmpl = next(e for e in entries if e.method == METHOD_DEFLATE)
     from dataclasses import replace as dc_replace
 
     from .zipwriter import write_zip
 
-    fake_template = write_zip([dc_replace(tmpl, flags=(tmpl.flags & ~0x06) | 0x06)])
-    return impersonate(data, fake_template, producer_claim="Microsoft Office Word")
+    fake_template = write_zip([dc_replace(tmpl, flags=(tmpl.flags & ~0x06) | (option_bits << 1))])
+    return impersonate(data, fake_template, producer_claim=producer)
+
+
+def _word_claim(data: bytes) -> bytes:
+    """Rewrite the claimed producer to Microsoft Word and copy Word's option
+    bits (super fast) onto every entry, leaving all DEFLATE streams intact."""
+    return _claim_with_bits(data, "Microsoft Office Word", 3)
+
+
+#: non-zlib encoders tried, in order, to edit a part of a zlib-written file
+EDITOR_PREFERENCE = ("go", "7zip", "node", "libdeflate", "zlib-ng", "zopfli")
+
+
+def pick_editor(avoid_profile: str) -> str | None:
+    """An installed encoder whose profile differs from ``avoid_profile``.
+
+    A Python script (zlib) edits files written by anything else; files that
+    are themselves zlib are edited by the first available non-zlib encoder.
+    """
+    if avoid_profile != "zlib":
+        return "zlib"
+    from .encoders import get_encoder
+
+    for name in EDITOR_PREFERENCE:
+        try:
+            enc = get_encoder(name)
+        except KeyError:
+            continue
+        if enc.available() and enc.library != "zlib":
+            return name
+    return None
+
+
+def rewrite_target(claim: str | None) -> tuple[str, int]:
+    """A false producer claim the file's own claim contradicts.
+
+    Word documents are rewritten to claim LibreOffice (with its 'normal'
+    option bits); anything else is rewritten to claim Microsoft Word (with
+    Word's 'super fast' bits), so the test never rewrites a claim to itself.
+    """
+    from .producers import match_producer
+
+    prod = match_producer(claim)
+    if prod is not None and prod.key == "microsoft-word":
+        return "LibreOffice/24.2.7.2$Linux_X86_64", 0
+    return "Microsoft Office Word", 3
+
+
+def _editor_profile(editor: str) -> str:
+    """The profile an editor's output belongs to."""
+    if editor == "zlib":
+        return "zlib"
+    from .encoders import get_encoder
+
+    return get_encoder(editor).library
+
+
+def editor_reproduces(data: bytes, entry: str, editor: str) -> bool:
+    """Does ``editor``'s encoder reproduce the *original* ``entry`` exactly?
+
+    Then the file was written by that encoder, and an edit recompressed by it
+    is byte-for-byte what the writer would have produced: no method can detect
+    it.  Decided from the bytes, not from the model's verdict.
+    """
+    from .aggregate import reproducing_setting
+    from .deflate import parse_stream
+
+    target = next(e for e in read_zip(data)[0] if e.name == entry)
+    output = parse_stream(target.raw).output
+    if editor == "zlib":
+        return bool(zlib_reencode_matches(target.raw, output))
+    return reproducing_setting(_editor_profile(editor), target.raw, output) is not None
 
 
 def evaluate_real_files(clf, files: list[Path], editor: str = "zlib",
-                        cross_editor: str | None = "go") -> dict:
-    """False alarms, edit detection and producer-rewrite detection."""
+                        cross_editor: str | None = "auto") -> dict:
+    """False alarms, edit detection and producer-rewrite detection.
+
+    Files are analysed exactly as ``dfp analyse`` does (exact re-encoding on).
+    ``editor`` edits one part with a Python script (zlib); ``cross_editor``
+    edits it with a non-zlib encoder ("auto" picks an installed one, None
+    skips that test).  An edit is only scored where the editor's encoder does
+    not reproduce the original part exactly (decided from the bytes, see
+    ``editor_reproduces``): a zlib-written file recompressed by zlib is
+    byte-for-byte what its writer would have produced, so no method can
+    detect it (those files are counted as ``*_same_encoder_skipped``).
+    """
+    from .evaluate import edit_outcome
+
+    if cross_editor == "auto":
+        cross_editor = pick_editor("zlib")
     genuine = []
     edits = []
     cross = []
     rewrites = []
+    skipped = {"edit": 0, "cross": 0}
     for path in files:
         data = path.read_bytes()
-        v = analyse_archive(str(path), clf, data=data, reencode=False)
+        v = analyse_archive(str(path), clf, data=data)
         genuine.append({
             "file": path.name, "claim": v.claims.get("producer"), "profile": v.profile,
-            "setting": v.setting, "flagged": v.inconsistent,
+            "setting": v.setting, "status": v.status, "flagged": v.inconsistent,
             "findings": [f.text for f in v.findings if f.kind == "inconsistent"],
         })
         entry = _largest_deflate_entry(data)
         if entry is None:
             continue
-        for ed, bucket in ((editor, edits), (cross_editor, cross)):
+        for ed, bucket, key in ((editor, edits, "edit"), (cross_editor, cross, "cross")):
             if not ed:
                 continue
+            if editor_reproduces(data, entry, ed):
+                skipped[key] += 1
+                continue
             edited = edit_with_python(data, entry, ed)
-            ve = analyse_archive(str(path), clf, data=edited, reencode=False)
-            from .evaluate import edit_outcome
-
-            bucket.append({"file": path.name, "entry": entry, **edit_outcome(ve, entry),
+            ve = analyse_archive(str(path), clf, data=edited)
+            bucket.append({"file": path.name, "entry": entry, "editor": ed,
+                           **edit_outcome(ve, entry),
                            "edited_entry_label": next(
                                (e.label for e in ve.entries if e.name == entry), None)})
         if any(e.name == "docProps/app.xml" for e in read_zip(data)[0]):
-            vr = analyse_archive(str(path), clf, data=_word_claim(data), reencode_limit=3)
+            target, bits = rewrite_target(v.claims.get("producer"))
+            vr = analyse_archive(str(path), clf, data=_claim_with_bits(data, target, bits))
             rewrites.append({
-                "file": path.name, "profile_before": v.profile, "profile_after": vr.profile,
+                "file": path.name, "claim_before": v.claims.get("producer"),
+                "claim_after": target, "profile_before": v.profile, "profile_after": vr.profile,
                 "kept_attribution": vr.profile == v.profile,
                 "flagged": any(f.kind == "inconsistent" and f.check in ("producer", "option-bits")
                                for f in vr.findings),
+                "flagged_by_streams": any(f.kind == "inconsistent" and f.check == "producer"
+                                          for f in vr.findings),
             })
 
     def rate(items, key):
@@ -262,12 +377,17 @@ def evaluate_real_files(clf, files: list[Path], editor: str = "zlib",
         "edit_editor": editor,
         "edit_flagged_rate": rate(edits, "flagged"),
         "edit_localised_rate": rate(edits, "localised"),
+        "edit_same_encoder_skipped": skipped["edit"],
         "edits": edits,
         "cross_editor": cross_editor,
         "cross_edit_flagged_rate": rate(cross, "flagged"),
         "cross_edit_localised_rate": rate(cross, "localised"),
+        "cross_edit_same_encoder_skipped": skipped["cross"],
         "cross_edits": cross,
+        "inconclusive_rate": (sum(1 for g in genuine if g["status"] == "inconclusive")
+                              / len(genuine)) if genuine else None,
         "rewrite_flag_rate": rate(rewrites, "flagged"),
+        "rewrite_flagged_by_streams_rate": rate(rewrites, "flagged_by_streams"),
         "rewrite_kept_attribution_rate": rate(rewrites, "kept_attribution"),
         "rewrites": rewrites,
     }
